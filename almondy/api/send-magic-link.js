@@ -4,7 +4,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { email } = req.body;
+  const { email, origin } = req.body;
+  const appOrigin = origin || "https://almondy.app";
 
   if (!email || !email.includes("@")) {
     return res.status(400).json({ error: "Invalid email" });
@@ -27,7 +28,7 @@ export default async function handler(req, res) {
             <p style="color:#888;font-size:14px;line-height:1.7;margin:0 0 28px">
               Click the button below to sign in. This link expires in 15 minutes.
             </p>
-            <a href="https://almondy.app?magic=true&email=${encodeURIComponent(email)}"
+            <a href="${appOrigin}?magic=true&email=${encodeURIComponent(email)}"
                style="display:inline-block;background:#fff;color:#000;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:700;font-size:14px">
               Sign in to PayChaser →
             </a>
