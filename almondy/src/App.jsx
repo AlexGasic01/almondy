@@ -1762,7 +1762,7 @@ export default function App() {
       {page === "systems"    && <SystemsPage setPage={handleSetPage} />}
       {page === "webdev" && <WebDevPage setPage={handleSetPage} />}
       {page === "paychaser"  && <PaychaserPage setPage={handleSetPage} />}
-      {page === "testimonials" && <TestimonialsPage setPage={handleSetPage} />}  // placeholder for later
+      {page === "testimonials" && <TestimonialsPage setPage={handleSetPage} />}
       {page === "pricing"    && <PricingPage  setPage={handleSetPage} />}
 
       {/* ── App ── */}
