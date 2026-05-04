@@ -15,17 +15,14 @@ const AlmondLogo = ({ size = 24, fill = "#fff" }) => (
 );
 
 const SplashScreen = ({ onDone }) => {
-  const [phase, setPhase] = useState("center");
+  const [phase, setPhase] = useState("center"); // "center" | "shift" | "out"
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("shift"), 700);
+    const t1 = setTimeout(() => setPhase("shift"), 600);
     const t2 = setTimeout(() => setPhase("out"),   2000);
     const t3 = setTimeout(() => onDone(),          2550);
     return () => [t1, t2, t3].forEach(clearTimeout);
   }, []);
-
-  // Width of text so we can offset icon by exactly half of it
-  const textWidth = 160; // approx px width of "Almondy" at font-size 34
 
   return (
     <div style={{
@@ -36,56 +33,43 @@ const SplashScreen = ({ onDone }) => {
       transition: phase === "out" ? "opacity 0.55s cubic-bezier(0.4,0,0.2,1)" : "none",
       pointerEvents: "none",
     }}>
-      <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+      <div style={{ position: "relative", height: 48 }}>
 
-        {/* Icon — starts centered, shifts left by half the text width */}
-        <div style={{
-          transform: phase === "shift"
-            ? `translateX(-${textWidth / 2}px)`
-            : "translateX(0px)",
-          transition: phase === "shift"
-            ? "transform 0.6s cubic-bezier(0.22,1,0.36,1)"
-            : "none",
-          zIndex: 1,
-          flexShrink: 0,
-        }}>
-          <svg
-            viewBox="0 0 561.91 628.53"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ height: 44, width: "auto", fill: "white", display: "block" }}
-          >
-            <path d="M2.37,433.93c5.95,44.84,22.67,84.11,49.04,115.98.32-16.47,1.63-33.27,4.01-50.39,18.36-132.33,95.72-262.99,212.25-358.49,67.05-54.96,138.22-95.7,207.27-121.48-99.64-54.78-268.15,9.03-384.82,148.69C22.66,248.99-9.33,345.84,2.37,433.93Z"/>
-            <path d="M271.8,622.59c86.78-19.14,166.84-82.32,219.66-173.34,77.69-133.88,90.98-284.25,40.57-372.28-7.71,47.74-23.46,95.95-47.04,142.29-41.7,81.94-97.72,149.54-157.93,196.54-7.26,5.67-15.58-6.84-8.81-13.24,51.1-48.35,98.09-110.98,134.89-183.96,26.67-52.89,44.21-107.7,52.39-161.59-25.45,30.76-52.9,57.6-81.31,79.78-7.2,5.63-15.46-6.8-8.75-13.15,25.62-24.25,50.19-52.14,72.95-83.13-63.05,28.29-127.15,67.93-188.21,118.35-128.11,105.78-212.81,248.36-232.38,391.17-.72,5.27-1.34,10.5-1.88,15.7,8.66,8.54,18.12,16.44,28.37,23.61,51.43,36.01,112.81,47.48,177.49,33.24Z"/>
-          </svg>
-        </div>
-
-        {/* Text — slides out to the right, offset right by half its own width */}
-        <div style={{
-          position: "absolute",
-          left: "100%",
-          transform: phase === "shift"
-            ? `translateX(calc(-${textWidth / 2}px + 12px))`
-            : `translateX(calc(-${textWidth / 2}px + 12px))`,
-          clipPath: phase === "shift"
-            ? "inset(0% 0% 0% 0%)"
-            : "inset(0% 100% 0% 0%)",
-          transition: phase === "shift"
-            ? "clip-path 0.55s 0.1s cubic-bezier(0.22,1,0.36,1)"
-            : "none",
-        }}>
-          <span style={{
-            display: "block",
-            fontSize: 34,
-            fontWeight: 800,
-            letterSpacing: "-1.5px",
-            color: "#ffffff",
-            paddingLeft: 12,
-            whiteSpace: "nowrap",
-            fontFamily: "Inter, sans-serif",
+        {/* Full wordmark SVG — sized to match */}
+        <svg
+          viewBox="0 0 1525.07 365.74"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ height: 48, width: "auto", display: "block", overflow: "visible" }}
+        >
+          {/* TEXT — revealed by clipPath sweeping left to right */}
+          <g style={{
+            clipPath: phase === "shift" ? "inset(0% 0% 0% 0%)" : "inset(0% 100% 0% 0%)",
+            transition: phase === "shift" ? "clip-path 0.55s 0.1s cubic-bezier(0.22,1,0.36,1)" : "none",
           }}>
-            Almondy
-          </span>
-        </div>
+            <text
+              fontFamily="Inter, sans-serif"
+              fontSize="306.1"
+              fontWeight="600"
+              fill="white"
+              transform="translate(221.25 264.4)"
+            >
+              <tspan x="0" y="0">Almon</tspan>
+              <tspan x="940.13" y="0">d</tspan>
+              <tspan x="1130.99" y="0">y</tspan>
+            </text>
+          </g>
+
+          {/* ICON — always visible, scales in on mount */}
+          <g style={{
+            transformOrigin: "100px 180px",
+            opacity: phase === "center" ? 0 : 1,
+            transform: phase === "center" ? "scale(0.85)" : "scale(1)",
+            transition: "opacity 0.4s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+          }}>
+            <path fill="white" d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
+            <path fill="white" d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
+          </g>
+        </svg>
 
       </div>
     </div>
