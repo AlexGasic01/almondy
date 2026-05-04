@@ -18,12 +18,22 @@ const SplashScreen = ({ onDone }) => {
   const [phase, setPhase] = useState("hidden");
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("icon"),  150);
-    const t2 = setTimeout(() => setPhase("text"),  900);
-    const t3 = setTimeout(() => setPhase("out"),   2200);
-    const t4 = setTimeout(() => onDone(),          2750);
+    const t1 = setTimeout(() => setPhase("icon"), 150);
+    const t2 = setTimeout(() => setPhase("text"), 900);
+    const t3 = setTimeout(() => setPhase("out"),  2200);
+    const t4 = setTimeout(() => onDone(),         2750);
     return () => [t1,t2,t3,t4].forEach(clearTimeout);
   }, []);
+
+  const H = 52;
+  // viewBox is 1525.07 x 365.74 — scale to height
+  const W = Math.round(H * 1525.07 / 365.74); // ~217px
+
+  const sharedSvgStyle = {
+    position: "absolute", top: 0, left: 0,
+    height: H, width: W,
+    display: "block",
+  };
 
   return (
     <div style={{
@@ -34,46 +44,56 @@ const SplashScreen = ({ onDone }) => {
       transition: phase === "out" ? "opacity 0.6s cubic-bezier(0.4,0,0.2,1)" : "none",
       pointerEvents: "none",
     }}>
-      <div style={{ display: "flex", alignItems: "center" }}>
+      {/* Container exactly the size of the wordmark */}
+      <div style={{ position: "relative", width: W, height: H }}>
 
-        {/* ICON — fades + scales in */}
-        <div style={{
-          flexShrink: 0,
-          opacity: phase === "hidden" ? 0 : 1,
-          transform: phase === "hidden" ? "scale(0.88)" : "scale(1)",
-          transition: "opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1)",
-        }}>
-          <svg viewBox="0 0 210 365.74" xmlns="http://www.w3.org/2000/svg"
-            style={{ height: 52, width: "auto", fill: "white", display: "block" }}>
+        {/* LAYER 1: icon only — fades + scales in from center of icon */}
+        <svg
+          viewBox="0 0 1525.07 365.74"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{
+            ...sharedSvgStyle,
+            opacity: phase === "hidden" ? 0 : 1,
+            transform: phase === "hidden" ? "scale(0.88)" : "scale(1)",
+            transformOrigin: "7% 50%",
+            transition: phase !== "hidden"
+              ? "opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1)"
+              : "none",
+          }}
+        >
+          <g fill="white">
             <path d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
             <path d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
-          </svg>
-        </div>
+          </g>
+        </svg>
 
-        {/* TEXT — expands from 0 width out to the right */}
-        <div style={{
-          overflow: "hidden",
-          maxWidth: phase === "text" || phase === "out" ? 280 : 0,
-          opacity: phase === "text" || phase === "out" ? 1 : 0,
-          transition: phase === "text"
-            ? "max-width 0.65s cubic-bezier(0.22,1,0.36,1), opacity 0.01s"
-            : "none",
-          whiteSpace: "nowrap",
-        }}>
-          <span style={{
-            display: "block",
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 600,
-            fontSize: 38,
-            letterSpacing: "-1.5px",
-            color: "white",
-            paddingLeft: 10,
-            lineHeight: 1,
-            fontOpticalSizing: "auto",
-          }}>
-            Almondy
-          </span>
-        </div>
+        {/* LAYER 2: text only — clips from right edge of icon outward */}
+        {/* Icon ends at x=210 out of 1525.07 = 13.77% of viewBox width */}
+        <svg
+          viewBox="0 0 1525.07 365.74"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{
+            ...sharedSvgStyle,
+            clipPath: phase === "text" || phase === "out"
+              ? "inset(0 0 0 0)"
+              : "inset(0 0 0 13.77%)",
+            transition: phase === "text"
+              ? "clip-path 0.65s cubic-bezier(0.22,1,0.36,1)"
+              : "none",
+          }}
+        >
+          <text
+            fill="white"
+            fontFamily="Inter18pt-SemiBold, 'Inter 18pt', Inter, sans-serif"
+            fontWeight="600"
+            fontSize="306.1"
+            transform="translate(221.25 264.4)"
+          >
+            <tspan x="0" y="0">Almon</tspan>
+            <tspan letterSpacing="0" x="940.13" y="0">d</tspan>
+            <tspan x="1130.99" y="0">y</tspan>
+          </text>
+        </svg>
 
       </div>
     </div>
