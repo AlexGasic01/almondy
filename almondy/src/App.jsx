@@ -154,7 +154,9 @@ const Nav = ({ page, setPage }) => {
   const links = [
     { id: "home", label: "Home" },
     { id: "systems", label: "Systems" },
+    { id: "webdev", label: "Web Development" },
     { id: "paychaser", label: "PayChaser" },
+    { id: "testimonials", label: "Testimonials" },
   ];
   return (
     <nav style={{
@@ -1522,6 +1524,145 @@ const handleUpgrade = async (planId) => {
 };
 
 /* ════════════════════════════════════════════
+   PAGE: WEB DEVELOPMENT
+════════════════════════════════════════════ */
+const WebDevPage = ({ setPage }) => {
+  const [openFaq, setOpenFaq] = useState(null);
+
+  const services = [
+    { icon: "⚡", title: "Landing Pages", desc: "High-converting single pages built to turn visitors into customers. Fast, focused, and designed to sell.", price: "From $400" },
+    { icon: "◈", title: "Business Websites", desc: "Multi-page sites that represent your business properly. Clean, professional, and built to last.", price: "From $800" },
+    { icon: "⚙️", title: "Web Apps", desc: "Custom tools, dashboards, and internal systems. If you can describe it, it can be built.", price: "Custom quote" },
+    { icon: "↗", title: "Redesigns", desc: "Got an existing site that's embarrassing you? Full redesign with modern UI and better performance.", price: "From $500" },
+  ];
+
+  const process = [
+    { step: "01", title: "Discovery call", desc: "15 minutes. You tell me what you need, I tell you if I can build it and for how much." },
+    { step: "02", title: "Design & build", desc: "I design and develop simultaneously — no lengthy back-and-forth. You see real progress fast." },
+    { step: "03", title: "Review & refine", desc: "You get two rounds of revisions. Most clients only need one." },
+    { step: "04", title: "Launch", desc: "Site goes live. I handle deployment, domain setup, and make sure everything works." },
+  ];
+
+  const faqs = [
+    ["How long does it take?", "Landing pages take 3–5 days. Full business sites take 1–2 weeks. Web apps depend on scope — we'll agree on a timeline before I start."],
+    ["What do you build with?", "React for web apps and interactive sites. Plain HTML/CSS/JS for simpler sites where speed matters most. Whatever fits the job."],
+    ["Do you do ongoing maintenance?", "Yes — I offer a simple monthly retainer for updates, fixes, and small additions. Ask me about it when we chat."],
+    ["Can you redesign my existing site?", "Absolutely. Send me the link and I'll give you an honest opinion and a quote."],
+    ["What do you need from me to get started?", "A brief description of what you want, any branding you have (logo, colours), and content if you have it. I can help with content too if needed."],
+  ];
+
+  return (
+    <div style={{ paddingTop: 62 }}>
+      {/* HERO */}
+      <div style={{ position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 60% at 50% 40%, rgba(40,40,40,0.45) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "relative", zIndex: 1, maxWidth: 900, margin: "0 auto", padding: "96px 48px 80px", textAlign: "center", animation: "fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--green-dim)", border: "1px solid rgba(34,197,94,0.28)", borderRadius: 999, padding: "5px 14px 5px 10px", fontSize: 12, fontWeight: 600, color: "var(--green)", marginBottom: 32, fontFamily: "var(--mono)" }}>
+            <span className="badge-dot" /> Taking on clients
+          </div>
+          <h1 style={{ fontSize: "clamp(42px, 6vw, 78px)", fontWeight: 800, letterSpacing: "-3px", lineHeight: 1.02, color: "var(--white)", marginBottom: 22 }}>
+            Websites that work<br />as hard as you do.
+          </h1>
+          <p style={{ fontSize: 16, color: "#858585", lineHeight: 1.8, maxWidth: 500, margin: "0 auto 40px" }}>
+            Clean, fast, and built to convert. <strong style={{ color: "#888" }}>No templates. No bloat.</strong> Just a site your clients can trust and your business can grow with.
+          </p>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <button style={{ background: "var(--white)", color: "var(--black)", padding: "13px 28px", fontSize: 14, fontWeight: 700, borderRadius: 8, letterSpacing: "-0.3px", border: "none", cursor: "pointer", fontFamily: "var(--font)" }}>Get a Free Quote →</button>
+            <a href="#process" style={{ background: "transparent", color: "#888", border: "1px solid rgba(255,255,255,0.12)", padding: "13px 28px", fontSize: 14, fontWeight: 600, borderRadius: 8, letterSpacing: "-0.3px", display: "inline-flex", alignItems: "center" }}>See How It Works</a>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
+
+      {/* SERVICES */}
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "100px 48px 0" }}>
+        <p style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: "2.5px", textTransform: "uppercase", color: "var(--muted)", marginBottom: 16, fontFamily: "var(--mono)" }}>What I Build</p>
+        <h2 style={{ fontSize: "clamp(30px, 3.5vw, 48px)", fontWeight: 800, letterSpacing: "-2px", lineHeight: 1.05, color: "var(--white)", marginBottom: 48 }}>
+          Pick your project.
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
+          {services.map(({ icon, title, desc, price }) => {
+            const [pos, setPos] = useState({ x: 50, y: 50 });
+            return (
+              <div key={title}
+                onMouseMove={e => { const r = e.currentTarget.getBoundingClientRect(); setPos({ x: ((e.clientX - r.left) / r.width * 100).toFixed(1), y: ((e.clientY - r.top) / r.height * 100).toFixed(1) }); }}
+                style={{ position: "relative", border: "1px solid var(--border)", borderRadius: 14, padding: 36, background: "#0c0c0c", overflow: "hidden", display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at ${pos.x}% ${pos.y}%, rgba(255,255,255,0.03) 0%, transparent 60%)`, pointerEvents: "none" }} />
+                <div style={{ fontSize: 22 }}>{icon}</div>
+                <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.8px", color: "var(--white)" }}>{title}</div>
+                <p style={{ fontSize: 13.5, color: "#858585", lineHeight: 1.7, flex: 1 }}>{desc}</p>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--green-dim)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 999, padding: "4px 12px", fontSize: 11.5, fontWeight: 700, color: "var(--green)", width: "fit-content", marginTop: 4 }}>{price}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* PROCESS */}
+      <div id="process" style={{ maxWidth: 1100, margin: "0 auto", padding: "100px 48px" }}>
+        <p style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: "2.5px", textTransform: "uppercase", color: "var(--muted)", marginBottom: 16, fontFamily: "var(--mono)" }}>The Process</p>
+        <h2 style={{ fontSize: "clamp(30px, 3.5vw, 48px)", fontWeight: 800, letterSpacing: "-2px", lineHeight: 1.05, color: "var(--white)", marginBottom: 56 }}>
+          Simple. No surprises.
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+          {process.map(({ step, title, desc }) => (
+            <div key={step} style={{ border: "1px solid var(--border)", borderRadius: 14, padding: "28px 24px", background: "#0c0c0c", display: "flex", flexDirection: "column", gap: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "2px", color: "var(--green)", fontFamily: "var(--mono)" }}>{step}</div>
+              <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: "-0.5px", color: "var(--white)", lineHeight: 1.2 }}>{title}</div>
+              <p style={{ fontSize: 13, color: "#858585", lineHeight: 1.7 }}>{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
+
+      {/* FAQ */}
+      <div style={{ maxWidth: 660, margin: "0 auto", padding: "80px 48px 80px" }}>
+        <h2 style={{ fontSize: "clamp(28px, 3vw, 44px)", fontWeight: 800, letterSpacing: "-1.5px", color: "var(--white)", textAlign: "center", marginBottom: 44 }}>
+          Questions? Answered.
+        </h2>
+        {faqs.map(([q, a], i) => (
+          <div key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.055)" }}>
+            <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 0", background: "none", border: "none", fontFamily: "var(--font)", fontSize: 14, fontWeight: 600, color: openFaq === i ? "var(--white)" : "#aaa", textAlign: "left", gap: 16 }}>
+              {q}
+              <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#444", flexShrink: 0, transform: openFaq === i ? "rotate(45deg)" : "none", transition: "transform 0.25s" }}>+</div>
+            </button>
+            <div style={{ maxHeight: openFaq === i ? 220 : 0, overflow: "hidden", transition: "max-height 0.4s cubic-bezier(0.22,1,0.36,1)", fontSize: 13.5, color: "#858585", lineHeight: 1.85, paddingBottom: openFaq === i ? 22 : 0 }}>{a}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* CTA */}
+      <div style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", background: "#0a0a0a", padding: "72px 48px", textAlign: "center" }}>
+        <h2 style={{ fontSize: "clamp(28px, 3.5vw, 46px)", fontWeight: 800, letterSpacing: "-2px", color: "var(--white)", marginBottom: 16 }}>Ready to get started?</h2>
+        <p style={{ fontSize: 15, color: "#444", marginBottom: 36 }}>Tell me what you need. I'll get back to you within 24 hours.</p>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+          <button style={{ background: "var(--white)", color: "var(--black)", padding: "13px 28px", fontSize: 14, fontWeight: 700, borderRadius: 8, border: "none", cursor: "pointer", fontFamily: "var(--font)" }}>Get a Free Quote →</button>
+          <button onClick={() => setPage("systems")} style={{ background: "transparent", color: "#888", border: "1px solid rgba(255,255,255,0.12)", padding: "13px 28px", fontSize: 14, fontWeight: 600, borderRadius: 8 }}>Back to Systems</button>
+        </div>
+      </div>
+
+      <Footer setPage={setPage} />
+    </div>
+  );
+};
+
+const TestimonialsPage = ({ setPage }) => (
+  <div style={{ paddingTop: 62 }}>
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: "140px 48px", textAlign: "center", animation: "fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both" }}>
+      <p style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: "2.5px", textTransform: "uppercase", color: "var(--muted)", marginBottom: 16, fontFamily: "var(--mono)" }}>Testimonials</p>
+      <h1 style={{ fontSize: "clamp(40px, 5vw, 68px)", fontWeight: 800, letterSpacing: "-2.5px", color: "var(--white)", marginBottom: 20 }}>Coming soon.</h1>
+      <p style={{ fontSize: 15, color: "#858585" }}>Reviews are being collected. Check back shortly.</p>
+    </div>
+    <Footer setPage={setPage} />
+  </div>
+);
+
+
+/* ════════════════════════════════════════════
    ROOT APP
 ════════════════════════════════════════════ */
 export default function App() {
@@ -1619,7 +1760,9 @@ export default function App() {
       {/* ── Marketing ── */}
       {page === "home"       && <HomePage    setPage={handleSetPage} />}
       {page === "systems"    && <SystemsPage setPage={handleSetPage} />}
+      {page === "webdev" && <WebDevPage setPage={handleSetPage} />}
       {page === "paychaser"  && <PaychaserPage setPage={handleSetPage} />}
+      {page === "testimonials" && <TestimonialsPage setPage={handleSetPage} />}  // placeholder for later
       {page === "pricing"    && <PricingPage  setPage={handleSetPage} />}
 
       {/* ── App ── */}
