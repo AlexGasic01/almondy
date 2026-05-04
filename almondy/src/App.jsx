@@ -1,15 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
 /* ─── SHARED ASSETS ─── */
-// Icon-only mark
-const AlmondyIcon = ({ size = 24, fill = "#fff" }) => (
-  <svg viewBox="0 0 561.91 628.53" xmlns="http://www.w3.org/2000/svg" style={{ height: size, width: "auto", fill }}>
-    <path d="M2.37,433.93c5.95,44.84,22.67,84.11,49.04,115.98.32-16.47,1.63-33.27,4.01-50.39,18.36-132.33,95.72-262.99,212.25-358.49,67.05-54.96,138.22-95.7,207.27-121.48-99.64-54.78-268.15,9.03-384.82,148.69C22.66,248.99-9.33,345.84,2.37,433.93Z"/>
-    <path d="M271.8,622.59c86.78-19.14,166.84-82.32,219.66-173.34,77.69-133.88,90.98-284.25,40.57-372.28-7.71,47.74-23.46,95.95-47.04,142.29-41.7,81.94-97.72,149.54-157.93,196.54-7.26,5.67-15.58-6.84-8.81-13.24,51.1-48.35,98.09-110.98,134.89-183.96,26.67-52.89,44.21-107.7,52.39-161.59-25.45,30.76-52.9,57.6-81.31,79.78-7.2,5.63-15.46-6.8-8.75-13.15,25.62-24.25,50.19-52.14,72.95-83.13-63.05,28.29-127.15,67.93-188.21,118.35-128.11,105.78-212.81,248.36-232.38,391.17-.72,5.27-1.34,10.5-1.88,15.7,8.66,8.54,18.12,16.44,28.37,23.61,51.43,36.01,112.81,47.48,177.49,33.24Z"/>
+const AlmondLogo = ({ size = 24, fill = "#fff" }) => (
+  <svg viewBox="0 0 214 410" xmlns="http://www.w3.org/2000/svg" style={{ height: size, width: "auto", fill }}>
+    <path d="M.95,217.78c2.4,18.11,9.13,33.98,19.75,46.86.13-6.65.66-13.44,1.61-20.36,7.4-53.46,38.56-106.25,85.49-144.84,27.01-22.2,55.67-38.66,83.49-49.08-40.13-22.13-108,3.65-155,60.07C9.13,143.06-3.76,182.19.95,217.78Z"/>
+    <path d="M109.47,294c34.95-7.73,67.2-33.26,88.48-70.03,31.29-54.09,36.64-114.84,16.34-150.41-3.1,19.29-9.45,38.76-18.95,57.49-16.8,33.11-39.36,60.41-63.61,79.41-2.92,2.29-6.27-2.77-3.55-5.35,20.58-19.54,39.51-44.84,54.33-74.32,10.74-21.37,17.81-43.51,21.1-65.29-10.25,12.43-21.31,23.27-32.75,32.23-2.9,2.27-6.23-2.75-3.52-5.31,10.32-9.8,20.22-21.07,29.38-33.58-25.4,11.43-51.22,27.45-75.81,47.81-51.6,42.74-85.71,100.34-93.6,158.04-.29,2.13-.54,4.24-.76,6.34,3.49,3.45,7.3,6.64,11.43,9.54,20.72,14.55,45.44,19.18,71.49,13.43Z"/>
   </svg>
 );
-// For backward compat with any AlmondLogo refs left in app pages
-const AlmondLogo = AlmondyIcon;
 
 const LockSVG = () => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
@@ -90,8 +87,8 @@ const Nav = ({ page, setPage }) => {
       borderBottom: "1px solid var(--border)"
     }}>
       <button onClick={() => setPage("home")} style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none" }}>
-        <AlmondyIcon size={24} />
-        <span style={{ fontSize: 16, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almondy</span>
+        <AlmondLogo size={24} />
+        <span style={{ fontSize: 16, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almond</span>
       </button>
       <ul style={{ display: "flex", gap: 36, listStyle: "none" }}>
         {links.map(l => (
@@ -123,10 +120,10 @@ const Footer = ({ setPage }) => (
       display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16
     }}>
       <button onClick={() => setPage("home")} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none" }}>
-        <AlmondyIcon size={18} fill="var(--muted)" />
-        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--muted)" }}>Almondy</span>
+        <AlmondLogo size={18} fill="var(--muted)" />
+        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--muted)" }}>Almond</span>
       </button>
-      <span style={{ fontSize: 12, color: "var(--muted)", fontFamily: "var(--mono)" }}>© 2026 Almondy. All rights reserved.</span>
+      <span style={{ fontSize: 12, color: "var(--muted)", fontFamily: "var(--mono)" }}>© 2026 Almond. All rights reserved.</span>
       <ul style={{ display: "flex", gap: 20, listStyle: "none" }}>
         {["Privacy", "Terms", "Systems", "PayChaser", "Contact"].map(l => (
           <li key={l}>
@@ -747,8 +744,8 @@ const PlanCard = ({ name, price, period, desc, cta, ctaStyle, features, featured
   );
 };
 const PRICES = {
-  monthly: { basic: "0", pro: "29", max: "79", basicP: "Free forever", proP: "per month", maxP: "per month" },
-  annual:  { basic: "0", pro: "23", max: "63", basicP: "Free forever", proP: "per month, billed annually", maxP: "per month, billed annually" }
+  monthly: { basic: "0", pro: "30", max: "60", basicP: "Free forever", proP: "per month", maxP: "per month" },
+  annual:  { basic: "0", pro: "24", max: "48", basicP: "Free forever", proP: "per month, billed annually", maxP: "per month, billed annually" }
 };
 
 const FAQS = [
@@ -850,20 +847,25 @@ const AuthPage = ({ setPage, setUser }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!email.includes("@")) return;
     setLoading(true);
-    // Simulate sending magic link
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      // Send magic link email via Resend
+      const res = await fetch("/api/send-magic-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error("Failed to send");
       setStep("sent");
-    }, 1200);
-  };
-
-  // Simulate clicking magic link — goes straight to onboarding
-  const handleMagicClick = () => {
-    setUser({ email });
-    setPage("onboarding");
+    } catch (err) {
+      console.error(err);
+      // Still show sent screen — don't expose errors to user
+      setStep("sent");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -875,7 +877,7 @@ const AuthPage = ({ setPage, setUser }) => {
       {/* Logo */}
       <button onClick={() => setPage("home")} style={{ position: "absolute", top: 28, left: 32, display: "flex", alignItems: "center", gap: 9, background: "none", border: "none" }}>
         <AlmondLogo size={22} />
-        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almondy</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almond</span>
       </button>
 
       <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 400, animation: "fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
@@ -925,24 +927,11 @@ const AuthPage = ({ setPage, setUser }) => {
               </p>
             </div>
 
-            {/* Simulated email preview card */}
-            <div style={{ background: "#0f0f0f", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 12, overflow: "hidden", marginBottom: 20 }}>
-              <div style={{ background: "#0a0a0a", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#ff5f57" }} />
-                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#febc2e" }} />
-                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#28c840" }} />
-                <span style={{ fontSize: 11, color: "#333", fontFamily: "var(--mono)", marginLeft: 6 }}>New Message</span>
-              </div>
-              <div style={{ padding: "18px 20px" }}>
-                <div style={{ fontSize: 11, color: "#444", fontFamily: "var(--mono)", marginBottom: 6 }}>FROM: hello@paychaser.com</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#999", marginBottom: 14 }}>Your PayChaser sign-in link</div>
-                <p style={{ fontSize: 12, color: "#555", lineHeight: 1.7, marginBottom: 16 }}>
-                  Click the button below to sign in to PayChaser. This link expires in 15 minutes.
-                </p>
-                {/* This button simulates clicking the magic link */}
-                <button onClick={handleMagicClick} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 18px", background: "var(--white)", color: "var(--black)", border: "none", borderRadius: 7, fontSize: 13, fontWeight: 700 }}>
-                  Sign in to PayChaser →
-                </button>
+            <div style={{ background: "#0f0f0f", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 12, padding: "20px", marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 14 }}>
+              <div style={{ fontSize: 20, marginTop: 2 }}>📧</div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#aaa", marginBottom: 4 }}>Magic link sent to <span style={{ color: "var(--white)" }}>{email}</span></div>
+                <div style={{ fontSize: 12, color: "#444", lineHeight: 1.7 }}>Check your inbox and click the link to sign in. It expires in 15 minutes. If you don't see it, check your spam folder.</div>
               </div>
             </div>
 
@@ -986,7 +975,7 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
 
       <button onClick={() => setPage("home")} style={{ position: "absolute", top: 28, left: 32, display: "flex", alignItems: "center", gap: 9, background: "none", border: "none" }}>
         <AlmondLogo size={22} />
-        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almondy</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almond</span>
       </button>
 
       <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 480, animation: "fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
@@ -1006,17 +995,6 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
             autoFocus
             style={{ width: "100%", padding: "15px 18px", background: "#0f0f0f", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, fontSize: 17, color: "var(--white)", outline: "none", fontFamily: "var(--font)", letterSpacing: "-0.3px" }}
           />
-
-          {/* Live preview */}
-          {bizName.trim() && (
-            <div style={{ background: "#0c0c0c", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "14px 16px", animation: "fadeUp 0.3s both" }}>
-              <div style={{ fontSize: 10, color: "#444", fontFamily: "var(--mono)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 8 }}>Preview — how reminders will look</div>
-              <div style={{ fontSize: 13, color: "#858585", lineHeight: 1.7 }}>
-                <span style={{ color: "#666" }}>From:</span> <span style={{ color: "#aaa" }}>{bizName.trim()}</span><br />
-                <span style={{ color: "#666" }}>Subject:</span> <span style={{ color: "#aaa" }}>Friendly reminder — Invoice #0012 is due</span>
-              </div>
-            </div>
-          )}
 
           <button
             onClick={handleContinue}
@@ -1231,103 +1209,212 @@ const DashboardPage = ({ setPage, user }) => {
 
 /* ════════════════════════════════════════════
    APP: PAYWALL
-   - Shown when free user hits limit or clicks locked feature
-   - Focused, single CTA, no nav distraction
+   - Side-by-side plan cards (like Claude's pricing)
+   - Fixed selection highlight bug
+   - Stripe-ready: swap STRIPE_PRICE_IDs and call redirectToCheckout
 ════════════════════════════════════════════ */
+
+// ── Stripe price IDs — replace these with your real ones from the Stripe dashboard ──
+const STRIPE_PRICES = {
+  pro:  { monthly: "price_PRO_MONTHLY_ID",  annual: "price_PRO_ANNUAL_ID"  },
+  max:  { monthly: "price_MAX_MONTHLY_ID",  annual: "price_MAX_ANNUAL_ID"  },
+};
+
 const PaywallPage = ({ setPage, user, setUser }) => {
   const [billing, setBilling] = useState("monthly");
-  const [selected, setSelected] = useState("pro");
+  const [loadingPlan, setLoadingPlan] = useState(null); // which plan CTA is loading
 
   const plans = {
-    monthly: { pro: 29, max: 79 },
-    annual:  { pro: 23, max: 63 },
+    monthly: { pro: "29.99", max: "59.99" },
+    annual:  { pro: "23.91", max: "47.91" },
   };
 
-  const handleUpgrade = () => {
-    // Simulate upgrade
-    setUser(u => ({ ...u, plan: selected }));
-    setPage("dashboard");
+  // ── Stripe price IDs ─────────────────────────────────────────
+  const STRIPE_PRICES = {
+    pro:  { monthly: "price_1TTGeLKVRE4IsC8TVpFheHv1", annual: "price_1TTGgZKVRE4IsC8TePFiDm3A" },
+    max:  { monthly: "price_1TTGezKVRE4IsC8TkKNoISYG", annual: "price_1TTGh5KVRE4IsC8TDlCvwreJ" },
   };
+  const STRIPE_PK = "pk_live_51Ri79DKVRE4IsC8TLJjKXSlE2IFHaTSKiMlxlmksW6rvCAs7WlBIzhaFa1dZmThNK7t2fNyLim01KdeUlgPjRUDE00vldMnDN5";
+
+  const handleUpgrade = async (planId) => {
+    setLoadingPlan(planId);
+    try {
+      // Dynamically load Stripe.js
+      const { loadStripe } = await import("https://esm.sh/@stripe/stripe-js");
+      const stripe = await loadStripe(STRIPE_PK);
+      const priceId = STRIPE_PRICES[planId][billing];
+      const checkoutParams = {
+        lineItems: [{ price: priceId, quantity: 1 }],
+        mode: "subscription",
+        successUrl: `https://almondy.app?session=success`,
+        cancelUrl:  `https://almondy.app?session=cancel`,
+        customerEmail: user?.email,
+        ...(planId === "pro" && { subscriptionData: { trialPeriodDays: 3 } }),
+      };
+      const { error } = await stripe.redirectToCheckout(checkoutParams);
+      if (error) {
+        console.error("Stripe error:", error);
+        setLoadingPlan(null);
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      setLoadingPlan(null);
+    }
+  };
+
+  const PLAN_DATA = [
+    {
+      id: "pro",
+      name: "Pro",
+      badge: "⚡ Most Popular",
+      desc: "For growing businesses that need automated chasing without the awkward follow-ups.",
+      features: [
+        "Unlimited invoices",
+        "Automated reminder sequences",
+        "Email + SMS reminders",
+        "Smart escalation logic",
+        "Advanced analytics",
+        "Priority email support",
+      ],
+      featured: true,
+    },
+    {
+      id: "max",
+      name: "Max",
+      badge: "Enterprise",
+      desc: "For agencies managing invoices at scale with full white-label and team control.",
+      features: [
+        "Everything in Pro",
+        "White-label branding",
+        "Custom reminder templates",
+        "Team member access",
+        "API access",
+        "Dedicated account manager",
+      ],
+      featured: false,
+    },
+  ];
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--black)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 24px", position: "relative", overflow: "hidden" }}>
+      {/* Backgrounds */}
       <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
       <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(34,197,94,0.04) 0%, transparent 70%)", pointerEvents: "none" }} />
 
       {/* Back button */}
-      <button onClick={() => setPage("dashboard")} style={{ position: "absolute", top: 24, left: 28, display: "flex", alignItems: "center", gap: 7, background: "none", border: "none", color: "#555", fontSize: 13, fontWeight: 600 }}>
+      <button onClick={() => setPage("dashboard")} style={{ position: "absolute", top: 24, left: 28, display: "flex", alignItems: "center", gap: 7, background: "none", border: "none", color: "#555", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
         ← Back to dashboard
       </button>
 
-      <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 520, animation: "fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
+      <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 860, animation: "fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
+
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 36 }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 999, padding: "4px 14px", fontSize: 12, fontWeight: 600, color: "var(--green)", marginBottom: 20, fontFamily: "var(--mono)" }}>
             <span className="badge-dot" style={{ width: 6, height: 6 }} /> Upgrade PayChaser
           </div>
-          <h1 style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-1.2px", color: "var(--white)", marginBottom: 10 }}>
+          <h1 style={{ fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 800, letterSpacing: "-1.5px", color: "var(--white)", marginBottom: 10 }}>
             You've hit the free limit
           </h1>
-          <p style={{ fontSize: 14, color: "#858585", lineHeight: 1.7 }}>
-            You're on 5 of 5 free invoices. Upgrade to keep chasing — and let PayChaser do the hard work for you.
+          <p style={{ fontSize: 14, color: "#666", lineHeight: 1.7, maxWidth: 440, margin: "0 auto 28px" }}>
+            You're on 5 of 5 free invoices. Upgrade to keep chasing — and let PayChaser do the hard work.
           </p>
-        </div>
 
-        {/* Billing toggle */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-          <div style={{ display: "inline-flex", background: "#111", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 999, padding: "3px 4px" }}>
-            {["monthly","annual"].map(m => (
-              <button key={m} onClick={() => setBilling(m)} style={{ padding: "6px 18px", borderRadius: 999, border: "none", fontSize: 12.5, fontWeight: 600, background: billing === m ? "var(--white)" : "transparent", color: billing === m ? "var(--black)" : "#555", display: "inline-flex", alignItems: "center", gap: 7, transition: "all 0.2s" }}>
+          {/* Billing toggle */}
+          <div style={{ display: "inline-flex", background: "#0f0f0f", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 999, padding: "3px 4px" }}>
+            {["monthly", "annual"].map(m => (
+              <button key={m} onClick={() => setBilling(m)} style={{
+                padding: "7px 20px", borderRadius: 999, border: "none", fontSize: 13, fontWeight: 600,
+                background: billing === m ? "var(--white)" : "transparent",
+                color: billing === m ? "var(--black)" : "#555",
+                display: "inline-flex", alignItems: "center", gap: 8,
+                transition: "all 0.2s", cursor: "pointer", fontFamily: "var(--font)"
+              }}>
                 {m.charAt(0).toUpperCase() + m.slice(1)}
-                {m === "annual" && <span style={{ fontSize: 9.5, fontWeight: 700, color: "var(--green)", background: "rgba(34,197,94,0.12)", borderRadius: 999, padding: "1px 7px" }}>-20%</span>}
+                {m === "annual" && (
+                  <span style={{ fontSize: 9.5, fontWeight: 700, color: "var(--green)", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 999, padding: "1px 7px" }}>Save 20%</span>
+                )}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Plan cards */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
-          {[
-            { id: "pro", name: "Pro", price: plans[billing].pro, desc: "Unlimited invoices, automated reminders, email + SMS chasing.", features: ["Unlimited invoices", "Automated reminder sequences", "Email + SMS reminders", "Smart escalation", "Advanced analytics", "Priority email support"] },
-            { id: "max", name: "Max", price: plans[billing].max, desc: "Everything in Pro, plus white-label and team access.", features: ["Everything in Pro", "White-label branding", "Team member access", "API access", "Dedicated account manager", "SLA guarantee"] },
-          ].map(plan => (
-            <button key={plan.id} onClick={() => setSelected(plan.id)} style={{ background: selected === plan.id ? "rgba(34,197,94,0.04)" : "#0c0c0c", border: `1px solid ${selected === plan.id ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.07)"}`, borderRadius: 14, padding: "20px 22px", textAlign: "left", cursor: "pointer", transition: "all 0.2s", position: "relative" }}>
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontSize: 14, fontWeight: 800, color: "var(--white)", letterSpacing: "-0.3px" }}>{plan.name}</span>
-                    {plan.id === "pro" && <span style={{ fontSize: 9.5, fontWeight: 700, color: "var(--green)", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 999, padding: "2px 8px" }}>MOST POPULAR</span>}
-                  </div>
-                  <p style={{ fontSize: 12, color: "#858585", lineHeight: 1.5 }}>{plan.desc}</p>
+        {/* ── Side-by-side plan cards ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 28 }}>
+          {PLAN_DATA.map(plan => {
+            const price = plans[billing][plan.id];
+            const isLoading = loadingPlan === plan.id;
+            return (
+              <div key={plan.id} style={{
+                position: "relative",
+                background: plan.featured ? "#0f0f0f" : "#0c0c0c",
+                border: `1px solid ${plan.featured ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.07)"}`,
+                borderRadius: 18,
+                padding: "28px 26px 26px",
+                display: "flex", flexDirection: "column",
+                boxShadow: plan.featured ? "0 0 0 1px rgba(255,255,255,0.04), 0 24px 60px rgba(0,0,0,0.5)" : "none",
+                overflow: "hidden",
+              }}>
+                {/* Badge */}
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 10, fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", color: plan.featured ? "var(--green)" : "#555", background: plan.featured ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.05)", border: `1px solid ${plan.featured ? "rgba(34,197,94,0.22)" : "rgba(255,255,255,0.09)"}`, borderRadius: 999, padding: "4px 11px", marginBottom: 18, width: "fit-content" }}>
+                  {plan.badge}
                 </div>
-                <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 16 }}>
-                  <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-1px", color: selected === plan.id ? "var(--green)" : "var(--white)", lineHeight: 1 }}>${plan.price}</div>
-                  <div style={{ fontSize: 10, color: "#444" }}>/mo</div>
+
+                {/* Plan name */}
+                <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.8px", color: "var(--white)", marginBottom: 6 }}>{plan.name}</div>
+
+                {/* Description */}
+                <p style={{ fontSize: 12.5, color: "#555", lineHeight: 1.65, marginBottom: 22, minHeight: 40 }}>{plan.desc}</p>
+
+                {/* Price */}
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 2, marginBottom: 4 }}>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: "#444", marginBottom: 6 }}>$</span>
+                  <span style={{ fontSize: 52, fontWeight: 800, letterSpacing: "-3px", color: "var(--white)", lineHeight: 1 }}>{price}</span>
+                  <span style={{ fontSize: 13, color: "#444", marginBottom: 8, marginLeft: 3 }}>/mo</span>
+                </div>
+                <div style={{ fontSize: 11, color: "#333", marginBottom: 22, fontFamily: "var(--mono)" }}>
+                  {billing === "annual" ? `AUD · billed as $${plan.id === "pro" ? "286.99" : "574.99"}/yr` : "AUD · billed monthly"}
+                </div>
+
+                {/* CTA */}
+                <button
+                  onClick={() => handleUpgrade(plan.id)}
+                  disabled={!!loadingPlan}
+                  style={{
+                    width: "100%", padding: "13px 20px",
+                    background: plan.id === "pro" ? "var(--white)" : "rgba(255,255,255,0.08)",
+                    color: plan.id === "pro" ? "var(--black)" : "var(--white)",
+                    border: plan.id === "pro" ? "none" : "1px solid rgba(255,255,255,0.18)",
+                    borderRadius: 10, fontSize: 14, fontWeight: 700,
+                    letterSpacing: "-0.3px", marginBottom: 22,
+                    cursor: loadingPlan ? "not-allowed" : "pointer",
+                    opacity: loadingPlan && !isLoading ? 0.4 : 1,
+                    transition: "all 0.2s", fontFamily: "var(--font)",
+                  }}>
+                  {isLoading ? "Redirecting..." : plan.id === "pro" ? "Start 3-day free trial →" : "Get started →"}
+                </button>
+
+                {/* Divider */}
+                <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)", marginBottom: 20 }} />
+
+                {/* Features */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+                  {plan.features.map(f => (
+                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "#777" }}>
+                      <div style={{ width: 16, height: 16, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 900, background: "rgba(34,197,94,0.1)", color: "var(--green)", border: "1px solid rgba(34,197,94,0.18)" }}>✓</div>
+                      {f}
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 14px" }}>
-                {plan.features.map(f => (
-                  <div key={f} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11.5, color: "#858585" }}>
-                    <span style={{ color: "var(--green)", fontSize: 10 }}>✓</span> {f}
-                  </div>
-                ))}
-              </div>
-              {/* Radio indicator */}
-              <div style={{ position: "absolute", top: 20, right: 20, width: 18, height: 18, borderRadius: "50%", border: `2px solid ${selected === plan.id ? "var(--green)" : "rgba(255,255,255,0.15)"}`, background: selected === plan.id ? "var(--green)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {selected === plan.id && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--black)" }} />}
-              </div>
-            </button>
-          ))}
+            );
+          })}
         </div>
 
-        {/* CTA */}
-        <button onClick={handleUpgrade} style={{ width: "100%", padding: "16px", background: "var(--white)", color: "var(--black)", border: "none", borderRadius: 12, fontSize: 16, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 14 }}>
-          Start 14-day free trial — ${plans[billing][selected]}/mo after
-        </button>
-
-        <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
+        {/* Trust row */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 28 }}>
           {["No credit card required", "Cancel any time", "Instant access"].map(t => (
-            <div key={t} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11.5, color: "#444" }}>
+            <div key={t} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#383838" }}>
               <span style={{ color: "var(--green)", fontSize: 10 }}>✓</span> {t}
             </div>
           ))}
