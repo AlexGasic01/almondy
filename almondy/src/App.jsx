@@ -299,7 +299,7 @@ const HomePage = ({ setPage }) => {
               <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--green)", display: "flex", alignItems: "center", gap: 7 }}>
                 <span className="badge-dot" style={{ width: 6, height: 6 }} /> Live Now
               </div>
-              <div style={{ fontSize: 48, fontWeight: 800, letterSpacing: "-1.5px", color: "var(--white)", marginTop: 10 }}>Almondy</div>
+              <div style={{ fontSize: 48, fontWeight: 800, letterSpacing: "-1.5px", color: "var(--white)", marginTop: 10 }}>PayChaser</div>
               <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75, maxWidth: 380, marginTop: 10 }}>Track invoices, chase payments, and collect faster — all in one place. Automated reminders that stay friendly until they can't.</p>
             </div>
             <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: "45%", background: "#0a0a0a", borderLeft: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -865,7 +865,7 @@ const AuthPage = ({ setPage, setUser }) => {
       const res = await fetch("/api/send-magic-link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, origin: window.location.origin }),
       });
       if (!res.ok) throw new Error("Failed to send");
       setStep("sent");
@@ -1271,8 +1271,8 @@ const PaywallPage = ({ setPage, user, setUser }) => {
       const checkoutParams = {
         lineItems: [{ price: priceId, quantity: 1 }],
         mode: "subscription",
-        successUrl: `https://almondy.app?session=success`,
-        cancelUrl:  `https://almondy.app?session=cancel`,
+        successUrl: `${window.location.origin}?session=success`,
+        cancelUrl:  `${window.location.origin}?session=cancel`,
         customerEmail: user?.email,
         ...(planId === "pro" && { subscriptionData: { trialPeriodDays: 3 } }),
       };
