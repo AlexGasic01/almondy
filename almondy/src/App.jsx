@@ -14,6 +14,55 @@ const AlmondLogo = ({ size = 24, fill = "#fff" }) => (
   </svg>
 );
 
+const SplashScreen = ({ onDone }) => {
+  const [phase, setPhase] = useState("in");
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase("reveal"), 400);
+    const t2 = setTimeout(() => setPhase("hold"),   1100);
+    const t3 = setTimeout(() => setPhase("out"),    1800);
+    const t4 = setTimeout(() => onDone(),           2350);
+    return () => [t1,t2,t3,t4].forEach(clearTimeout);
+  }, []);
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      background: "#080808",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      opacity: phase === "out" ? 0 : 1,
+      transition: phase === "out" ? "opacity 0.55s cubic-bezier(0.4,0,0.2,1)" : "none",
+      pointerEvents: "none",
+    }}>
+      <div style={{
+        display: "flex", alignItems: "center",
+        opacity: phase === "in" ? 0 : 1,
+        transform: phase === "in" ? "scale(0.88)" : "scale(1)",
+        transition: "opacity 0.4s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+      }}>
+        <AlmondLogo size={42} fill="#ffffff" />
+        <div style={{
+          clipPath: phase === "reveal" || phase === "hold"
+            ? "inset(0% 0% 0% 0%)"
+            : "inset(0% 100% 0% 0%)",
+          transition: phase === "reveal"
+            ? "clip-path 0.55s cubic-bezier(0.22,1,0.36,1)"
+            : "none",
+        }}>
+          <span style={{
+            display: "block", fontSize: 34, fontWeight: 800,
+            letterSpacing: "-1.5px", color: "#ffffff",
+            paddingLeft: 11, whiteSpace: "nowrap",
+            fontFamily: "Inter, sans-serif",
+          }}>
+            Almondy
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const LockSVG = () => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
     <rect x="3" y="11" width="18" height="12" rx="2" fill="#1e1e1e" stroke="#444" strokeWidth="1.5"/>
@@ -1456,6 +1505,7 @@ const handleUpgrade = async (planId) => {
    ROOT APP
 ════════════════════════════════════════════ */
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);  // 👈 add this line
   const [page, setPage] = useState("home");
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -1547,6 +1597,7 @@ export default function App() {
   return (
     <>
       <GlobalStyle />
+      {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}  {/* 👈 add this line */}
       {!isAppPage && <Nav page={page} setPage={handleSetPage} />}
 
       {/* ── Marketing ── */}
