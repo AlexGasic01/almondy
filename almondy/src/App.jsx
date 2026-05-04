@@ -1269,31 +1269,26 @@ const PaywallPage = ({ setPage, user, setUser }) => {
   };
   const STRIPE_PK = "pk_live_51Ri79DKVRE4IsC8TLJjKXSlE2IFHaTSKiMlxlmksW6rvCAs7WlBIzhaFa1dZmThNK7t2fNyLim01KdeUlgPjRUDE00vldMnDN5";
 
-  const handleUpgrade = async (planId) => {
-    setLoadingPlan(planId);
-    try {
-      // Dynamically load Stripe.js
-      const { loadStripe } = await import("https://esm.sh/@stripe/stripe-js");
-      const stripe = await loadStripe(STRIPE_PK);
-      const priceId = STRIPE_PRICES[planId][billing];
-      const checkoutParams = {
-        lineItems: [{ price: priceId, quantity: 1 }],
-        mode: "subscription",
-        successUrl: `${window.location.origin}?session=success`,
-        cancelUrl:  `${window.location.origin}?session=cancel`,
-        customerEmail: user?.email,
-        ...(planId === "pro" && { subscriptionData: { trialPeriodDays: 3 } }),
-      };
-      const { error } = await stripe.redirectToCheckout(checkoutParams);
-      if (error) {
-        console.error("Stripe error:", error);
-        setLoadingPlan(null);
-      }
-    } catch (err) {
-      console.error("Checkout error:", err);
-      setLoadingPlan(null);
-    }
-  };
+const handleUpgrade = async (planId) => {
+  setLoadingPlan(planId);
+  try {
+    const priceId = STRIPE_PRICES[planId][billing];
+    const res = await fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        priceId,
+        email: user?.email,
+        trial: planId === "pro",
+      }),
+    });
+    const { url } = await res.json();
+    window.location.href = url;
+  } catch (err) {
+    console.error("Checkout error:", err);
+    setLoadingPlan(null);
+  }
+};
 
   const PLAN_DATA = [
     {
