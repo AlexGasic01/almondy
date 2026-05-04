@@ -70,9 +70,7 @@ const SplashScreen = ({ onDone }) => {
             fontSize="306.1"
             transform="translate(221.25 264.4)"
           >
-            <tspan x="0" y="0">Almon</tspan>
-            <tspan letterSpacing="0" x="940.13" y="0">d</tspan>
-            <tspan x="1130.99" y="0">y</tspan>
+            <tspan x="0" y="0">Almondy</tspan>
           </text>
           <g fill="white">
             <path d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
