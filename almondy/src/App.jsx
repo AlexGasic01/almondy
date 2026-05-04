@@ -18,24 +18,26 @@ const SplashScreen = ({ onDone }) => {
   const [phase, setPhase] = useState("hidden");
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("icon"),  100);
-    const t2 = setTimeout(() => setPhase("text"),  900);
+    const t1 = setTimeout(() => setPhase("icon"),  150);
+    const t2 = setTimeout(() => setPhase("slide"), 900);
     const t3 = setTimeout(() => setPhase("out"),   2200);
     const t4 = setTimeout(() => onDone(),          2750);
     return () => [t1,t2,t3,t4].forEach(clearTimeout);
   }, []);
 
-  const iconVisible = phase === "icon" || phase === "text" || phase === "out";
-  const textVisible = phase === "text" || phase === "out";
+  const iconVisible = phase !== "hidden";
+  const sliding    = phase === "slide" || phase === "out";
 
-  const W = 1525.07, H = 365.74, HEIGHT = 56;
-  const containerW = Math.round(W / H * HEIGHT);
-
-  const svgStyle = {
-    height: HEIGHT, width: containerW,
-    display: "block", position: "absolute", top: 0, left: 0,
-    overflow: "visible",
-  };
+  // At height 56px, full wordmark width = 56 * (1525.07/365.74) = ~233px
+  // Icon portion = 56 * (210/365.74) = ~32px wide
+  // Text portion = ~201px wide
+  // When centered, icon needs to shift left by half text width = ~100px
+  const HEIGHT     = 56;
+  const RATIO      = 1525.07 / 365.74;
+  const TOTAL_W    = Math.round(HEIGHT * RATIO);       // ~233px
+  const ICON_W     = Math.round(HEIGHT * 210 / 365.74); // ~32px
+  const TEXT_W     = TOTAL_W - ICON_W;                  // ~201px
+  const SHIFT      = Math.round(TEXT_W / 2);            // ~100px
 
   return (
     <div style={{
@@ -45,48 +47,75 @@ const SplashScreen = ({ onDone }) => {
       opacity: phase === "out" ? 0 : 1,
       transition: phase === "out" ? "opacity 0.6s cubic-bezier(0.4,0,0.2,1)" : "none",
       pointerEvents: "none",
+      overflow: "hidden",
     }}>
-      <div style={{ position: "relative", width: containerW, height: HEIGHT }}>
 
-        {/* LAYER 1 — icon fades + scales in */}
-        <svg viewBox={`0 0 ${W} ${H}`} xmlns="http://www.w3.org/2000/svg" style={{
-          ...svgStyle,
-          opacity: iconVisible ? 1 : 0,
-          transform: iconVisible ? "scale(1)" : "scale(0.88)",
-          transformOrigin: "11% 50%",
-          transition: "opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1)",
-        }}>
-          <g fill="white">
-            <path d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
-            <path d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
-          </g>
+      {/* ICON — fades in centered, then slides left */}
+      <div style={{
+        position: "absolute",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        opacity: iconVisible ? 1 : 0,
+        transform: sliding
+          ? `translateX(-${SHIFT}px) scale(1)`
+          : iconVisible
+            ? "translateX(0px) scale(1)"
+            : "translateX(0px) scale(0.88)",
+        transition: phase === "icon"
+          ? "opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1)"
+          : phase === "slide"
+            ? "transform 0.65s cubic-bezier(0.22,1,0.36,1)"
+            : "none",
+        zIndex: 2,
+      }}>
+        <svg viewBox="0 0 210 365.74" xmlns="http://www.w3.org/2000/svg"
+          style={{ height: HEIGHT, width: "auto", display: "block", fill: "white" }}>
+          <path d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
+          <path d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
         </svg>
+      </div>
 
-        {/* LAYER 2 — text sweeps out from behind icon */}
-        {/* Icon ends at x≈210 out of 1525.07 = 13.77% — clip starts there and sweeps right */}
-        <svg viewBox={`0 0 ${W} ${H}`} xmlns="http://www.w3.org/2000/svg" style={{
-          ...svgStyle,
-          clipPath: textVisible
-            ? "inset(0% 0% 0% 0%)"
-            : "inset(0% 0% 0% 13.77%)",
-          transition: textVisible
-            ? "clip-path 0.6s cubic-bezier(0.22,1,0.36,1)"
+      {/* TEXT — starts hidden behind icon (translateX 0), slides right */}
+      {/* Clipped so it can't be seen until it exits the icon's position */}
+      <div style={{
+        position: "absolute",
+        overflow: "hidden",
+        // mask so text is hidden while behind the icon
+        WebkitMaskImage: sliding
+          ? "none"
+          : `linear-gradient(to right, transparent ${ICON_W / 2}px, black ${ICON_W / 2}px)`,
+        maskImage: sliding
+          ? "none"
+          : `linear-gradient(to right, transparent ${ICON_W / 2}px, black ${ICON_W / 2}px)`,
+      }}>
+        <div style={{
+          transform: sliding
+            ? `translateX(${SHIFT}px)`
+            : "translateX(0px)",
+          transition: sliding
+            ? "transform 0.65s cubic-bezier(0.22,1,0.36,1)"
             : "none",
         }}>
-          <text
-            fontFamily="Inter, sans-serif"
-            fontSize="306.1"
-            fontWeight="600"
-            fill="white"
-            transform="translate(221.25 264.4)"
+          <svg
+            viewBox="221.25 0 1303.82 365.74"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ height: HEIGHT, width: Math.round(HEIGHT * 1303.82 / 365.74), display: "block" }}
           >
-            <tspan x="0" y="0">Almon</tspan>
-            <tspan x="940.13" y="0">d</tspan>
-            <tspan x="1130.99" y="0">y</tspan>
-          </text>
-        </svg>
-
+            <text
+              fontFamily="'Inter', sans-serif"
+              fontWeight="600"
+              fontSize="306.1"
+              fill="white"
+              transform="translate(221.25 264.4)"
+              style={{ fontOpticalSizing: "auto" }}
+            >
+              <tspan x="0" y="0">Almon</tspan>
+              <tspan x="940.13" y="0">d</tspan>
+              <tspan x="1130.99" y="0">y</tspan>
+            </text>
+          </svg>
+        </div>
       </div>
+
     </div>
   );
 };
@@ -103,7 +132,7 @@ const LockSVG = () => (
 /* ─── GLOBAL STYLES ─── */
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&display=swap');
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --black: #080808; --surface: #111111; --surface2: #1a1a1a;
