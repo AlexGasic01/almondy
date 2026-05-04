@@ -1453,8 +1453,26 @@ const PaywallPage = ({ setPage, user, setUser }) => {
    ROOT APP
 ════════════════════════════════════════════ */
 export default function App() {
-  const [page, setPage] = useState("home");
-  const [user, setUser] = useState(null); // { email, bizName, plan }
+  const params = new URLSearchParams(window.location.search);
+  const magicEmail = params.get("magic") === "true" ? params.get("email") : null;
+  const sessionStatus = params.get("session");
+
+  const [page, setPage] = useState(() => {
+    if (magicEmail) return "onboarding";
+    if (sessionStatus === "success") return "dashboard";
+    return "home";
+  });
+  const [user, setUser] = useState(() => {
+    if (magicEmail) return { email: decodeURIComponent(magicEmail), plan: "free" };
+    return null;
+  });
+
+  // Clean URL params after reading them
+  useEffect(() => {
+    if (magicEmail || sessionStatus) {
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
 
   const handleSetPage = (p) => {
     setPage(p);
