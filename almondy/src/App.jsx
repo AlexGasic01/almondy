@@ -87,8 +87,13 @@ const Nav = ({ page, setPage }) => {
       borderBottom: "1px solid var(--border)"
     }}>
       <button onClick={() => setPage("home")} style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none" }}>
-        <AlmondLogo size={24} />
-        <span style={{ fontSize: 16, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almond</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 1650 380" style={{ height: 20, width: "auto", fill: "var(--white)" }}>
+        <text style={{ fontFamily: "Inter, sans-serif", fontSize: "306.1px", fontWeight: 600 }} transform="translate(221.25 264.4)"><tspan x="0" y="0">Almondy</tspan></text>
+        <g>
+          <path d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
+          <path d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
+        </g>
+      </svg>
       </button>
       <ul style={{ display: "flex", gap: 36, listStyle: "none" }}>
         {links.map(l => (
@@ -120,10 +125,15 @@ const Footer = ({ setPage }) => (
       display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16
     }}>
       <button onClick={() => setPage("home")} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none" }}>
-        <AlmondLogo size={18} fill="var(--muted)" />
-        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--muted)" }}>Almond</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 1650 380" style={{ height: 20, width: "auto", fill: "var(--white)" }}>
+        <text style={{ fontFamily: "Inter, sans-serif", fontSize: "306.1px", fontWeight: 600 }} transform="translate(221.25 264.4)"><tspan x="0" y="0">Almondy</tspan></text>
+        <g>
+          <path d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
+          <path d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
+        </g>
+      </svg>
       </button>
-      <span style={{ fontSize: 12, color: "var(--muted)", fontFamily: "var(--mono)" }}>© 2026 Almond. All rights reserved.</span>
+      <span style={{ fontSize: 12, color: "var(--muted)", fontFamily: "var(--mono)" }}>© 2026 Almondy. All rights reserved.</span>
       <ul style={{ display: "flex", gap: 20, listStyle: "none" }}>
         {["Privacy", "Terms", "Systems", "PayChaser", "Contact"].map(l => (
           <li key={l}>
@@ -234,7 +244,7 @@ const HomePage = ({ setPage }) => {
               Without awkward<br />follow-ups.
             </h1>
             <p style={{ fontSize: 15.5, color: "#666", maxWidth: 420, lineHeight: 1.75, marginBottom: 44, animation: "fadeUp 0.55s 0.16s cubic-bezier(0.22,1,0.36,1) both" }}>
-              PayChaser sends your customers overdue invoice reminders automatically. <strong style={{ color: "#999" }}>Friendly at first. Firm when needed.</strong> You focus on the work — PayChaser chases the money.
+              Almondy sends your customers overdue invoice reminders automatically. <strong style={{ color: "#999" }}>Friendly at first. Firm when needed.</strong> You focus on the work — Almondy chases the money.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", animation: "fadeUp 0.55s 0.24s cubic-bezier(0.22,1,0.36,1) both" }}>
               <button onClick={() => setPage("systems")} style={{ background: "var(--white)", color: "var(--black)", border: "none", padding: "13px 28px", fontSize: 14, fontWeight: 700, borderRadius: 8, letterSpacing: "-0.3px" }}>
@@ -289,7 +299,7 @@ const HomePage = ({ setPage }) => {
               <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--green)", display: "flex", alignItems: "center", gap: 7 }}>
                 <span className="badge-dot" style={{ width: 6, height: 6 }} /> Live Now
               </div>
-              <div style={{ fontSize: 48, fontWeight: 800, letterSpacing: "-1.5px", color: "var(--white)", marginTop: 10 }}>PayChaser</div>
+              <div style={{ fontSize: 48, fontWeight: 800, letterSpacing: "-1.5px", color: "var(--white)", marginTop: 10 }}>Almondy</div>
               <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75, maxWidth: 380, marginTop: 10 }}>Track invoices, chase payments, and collect faster — all in one place. Automated reminders that stay friendly until they can't.</p>
             </div>
             <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: "45%", background: "#0a0a0a", borderLeft: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -368,13 +378,13 @@ const SysCard = ({ onClick, live, name, desc }) => {
 const STEPS = [
   {
     num: "Step 01 — Connect", heading: "Add your invoices in seconds.",
-    body: <>Connect your existing tools or add invoices manually. PayChaser works with your workflow — not against it. <strong style={{ color: "#888" }}>No complex setup, no training required.</strong> Just drop in your invoices and you're live.</>,
+    body: <>Connect your existing tools or add invoices manually. Almondy works with your workflow — not against it. <strong style={{ color: "#888" }}>No complex setup, no training required.</strong> Just drop in your invoices and you're live.</>,
     visLabel: "Invoice Import",
     vis: <VisInvoiceImport />
   },
   {
     num: "Step 02 — Automate", heading: "Set your reminder rules. Once.",
-    body: <>Tell PayChaser how you want to chase — friendly nudge on day 3, firmer tone on day 7, final notice on day 14. <strong style={{ color: "#888" }}>It handles the timing, the wording, and the sending.</strong> You never have to think about it again.</>,
+    body: <>Tell Almondy how you want to chase — friendly nudge on day 3, firmer tone on day 7, final notice on day 14. <strong style={{ color: "#888" }}>It handles the timing, the wording, and the sending.</strong> You never have to think about it again.</>,
     visLabel: "Reminder Schedule",
     vis: <VisSchedule />
   },
@@ -386,7 +396,7 @@ const STEPS = [
   },
   {
     num: "Step 04 — Collect", heading: "Get paid. Move on.",
-    body: <>When a client pays, PayChaser marks it done and stops all reminders automatically. <strong style={{ color: "#888" }}>No double-checking, No Worry.</strong> Automated end to end so you can stop worrying and get back to work.</>,
+    body: <>When a client pays, Almondy marks it done and stops all reminders automatically. <strong style={{ color: "#888" }}>No double-checking, No Worry.</strong> Automated end to end so you can stop worrying and get back to work.</>,
     visLabel: "Payment Received",
     vis: <VisCelebrate />
   }
@@ -535,7 +545,7 @@ const PaychaserPage = ({ setPage }) => {
             Chase money.<br />Not clients.
           </h1>
           <p style={{ fontSize: 16, color: "#858585", lineHeight: 1.8, maxWidth: 520, margin: "0 auto 40px" }}>
-            PayChaser sends your overdue invoice reminders automatically. <strong style={{ color: "#888" }}>Friendly at first. Firm when needed.</strong> You focus on the work — we chase the money.
+            Almondy sends your overdue invoice reminders automatically. <strong style={{ color: "#888" }}>Friendly at first. Firm when needed.</strong> You focus on the work — we chase the money.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <button onClick={() => setPage("auth")} style={{ background: "var(--white)", color: "var(--black)", padding: "13px 28px", fontSize: 14, fontWeight: 700, borderRadius: 8, letterSpacing: "-0.3px", border: "none", cursor: "pointer", fontFamily: "var(--font)" }}>Get Started →</button>
@@ -550,7 +560,7 @@ const PaychaserPage = ({ setPage }) => {
           <div style={{ background: "#0c0c0c", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 16, overflow: "hidden", boxShadow: "0 40px 100px rgba(0,0,0,0.8)" }}>
             <div style={{ background: "#090909", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "14px 18px", display: "flex", alignItems: "center", gap: 7 }}>
               {[["#ff5f57"],["#febc2e"],["#28c840"]].map(([c]) => <div key={c} style={{ width: 11, height: 11, borderRadius: "50%", background: c }} />)}
-              <div style={{ flex: 1, textAlign: "center", fontSize: 12, fontWeight: 600, color: "#333", fontFamily: "var(--mono)", marginLeft: -55 }}>PayChaser — Dashboard</div>
+              <div style={{ flex: 1, textAlign: "center", fontSize: 12, fontWeight: 600, color: "#333", fontFamily: "var(--mono)", marginLeft: -55 }}>Almondy — Dashboard</div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", minHeight: 420 }}>
               <div style={{ background: "#0a0a0a", borderRight: "1px solid rgba(255,255,255,0.05)", padding: "20px 0", display: "flex", flexDirection: "column", gap: 2 }}>
@@ -661,7 +671,7 @@ const PaychaserPage = ({ setPage }) => {
       {/* CTA */}
       <div style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", background: "#0a0a0a", padding: "72px 48px", textAlign: "center" }}>
         <h2 style={{ fontSize: "clamp(28px, 3.5vw, 46px)", fontWeight: 800, letterSpacing: "-2px", color: "var(--white)", marginBottom: 16 }}>Ready to stop worrying?</h2>
-        <p style={{ fontSize: 15, color: "#444", marginBottom: 36 }}>Join businesses already using PayChaser to collect what they're owed.</p>
+        <p style={{ fontSize: 15, color: "#444", marginBottom: 36 }}>Join businesses already using Almondy to collect what they're owed.</p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
           <button onClick={() => setPage("auth")} style={{ background: "var(--white)", color: "var(--black)", padding: "13px 28px", fontSize: 14, fontWeight: 700, borderRadius: 8, border: "none", cursor: "pointer", fontFamily: "var(--font)" }}>Get Started Free →</button>
           <button onClick={() => setPage("systems")} style={{ background: "transparent", color: "#888", border: "1px solid rgba(255,255,255,0.12)", padding: "13px 28px", fontSize: 14, fontWeight: 600, borderRadius: 8 }}>Back to Systems</button>
@@ -750,10 +760,10 @@ const PRICES = {
 
 const FAQS = [
   ["Can I switch plans at any time?", "Yes — upgrade or downgrade whenever you like. Upgrades are prorated immediately. Downgrades kick in at the start of your next billing period."],
-  ["What counts as an \"active invoice\"?", "An active invoice is any invoice PayChaser is currently tracking or chasing. Once marked as paid or archived, it no longer counts toward your limit."],
+  ["What counts as an \"active invoice\"?", "An active invoice is any invoice Almondy is currently tracking or chasing. Once marked as paid or archived, it no longer counts toward your limit."],
   ["Is there really a free trial on Pro?", "Absolutely. 14 days, full Pro features, no credit card required. If it's not for you, walk away — no awkward cancellation flow, no hidden fees."],
-  ["How does automated chasing work?", "PayChaser sends a series of reminders on a schedule you control. It starts polite, escalates over time, and stops automatically the moment the invoice is paid."],
-  ["Do my clients see PayChaser branding?", "On Basic and Pro, reminders come from your name and email — clients won't see \"PayChaser\" anywhere. Max adds full white-label support including custom domains."],
+  ["How does automated chasing work?", "Almondy sends a series of reminders on a schedule you control. It starts polite, escalates over time, and stops automatically the moment the invoice is paid."],
+  ["Do my clients see Almondy branding?", "On Basic and Pro, reminders come from your name and email — clients won't see \"Almondy\" anywhere. Max adds full white-label support including custom domains."],
 ];
 
 const PricingPage = ({ setPage }) => {
@@ -876,8 +886,13 @@ const AuthPage = ({ setPage, setUser }) => {
 
       {/* Logo */}
       <button onClick={() => setPage("home")} style={{ position: "absolute", top: 28, left: 32, display: "flex", alignItems: "center", gap: 9, background: "none", border: "none" }}>
-        <AlmondLogo size={22} />
-        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almond</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 1650 380" style={{ height: 20, width: "auto", fill: "var(--white)" }}>
+        <text style={{ fontFamily: "Inter, sans-serif", fontSize: "306.1px", fontWeight: 600 }} transform="translate(221.25 264.4)"><tspan x="0" y="0">Almondy</tspan></text>
+        <g>
+          <path d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
+          <path d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
+        </g>
+      </svg>
       </button>
 
       <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 400, animation: "fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
@@ -885,7 +900,7 @@ const AuthPage = ({ setPage, setUser }) => {
           <>
             <div style={{ textAlign: "center", marginBottom: 36 }}>
               <div style={{ width: 52, height: 52, background: "#111", border: "1px solid #2a2a2a", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 22 }}>✉️</div>
-              <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-1px", color: "var(--white)", marginBottom: 8 }}>Sign in to PayChaser</h1>
+              <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-1px", color: "var(--white)", marginBottom: 8 }}>Sign in to Almondy</h1>
               <p style={{ fontSize: 14, color: "#858585", lineHeight: 1.6 }}>Enter your email and we'll send you a link to sign in. No password needed.</p>
             </div>
 
@@ -974,15 +989,20 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
       </div>
 
       <button onClick={() => setPage("home")} style={{ position: "absolute", top: 28, left: 32, display: "flex", alignItems: "center", gap: 9, background: "none", border: "none" }}>
-        <AlmondLogo size={22} />
-        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almond</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 1650 380" style={{ height: 20, width: "auto", fill: "var(--white)" }}>
+        <text style={{ fontFamily: "Inter, sans-serif", fontSize: "306.1px", fontWeight: 600 }} transform="translate(221.25 264.4)"><tspan x="0" y="0">Almondy</tspan></text>
+        <g>
+          <path d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
+          <path d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
+        </g>
+      </svg>
       </button>
 
       <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 480, animation: "fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--green)", letterSpacing: "1px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 16 }}>Welcome aboard</div>
           <h1 style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-1.2px", color: "var(--white)", marginBottom: 10 }}>What's your business called?</h1>
-          <p style={{ fontSize: 14, color: "#858585", lineHeight: 1.6 }}>This is how PayChaser will sign off your reminder emails to clients.</p>
+          <p style={{ fontSize: 14, color: "#858585", lineHeight: 1.6 }}>This is how Almondy will sign off your reminder emails to clients.</p>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -1036,8 +1056,13 @@ const STATUS_CONFIG = {
 const AppNav = ({ user, setPage }) => (
   <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: 58, background: "rgba(8,8,8,0.95)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 28px" }}>
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <AlmondLogo size={20} />
-      <span style={{ fontSize: 14, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>PayChaser</span>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 1650 380" style={{ height: 22, width: "auto", fill: "var(--white)" }}>
+        <text style={{ fontFamily: "Inter, sans-serif", fontSize: "306.1px", fontWeight: 600 }} transform="translate(221.25 264.4)"><tspan x="0" y="0">Almondy</tspan></text>
+        <g>
+          <path d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
+          <path d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
+        </g>
+      </svg>
       {/* Free plan badge */}
       {user?.plan === "free" && (
         <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 999, padding: "2px 10px", fontSize: 10.5, fontWeight: 700, color: "#f59e0b", letterSpacing: "0.5px" }}>
@@ -1317,7 +1342,7 @@ const PaywallPage = ({ setPage, user, setUser }) => {
             You've hit the free limit
           </h1>
           <p style={{ fontSize: 14, color: "#666", lineHeight: 1.7, maxWidth: 440, margin: "0 auto 28px" }}>
-            You're on 5 of 5 free invoices. Upgrade to keep chasing — and let PayChaser do the hard work.
+            You're on 5 of 5 free invoices. Upgrade to keep chasing — and let Almondy do the hard work.
           </p>
 
           {/* Billing toggle */}
