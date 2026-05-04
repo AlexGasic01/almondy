@@ -1,11 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-/* ─── SUPABASE CLIENT ─── */
-const SUPABASE_URL = "https://qmaqmbimnhzyspvnioeb.supabase.co";
-const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtYXFtYmltbmh6eXNwdm5pb2ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MzU2MjAsImV4cCI6MjA5MzQxMTYyMH0.wicztn4rC4a46UFJRmS1w5jw3tgM4uLj376HpEFlvs4";
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
-
 
 /* ─── SHARED ASSETS ─── */
 const AlmondLogo = ({ size = 24, fill = "#fff" }) => (
@@ -545,7 +538,7 @@ const PaychaserPage = ({ setPage }) => {
             PayChaser sends your overdue invoice reminders automatically. <strong style={{ color: "#888" }}>Friendly at first. Firm when needed.</strong> You focus on the work — we chase the money.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="https://app.paychaser.com" style={{ background: "var(--white)", color: "var(--black)", padding: "13px 28px", fontSize: 14, fontWeight: 700, borderRadius: 8, letterSpacing: "-0.3px" }}>Get Started →</a>
+            <button onClick={() => setPage("auth")} style={{ background: "var(--white)", color: "var(--black)", padding: "13px 28px", fontSize: 14, fontWeight: 700, borderRadius: 8, letterSpacing: "-0.3px", border: "none", cursor: "pointer", fontFamily: "var(--font)" }}>Get Started →</button>
             <a href="#how" style={{ background: "transparent", color: "#888", border: "1px solid rgba(255,255,255,0.12)", padding: "13px 28px", fontSize: 14, fontWeight: 600, borderRadius: 8, letterSpacing: "-0.3px" }}>See How It Works</a>
           </div>
         </div>
@@ -659,7 +652,7 @@ const PaychaserPage = ({ setPage }) => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 48, paddingTop: 32, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
           <button onClick={() => goTo(step - 1)} disabled={step === 0} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", fontSize: 13, fontWeight: 600, borderRadius: 8, background: "transparent", color: "#858585", border: "1px solid rgba(255,255,255,0.08)", opacity: step === 0 ? 0.2 : 1, cursor: step === 0 ? "default" : "pointer" }}>← Previous</button>
           <span style={{ fontSize: 12, color: "#333", fontFamily: "var(--mono)" }}>Step <span style={{ color: "#666" }}>{step + 1}</span> of 4</span>
-          <button onClick={() => step < STEPS.length - 1 ? goTo(step + 1) : window.open("https://app.paychaser.com")} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", fontSize: 13, fontWeight: 600, borderRadius: 8, background: step === STEPS.length - 1 ? "var(--green)" : "var(--white)", color: "var(--black)", border: "none" }}>
+          <button onClick={() => step < STEPS.length - 1 ? goTo(step + 1) : setPage("auth")} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", fontSize: 13, fontWeight: 600, borderRadius: 8, background: step === STEPS.length - 1 ? "var(--green)" : "var(--white)", color: "var(--black)", border: "none" }}>
             {step === STEPS.length - 1 ? "Get Started →" : "Next →"}
           </button>
         </div>
@@ -670,7 +663,7 @@ const PaychaserPage = ({ setPage }) => {
         <h2 style={{ fontSize: "clamp(28px, 3.5vw, 46px)", fontWeight: 800, letterSpacing: "-2px", color: "var(--white)", marginBottom: 16 }}>Ready to stop worrying?</h2>
         <p style={{ fontSize: 15, color: "#444", marginBottom: 36 }}>Join businesses already using PayChaser to collect what they're owed.</p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-          <a href="https://app.paychaser.com" style={{ background: "var(--white)", color: "var(--black)", padding: "13px 28px", fontSize: 14, fontWeight: 700, borderRadius: 8 }}>Get Started Free →</a>
+          <button onClick={() => setPage("auth")} style={{ background: "var(--white)", color: "var(--black)", padding: "13px 28px", fontSize: 14, fontWeight: 700, borderRadius: 8, border: "none", cursor: "pointer", fontFamily: "var(--font)" }}>Get Started Free →</button>
           <button onClick={() => setPage("systems")} style={{ background: "transparent", color: "#888", border: "1px solid rgba(255,255,255,0.12)", padding: "13px 28px", fontSize: 14, fontWeight: 600, borderRadius: 8 }}>Back to Systems</button>
         </div>
       </div>
@@ -853,19 +846,21 @@ const AuthPage = ({ setPage, setUser }) => {
   const [step, setStep] = useState("email"); // "email" | "sent"
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const handleSend = async () => {
+  const handleSend = () => {
     if (!email.includes("@")) return;
     setLoading(true);
-    setError("");
-    const { error: err } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin },
-    });
-    setLoading(false);
-    if (err) { setError(err.message); return; }
-    setStep("sent");
+    // Simulate sending magic link
+    setTimeout(() => {
+      setLoading(false);
+      setStep("sent");
+    }, 1200);
+  };
+
+  // Simulate clicking magic link — goes straight to onboarding
+  const handleMagicClick = () => {
+    setUser({ email });
+    setPage("onboarding");
   };
 
   return (
@@ -910,7 +905,6 @@ const AuthPage = ({ setPage, setUser }) => {
               </button>
             </div>
 
-            {error && <p style={{ textAlign: "center", fontSize: 12, color: "#f87171", marginTop: 8 }}>{error}</p>}
             <p style={{ textAlign: "center", fontSize: 12, color: "#444", marginTop: 20, lineHeight: 1.6 }}>
               By continuing you agree to our{" "}
               <span style={{ color: "#666", cursor: "pointer" }}>Terms</span> and{" "}
@@ -942,9 +936,10 @@ const AuthPage = ({ setPage, setUser }) => {
                 <p style={{ fontSize: 12, color: "#555", lineHeight: 1.7, marginBottom: 16 }}>
                   Click the button below to sign in to PayChaser. This link expires in 15 minutes.
                 </p>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 18px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 7, fontSize: 12, color: "var(--green)", fontWeight: 600 }}>
-                  ✓ Check your email — link expires in 15 mins
-                </div>
+                {/* This button simulates clicking the magic link */}
+                <button onClick={handleMagicClick} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 18px", background: "var(--white)", color: "var(--black)", border: "none", borderRadius: 7, fontSize: 13, fontWeight: 700 }}>
+                  Sign in to PayChaser →
+                </button>
               </div>
             </div>
 
@@ -967,18 +962,13 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
   const [bizName, setBizName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleContinue = async () => {
+  const handleContinue = () => {
     if (!bizName.trim()) return;
     setLoading(true);
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    if (authUser) {
-      await supabase
-        .from("profiles")
-        .update({ biz_name: bizName.trim() })
-        .eq("id", authUser.id);
-    }
-    setUser(u => ({ ...u, bizName: bizName.trim(), plan: "free" }));
-    setPage("dashboard");
+    setTimeout(() => {
+      setUser(u => ({ ...u, bizName: bizName.trim(), plan: "free" }));
+      setPage("dashboard");
+    }, 800);
   };
 
   return (
@@ -1350,58 +1340,11 @@ const PaywallPage = ({ setPage, user, setUser }) => {
 export default function App() {
   const [page, setPage] = useState("home");
   const [user, setUser] = useState(null); // { email, bizName, plan }
-  const [authLoading, setAuthLoading] = useState(true);
-
-  // ── Listen for Supabase auth state changes ──
-  useEffect(() => {
-    // Check for existing session on load (handles magic link redirect)
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("biz_name, plan")
-          .eq("id", session.user.id)
-          .single();
-        const bizName = profile?.biz_name || "";
-        const plan = profile?.plan || "free";
-        setUser({ email: session.user.email, bizName, plan });
-        setPage(bizName ? "dashboard" : "onboarding");
-      }
-      setAuthLoading(false);
-    });
-
-    // Listen for sign-in via magic link
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_IN" && session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("biz_name, plan")
-          .eq("id", session.user.id)
-          .single();
-        const bizName = profile?.biz_name || "";
-        const plan = profile?.plan || "free";
-        setUser({ email: session.user.email, bizName, plan });
-        setPage(bizName ? "dashboard" : "onboarding");
-      }
-      if (event === "SIGNED_OUT") {
-        setUser(null);
-        setPage("home");
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const handleSetPage = (p) => {
     setPage(p);
     window.scrollTo(0, 0);
   };
-
-  if (authLoading) return (
-    <div style={{ minHeight: "100vh", background: "#080808", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <AlmondLogo size={32} fill="#222" />
-    </div>
-  );
 
   // Marketing pages use the public Nav; app pages have their own chrome
   const isAppPage = ["auth", "onboarding", "dashboard", "paywall"].includes(page);
