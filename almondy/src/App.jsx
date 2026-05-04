@@ -15,14 +15,13 @@ const AlmondLogo = ({ size = 24, fill = "#fff" }) => (
 );
 
 const SplashScreen = ({ onDone }) => {
-  const [phase, setPhase] = useState("in");
+  const [phase, setPhase] = useState("center"); // "center" | "shift" | "out"
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("reveal"), 400);
-    const t2 = setTimeout(() => setPhase("hold"),   1100);
-    const t3 = setTimeout(() => setPhase("out"),    1800);
-    const t4 = setTimeout(() => onDone(),           2350);
-    return () => [t1,t2,t3,t4].forEach(clearTimeout);
+    const t1 = setTimeout(() => setPhase("shift"), 700);  // icon slides left, text reveals
+    const t2 = setTimeout(() => setPhase("out"),   2000); // whole thing fades
+    const t3 = setTimeout(() => onDone(),          2550);
+    return () => [t1, t2, t3].forEach(clearTimeout);
   }, []);
 
   return (
@@ -34,25 +33,39 @@ const SplashScreen = ({ onDone }) => {
       transition: phase === "out" ? "opacity 0.55s cubic-bezier(0.4,0,0.2,1)" : "none",
       pointerEvents: "none",
     }}>
+      {/* This wrapper is what shifts left to make room for the text */}
       <div style={{
         display: "flex", alignItems: "center",
-        opacity: phase === "in" ? 0 : 1,
-        transform: phase === "in" ? "scale(0.88)" : "scale(1)",
-        transition: "opacity 0.4s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+        transform: phase === "center" ? "translateX(0px)" : "translateX(-90px)",
+        transition: phase === "shift" ? "transform 0.6s cubic-bezier(0.22,1,0.36,1)" : "none",
       }}>
-        <AlmondLogo size={42} fill="#ffffff" />
+        {/* Icon */}
+        <svg
+          viewBox="0 0 561.91 628.53"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ height: 44, width: "auto", fill: "white", flexShrink: 0 }}
+        >
+          <path d="M2.37,433.93c5.95,44.84,22.67,84.11,49.04,115.98.32-16.47,1.63-33.27,4.01-50.39,18.36-132.33,95.72-262.99,212.25-358.49,67.05-54.96,138.22-95.7,207.27-121.48-99.64-54.78-268.15,9.03-384.82,148.69C22.66,248.99-9.33,345.84,2.37,433.93Z"/>
+          <path d="M271.8,622.59c86.78-19.14,166.84-82.32,219.66-173.34,77.69-133.88,90.98-284.25,40.57-372.28-7.71,47.74-23.46,95.95-47.04,142.29-41.7,81.94-97.72,149.54-157.93,196.54-7.26,5.67-15.58-6.84-8.81-13.24,51.1-48.35,98.09-110.98,134.89-183.96,26.67-52.89,44.21-107.7,52.39-161.59-25.45,30.76-52.9,57.6-81.31,79.78-7.2,5.63-15.46-6.8-8.75-13.15,25.62-24.25,50.19-52.14,72.95-83.13-63.05,28.29-127.15,67.93-188.21,118.35-128.11,105.78-212.81,248.36-232.38,391.17-.72,5.27-1.34,10.5-1.88,15.7,8.66,8.54,18.12,16.44,28.37,23.61,51.43,36.01,112.81,47.48,177.49,33.24Z"/>
+        </svg>
+
+        {/* Text revealed by clip-path from left to right */}
         <div style={{
-          clipPath: phase === "reveal" || phase === "hold"
+          clipPath: phase === "shift"
             ? "inset(0% 0% 0% 0%)"
             : "inset(0% 100% 0% 0%)",
-          transition: phase === "reveal"
-            ? "clip-path 0.55s cubic-bezier(0.22,1,0.36,1)"
+          transition: phase === "shift"
+            ? "clip-path 0.55s 0.15s cubic-bezier(0.22,1,0.36,1)"
             : "none",
         }}>
           <span style={{
-            display: "block", fontSize: 34, fontWeight: 800,
-            letterSpacing: "-1.5px", color: "#ffffff",
-            paddingLeft: 11, whiteSpace: "nowrap",
+            display: "block",
+            fontSize: 34,
+            fontWeight: 800,
+            letterSpacing: "-1.5px",
+            color: "#ffffff",
+            paddingLeft: 12,
+            whiteSpace: "nowrap",
             fontFamily: "Inter, sans-serif",
           }}>
             Almondy
