@@ -15,22 +15,25 @@ const AlmondLogo = ({ size = 24, fill = "#fff" }) => (
 );
 
 const SplashScreen = ({ onDone }) => {
-  const [phase, setPhase] = useState("center");
+  const [phase, setPhase] = useState("hidden"); // "hidden" | "icon" | "text" | "out"
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("shift"), 700);
-    const t2 = setTimeout(() => setPhase("out"),   2100);
-    const t3 = setTimeout(() => onDone(),          2650);
-    return () => [t1, t2, t3].forEach(clearTimeout);
+    const t1 = setTimeout(() => setPhase("icon"),  100);  // icon fades in
+    const t2 = setTimeout(() => setPhase("text"),  900);  // text sweeps out
+    const t3 = setTimeout(() => setPhase("out"),   2200); // fade away
+    const t4 = setTimeout(() => onDone(),          2750);
+    return () => [t1,t2,t3,t4].forEach(clearTimeout);
   }, []);
 
-  // At height 48px, the wordmark SVG (1525.07 wide, 365.74 tall) renders at:
-  // width = 48 * (1525.07 / 365.74) = ~200px total
-  // icon portion = 48 * (210 / 365.74) = ~27.5px wide
-  // text portion = ~200 - 27.5 = ~172.5px
-  // so icon shifts left by half the text portion = ~86px
+  const iconVisible = phase === "icon" || phase === "text" || phase === "out";
+  const textVisible = phase === "text" || phase === "out";
 
-  const SHIFT = 86;
+  // Both layers use identical SVG viewBox — they sit exactly on top of each other
+  const svgProps = {
+    viewBox: "0 0 1525.07 365.74",
+    xmlns: "http://www.w3.org/2000/svg",
+    style: { height: 44, width: "auto", display: "block", position: "absolute", top: 0, left: 0 },
+  };
 
   return (
     <div style={{
@@ -38,58 +41,46 @@ const SplashScreen = ({ onDone }) => {
       background: "#080808",
       display: "flex", alignItems: "center", justifyContent: "center",
       opacity: phase === "out" ? 0 : 1,
-      transition: phase === "out" ? "opacity 0.55s cubic-bezier(0.4,0,0.2,1)" : "none",
+      transition: phase === "out" ? "opacity 0.6s cubic-bezier(0.4,0,0.2,1)" : "none",
       pointerEvents: "none",
     }}>
+      {/* Container sized to the wordmark — both SVG layers stack inside it */}
+      <div style={{
+        position: "relative",
+        // 1525.07 / 365.74 * 44px height = ~183.5px wide
+        width: Math.round(1525.07 / 365.74 * 44),
+        height: 44,
+      }}>
 
-      {/* Outer wrapper stays centered. Inner shifts so icon+text end up centered together */}
-      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-
-        {/* ICON — shifts left on "shift" phase */}
-        <div style={{
-          flexShrink: 0,
-          transform: phase === "shift" ? `translateX(-${SHIFT}px)` : "translateX(0px)",
-          transition: phase === "shift" ? "transform 0.65s cubic-bezier(0.22,1,0.36,1)" : "none",
-          zIndex: 1,
+        {/* LAYER 1 — icon only, fades in */}
+        <svg {...svgProps} style={{ ...svgProps.style,
+          opacity: iconVisible ? 1 : 0,
+          transform: iconVisible ? "scale(1)" : "scale(0.88)",
+          transition: "opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1)",
         }}>
-          <svg
-            viewBox="0 0 210 365.74"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ height: 48, width: "auto", display: "block", fill: "white" }}
-          >
+          <g fill="white">
             <path d="M.87,192.5c2.19,16.56,8.35,31.07,18.06,42.85.12-6.08.6-12.29,1.48-18.62,6.76-48.89,35.26-97.16,78.18-132.45,24.7-20.3,50.91-35.36,76.35-44.88-36.7-20.24-98.77,3.34-141.74,54.93C8.35,124.18-3.43,159.96.87,192.5Z"/>
             <path d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
-          </svg>
-        </div>
+          </g>
+        </svg>
 
-        {/* TEXT — hidden behind clipPath, shifts right simultaneously, reveals as it moves */}
-        <div style={{
-          position: "absolute",
-          left: "50%",
-          transform: phase === "shift" ? `translateX(${SHIFT - 8}px)` : "translateX(-80px)",
-          clipPath: phase === "shift" ? "inset(0% 0% 0% 0%)" : "inset(0% 100% 0% 0%)",
-          transition: phase === "shift"
-            ? "transform 0.65s cubic-bezier(0.22,1,0.36,1), clip-path 0.55s 0.05s cubic-bezier(0.22,1,0.36,1)"
-            : "none",
+        {/* LAYER 2 — text only, sweeps in via clipPath */}
+        <svg {...svgProps} style={{ ...svgProps.style,
+          clipPath: textVisible ? "inset(0% 0% 0% 0%)" : "inset(0% 100% 0% 14.5%)",
+          transition: textVisible ? "clip-path 0.6s cubic-bezier(0.22,1,0.36,1)" : "none",
         }}>
-          <svg
-            viewBox="221.25 0 1303.82 365.74"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ height: 48, width: "auto", display: "block" }}
+          <text
+            fontFamily="Inter, sans-serif"
+            fontSize="306.1"
+            fontWeight="600"
+            fill="white"
+            transform="translate(221.25 264.4)"
           >
-            <text
-              fontFamily="Inter, sans-serif"
-              fontSize="306.1"
-              fontWeight="600"
-              fill="white"
-              transform="translate(221.25 264.4)"
-            >
-              <tspan x="0" y="0">Almon</tspan>
-              <tspan x="940.13" y="0">d</tspan>
-              <tspan x="1130.99" y="0">y</tspan>
-            </text>
-          </svg>
-        </div>
+            <tspan x="0" y="0">Almon</tspan>
+            <tspan x="940.13" y="0">d</tspan>
+            <tspan x="1130.99" y="0">y</tspan>
+          </text>
+        </svg>
 
       </div>
     </div>
