@@ -1544,27 +1544,23 @@ export default function App() {
         .eq("id", session.user.id)
         .single();
 
-      if (!profile) {
-        // New user — create profile and send to onboarding
-        await supabase.from("profiles").insert({
-          id: session.user.id,
-          email,
-          plan: "free",
-        });
-        setUser({ id: session.user.id, email, plan: "free" });
-        setPage("onboarding");
+    if (!profile) {
+      await supabase.from("profiles").insert({
+        id: session.user.id,
+        email,
+        plan: "free",
+      });
+      setUser({ id: session.user.id, email, plan: "free" });
+      setPage("paywall"); // 👈 was "onboarding"
+    } else {
+      setUser({ id: session.user.id, email, plan: profile.plan || "free", bizName: profile.biz_name });
+      const hasActivePlan = profile.plan === "pro" || profile.plan === "max";
+      if (!hasActivePlan) {
+        setPage("paywall"); // 👈 skip onboarding/dashboard checks entirely
       } else {
-        // Existing user — check plan and route accordingly
-        setUser({ id: session.user.id, email, plan: profile.plan || "free", bizName: profile.biz_name });
-        const hasActivePlan = profile.plan === "pro" || profile.plan === "max";
-        if (!profile.biz_name) {
-          setPage("onboarding");
-        } else if (!hasActivePlan) {
-          setPage("paywall");
-        } else {
-          setPage("dashboard");
-        }
+        setPage("dashboard");
       }
+    }
 
       // Clean URL after magic link redirect
       window.history.replaceState({}, "", window.location.pathname);
