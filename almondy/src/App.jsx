@@ -15,12 +15,12 @@ const AlmondLogo = ({ size = 24, fill = "#fff" }) => (
 );
 
 const SplashScreen = ({ onDone }) => {
-  const [phase, setPhase] = useState("hidden"); // "hidden" | "icon" | "text" | "out"
+  const [phase, setPhase] = useState("hidden");
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("icon"),  100);  // icon fades in
-    const t2 = setTimeout(() => setPhase("text"),  900);  // text sweeps out
-    const t3 = setTimeout(() => setPhase("out"),   2200); // fade away
+    const t1 = setTimeout(() => setPhase("icon"),  100);
+    const t2 = setTimeout(() => setPhase("text"),  900);
+    const t3 = setTimeout(() => setPhase("out"),   2200);
     const t4 = setTimeout(() => onDone(),          2750);
     return () => [t1,t2,t3,t4].forEach(clearTimeout);
   }, []);
@@ -28,11 +28,13 @@ const SplashScreen = ({ onDone }) => {
   const iconVisible = phase === "icon" || phase === "text" || phase === "out";
   const textVisible = phase === "text" || phase === "out";
 
-  // Both layers use identical SVG viewBox — they sit exactly on top of each other
-  const svgProps = {
-    viewBox: "0 0 1525.07 365.74",
-    xmlns: "http://www.w3.org/2000/svg",
-    style: { height: 44, width: "auto", display: "block", position: "absolute", top: 0, left: 0 },
+  const W = 1525.07, H = 365.74, HEIGHT = 56;
+  const containerW = Math.round(W / H * HEIGHT);
+
+  const svgStyle = {
+    height: HEIGHT, width: containerW,
+    display: "block", position: "absolute", top: 0, left: 0,
+    overflow: "visible",
   };
 
   return (
@@ -44,18 +46,14 @@ const SplashScreen = ({ onDone }) => {
       transition: phase === "out" ? "opacity 0.6s cubic-bezier(0.4,0,0.2,1)" : "none",
       pointerEvents: "none",
     }}>
-      {/* Container sized to the wordmark — both SVG layers stack inside it */}
-      <div style={{
-        position: "relative",
-        // 1525.07 / 365.74 * 44px height = ~183.5px wide
-        width: Math.round(1525.07 / 365.74 * 44),
-        height: 44,
-      }}>
+      <div style={{ position: "relative", width: containerW, height: HEIGHT }}>
 
-        {/* LAYER 1 — icon only, fades in */}
-        <svg {...svgProps} style={{ ...svgProps.style,
+        {/* LAYER 1 — icon fades + scales in */}
+        <svg viewBox={`0 0 ${W} ${H}`} xmlns="http://www.w3.org/2000/svg" style={{
+          ...svgStyle,
           opacity: iconVisible ? 1 : 0,
           transform: iconVisible ? "scale(1)" : "scale(0.88)",
+          transformOrigin: "11% 50%",
           transition: "opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1)",
         }}>
           <g fill="white">
@@ -64,10 +62,16 @@ const SplashScreen = ({ onDone }) => {
           </g>
         </svg>
 
-        {/* LAYER 2 — text only, sweeps in via clipPath */}
-        <svg {...svgProps} style={{ ...svgProps.style,
-          clipPath: textVisible ? "inset(0% 0% 0% 0%)" : "inset(0% 100% 0% 14.5%)",
-          transition: textVisible ? "clip-path 0.6s cubic-bezier(0.22,1,0.36,1)" : "none",
+        {/* LAYER 2 — text sweeps out from behind icon */}
+        {/* Icon ends at x≈210 out of 1525.07 = 13.77% — clip starts there and sweeps right */}
+        <svg viewBox={`0 0 ${W} ${H}`} xmlns="http://www.w3.org/2000/svg" style={{
+          ...svgStyle,
+          clipPath: textVisible
+            ? "inset(0% 0% 0% 0%)"
+            : "inset(0% 0% 0% 13.77%)",
+          transition: textVisible
+            ? "clip-path 0.6s cubic-bezier(0.22,1,0.36,1)"
+            : "none",
         }}>
           <text
             fontFamily="Inter, sans-serif"
@@ -424,7 +428,7 @@ const SystemsPage = ({ setPage }) => (
       </h1>
       <p style={{ fontSize: 15.5, color: "#858585", maxWidth: 480, lineHeight: 1.75 }}>Software built for the real world. Each system solves one problem, and solves it well.</p>
     </div>
-    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 64px 120px" }}>
+    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 64px" }}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
         <SysCard onClick={() => setPage("paychaser")} live name="PayChaser" desc="Track invoices, chase payments, and collect faster — all in one place. Automated reminders that stay friendly until they can't." />
         <LockedCard />
