@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
 /* ─── SHARED ASSETS ─── */
-const AlmondLogo = ({ size = 24, fill = "#fff" }) => (
-  <svg viewBox="0 0 214 410" xmlns="http://www.w3.org/2000/svg" style={{ height: size, width: "auto", fill }}>
-    <path d="M.95,217.78c2.4,18.11,9.13,33.98,19.75,46.86.13-6.65.66-13.44,1.61-20.36,7.4-53.46,38.56-106.25,85.49-144.84,27.01-22.2,55.67-38.66,83.49-49.08-40.13-22.13-108,3.65-155,60.07C9.13,143.06-3.76,182.19.95,217.78Z"/>
-    <path d="M109.47,294c34.95-7.73,67.2-33.26,88.48-70.03,31.29-54.09,36.64-114.84,16.34-150.41-3.1,19.29-9.45,38.76-18.95,57.49-16.8,33.11-39.36,60.41-63.61,79.41-2.92,2.29-6.27-2.77-3.55-5.35,20.58-19.54,39.51-44.84,54.33-74.32,10.74-21.37,17.81-43.51,21.1-65.29-10.25,12.43-21.31,23.27-32.75,32.23-2.9,2.27-6.23-2.75-3.52-5.31,10.32-9.8,20.22-21.07,29.38-33.58-25.4,11.43-51.22,27.45-75.81,47.81-51.6,42.74-85.71,100.34-93.6,158.04-.29,2.13-.54,4.24-.76,6.34,3.49,3.45,7.3,6.64,11.43,9.54,20.72,14.55,45.44,19.18,71.49,13.43Z"/>
+// Icon-only mark
+const AlmondyIcon = ({ size = 24, fill = "#fff" }) => (
+  <svg viewBox="0 0 561.91 628.53" xmlns="http://www.w3.org/2000/svg" style={{ height: size, width: "auto", fill }}>
+    <path d="M2.37,433.93c5.95,44.84,22.67,84.11,49.04,115.98.32-16.47,1.63-33.27,4.01-50.39,18.36-132.33,95.72-262.99,212.25-358.49,67.05-54.96,138.22-95.7,207.27-121.48-99.64-54.78-268.15,9.03-384.82,148.69C22.66,248.99-9.33,345.84,2.37,433.93Z"/>
+    <path d="M271.8,622.59c86.78-19.14,166.84-82.32,219.66-173.34,77.69-133.88,90.98-284.25,40.57-372.28-7.71,47.74-23.46,95.95-47.04,142.29-41.7,81.94-97.72,149.54-157.93,196.54-7.26,5.67-15.58-6.84-8.81-13.24,51.1-48.35,98.09-110.98,134.89-183.96,26.67-52.89,44.21-107.7,52.39-161.59-25.45,30.76-52.9,57.6-81.31,79.78-7.2,5.63-15.46-6.8-8.75-13.15,25.62-24.25,50.19-52.14,72.95-83.13-63.05,28.29-127.15,67.93-188.21,118.35-128.11,105.78-212.81,248.36-232.38,391.17-.72,5.27-1.34,10.5-1.88,15.7,8.66,8.54,18.12,16.44,28.37,23.61,51.43,36.01,112.81,47.48,177.49,33.24Z"/>
   </svg>
 );
+// For backward compat with any AlmondLogo refs left in app pages
+const AlmondLogo = AlmondyIcon;
 
 const LockSVG = () => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
@@ -87,8 +90,8 @@ const Nav = ({ page, setPage }) => {
       borderBottom: "1px solid var(--border)"
     }}>
       <button onClick={() => setPage("home")} style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none" }}>
-        <AlmondLogo size={24} />
-        <span style={{ fontSize: 16, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almond</span>
+        <AlmondyIcon size={24} />
+        <span style={{ fontSize: 16, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almondy</span>
       </button>
       <ul style={{ display: "flex", gap: 36, listStyle: "none" }}>
         {links.map(l => (
@@ -120,10 +123,10 @@ const Footer = ({ setPage }) => (
       display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16
     }}>
       <button onClick={() => setPage("home")} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none" }}>
-        <AlmondLogo size={18} fill="var(--muted)" />
-        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--muted)" }}>Almond</span>
+        <AlmondyIcon size={18} fill="var(--muted)" />
+        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--muted)" }}>Almondy</span>
       </button>
-      <span style={{ fontSize: 12, color: "var(--muted)", fontFamily: "var(--mono)" }}>© 2026 Almond. All rights reserved.</span>
+      <span style={{ fontSize: 12, color: "var(--muted)", fontFamily: "var(--mono)" }}>© 2026 Almondy. All rights reserved.</span>
       <ul style={{ display: "flex", gap: 20, listStyle: "none" }}>
         {["Privacy", "Terms", "Systems", "PayChaser", "Contact"].map(l => (
           <li key={l}>
@@ -872,7 +875,7 @@ const AuthPage = ({ setPage, setUser }) => {
       {/* Logo */}
       <button onClick={() => setPage("home")} style={{ position: "absolute", top: 28, left: 32, display: "flex", alignItems: "center", gap: 9, background: "none", border: "none" }}>
         <AlmondLogo size={22} />
-        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almond</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almondy</span>
       </button>
 
       <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 400, animation: "fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
@@ -983,7 +986,7 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
 
       <button onClick={() => setPage("home")} style={{ position: "absolute", top: 28, left: 32, display: "flex", alignItems: "center", gap: 9, background: "none", border: "none" }}>
         <AlmondLogo size={22} />
-        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almond</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--white)", letterSpacing: "-0.3px" }}>Almondy</span>
       </button>
 
       <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 480, animation: "fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
