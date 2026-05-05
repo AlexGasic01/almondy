@@ -1171,7 +1171,7 @@ onClick={async () => {
         `,
       }),
     });
-  } catch(e) { console.error(e); }
+} catch(e) { console.error("Email failed:", e); }
   setSubmitted(true);
 }}
               disabled={!canNext()}
