@@ -2051,7 +2051,15 @@ const PaywallPage = ({ setPage, user, setUser }) => {
 const WebDevPage = ({ setPage }) => {
   const isMobile = useIsMobile();
   const [openFaq,setOpenFaq] = useState(null);
+  const [activeStep, setActiveStep] = useState(0);
 
+  useEffect(() => {
+  const interval = setInterval(() => {
+    setActiveStep(s => (s + 1) % process.length);
+  }, 2500);
+  return () => clearInterval(interval);
+}, []);
+  
   const services = [
     { icon:"⚡",title:"Landing Pages",desc:"High-converting single pages built to turn visitors into customers.",price:"From $400" },
     { icon:"◈",title:"Business Websites",desc:"Multi-page sites that represent your business properly.",price:"From $800" },
@@ -2101,76 +2109,29 @@ const WebDevPage = ({ setPage }) => {
     <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",lineHeight:1.05 }}>Up and running fast.</h2>
   </div>
 
-  {(() => {
-    const [activeStep, setActiveStep] = useState(0);
-    const [stepVisible, setStepVisible] = useState(true);
-
-    const goToStep = (n) => {
-      setStepVisible(false);
-      setTimeout(() => { setActiveStep(n); setStepVisible(true); }, 180);
-    };
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setActiveStep(s => {
-          const next = (s + 1) % process.length;
-          setStepVisible(false);
-          setTimeout(() => setStepVisible(true), 180);
-          return next;
-        });
-      }, 2800);
-      return () => clearInterval(interval);
-    }, []);
-
-    const s = process[activeStep];
-
-    return (
-      <>
-        {/* Progress dots */}
-        <div style={{ display:"flex",alignItems:"center",marginBottom:isMobile?36:48 }}>
-          {process.map((_,i) => (
-            <div key={i} style={{ display:"contents" }}>
-              <button onClick={() => goToStep(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<=activeStep?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i===activeStep?"var(--green)":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)",color:i===activeStep?"var(--black)":i<activeStep?"var(--green)":"#333",fontSize:isMobile?10:11,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1,boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none",transition:"all 0.35s",cursor:"pointer" }}>{i+1}</button>
-              {i < process.length-1 && (
-                <div style={{ flex:1,height:1,background:"rgba(255,255,255,0.07)",position:"relative" }}>
-                  <div style={{ position:"absolute",top:0,left:0,height:"100%",width:activeStep>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Active step card */}
-        <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:isMobile?20:48,alignItems:"center",minHeight:180 }}>
-          <div style={{ opacity:stepVisible?1:0,transform:stepVisible?"translateY(0)":"translateY(12px)",transition:"all 0.3s cubic-bezier(0.22,1,0.36,1)" }}>
-            <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--green)",fontFamily:"var(--mono)",marginBottom:12 }}>Step {s.step}</div>
-            <div style={{ fontSize:isMobile?"clamp(22px,6vw,30px)":"clamp(24px,2.5vw,34px)",fontWeight:800,letterSpacing:"-1.2px",color:"var(--white)",lineHeight:1.1,marginBottom:10 }}>{s.title}</div>
-            <p style={{ fontSize:14,color:"#858585",lineHeight:1.8,margin:0 }}>{s.desc}</p>
+  <div style={{ display:"flex",alignItems:"center",marginBottom:isMobile?28:40 }}>
+    {process.map((_,i) => (
+      <div key={i} style={{ display:"contents" }}>
+        <button onClick={() => setActiveStep(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<=activeStep?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i===activeStep?"var(--green)":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)",color:i===activeStep?"var(--black)":i<activeStep?"var(--green)":"#333",fontSize:isMobile?10:11,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1,boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none",transition:"all 0.35s",cursor:"pointer" }}>{i+1}</button>
+        {i < process.length-1 && (
+          <div style={{ flex:1,height:1,background:"rgba(255,255,255,0.07)",position:"relative" }}>
+            <div style={{ position:"absolute",top:0,left:0,height:"100%",width:activeStep>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} />
           </div>
+        )}
+      </div>
+    ))}
+  </div>
 
-          {/* All 4 cards mini-grid on right */}
-          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
-            {process.map(({ step,title },i) => (
-              <button key={step} onClick={() => goToStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${i===activeStep?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.06)"}`,borderRadius:12,padding:"16px 14px",textAlign:"left",cursor:"pointer",transition:"all 0.25s",position:"relative",overflow:"hidden" }}>
-                {i===activeStep&&<div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,rgba(34,197,94,0.7),transparent)" }} />}
-                <div style={{ fontSize:10,fontWeight:700,letterSpacing:"2px",color:i===activeStep?"var(--green)":"#333",fontFamily:"var(--mono)",marginBottom:6 }}>{step}</div>
-                <div style={{ fontSize:12.5,fontWeight:700,color:i===activeStep?"var(--white)":"#444",letterSpacing:"-0.3px" }}>{title}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Nav */}
-        <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:32,paddingTop:24,borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-          <button onClick={() => goToStep(activeStep-1)} disabled={activeStep===0} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"10px 20px",fontSize:13,fontWeight:600,borderRadius:8,background:"transparent",color:"#555",border:"1px solid rgba(255,255,255,0.08)",opacity:activeStep===0?0.2:1,cursor:activeStep===0?"default":"pointer" }}>← Prev</button>
-          <span style={{ fontSize:11,color:"#333",fontFamily:"var(--mono)" }}>{activeStep+1} / {process.length}</span>
-          <button onClick={() => activeStep<process.length-1?goToStep(activeStep+1):setPage("webdev-onboarding")} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"10px 20px",fontSize:13,fontWeight:600,borderRadius:8,background:activeStep===process.length-1?"var(--green)":"var(--white)",color:"var(--black)",border:"none",cursor:"pointer" }}>
-            {activeStep===process.length-1?"Get Started →":"Next →"}
-          </button>
-        </div>
-      </>
-    );
-  })()}
+  <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:10 }}>
+    {process.map(({ step,title,desc },i) => (
+      <div key={step} onClick={() => setActiveStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${i===activeStep?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.06)"}`,borderRadius:14,padding:"22px 18px",position:"relative",overflow:"hidden",cursor:"pointer",transition:"all 0.3s" }}>
+        {i===activeStep&&<div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,rgba(34,197,94,0.6),transparent)" }} />}
+        <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2px",color:i===activeStep?"var(--green)":"#333",fontFamily:"var(--mono)",marginBottom:12 }}>{step}</div>
+        <div style={{ fontSize:14,fontWeight:700,color:i===activeStep?"var(--white)":"#444",marginBottom:6,letterSpacing:"-0.3px" }}>{title}</div>
+        <p style={{ fontSize:12.5,color:i===activeStep?"#858585":"#2e2e2e",lineHeight:1.7,margin:0 }}>{desc}</p>
+      </div>
+    ))}
+  </div>
 </div>
 
 
