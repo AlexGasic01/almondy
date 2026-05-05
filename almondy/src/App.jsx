@@ -534,7 +534,13 @@ const PALETTE_OPTIONS = [
   { id:"warm",    label:"Warm & earthy",    colors:["#f5f0e8","#2c1a0e","#c2693e"] },
   { id:"bold",    label:"Bold & vibrant",   colors:["#0f0a1e","#f4f4f4","#a855f7"] },
   { id:"navy",    label:"Navy & gold",      colors:["#0a1628","#f8f4e8","#c9a84c"] },
-  { id:"custom",  label:"I'll describe it", colors:[] },
+  { id:"forest",  label:"Forest & sage",    colors:["#1a2e1a","#f0f4f0","#6b9e6b"] },
+  { id:"sunset",  label:"Sunset & coral",   colors:["#1a0a0a","#fff8f0","#e8634a"] },
+  { id:"slate",   label:"Slate & silver",   colors:["#1a1f2e","#f0f2f5","#8899bb"] },
+  { id:"cream",   label:"Cream & charcoal", colors:["#faf8f3","#2a2a2a","#c4a882"] },
+  { id:"ocean",   label:"Ocean & teal",     colors:["#0a1628","#f0fafa","#2ab5b5"] },
+  { id:"rose",    label:"Rose & blush",     colors:["#1a0a0e","#fff5f7","#e87b9a"] },
+  { id:"custom",  label:"Custom colours",   colors:[] },
 ];
 
 const FONT_OPTIONS = [
@@ -778,15 +784,54 @@ const WebDevOnboardingPage = ({ setPage }) => {
               </button>
             ))}
           </div>
-          {data.palette === "custom" && (
-            <textarea
-              autoFocus
-              style={textareaStyle}
-              placeholder="Describe your colours e.g. 'warm cream background, deep charcoal text, rust orange accents'"
-              value={data.paletteCustom}
-              onChange={e => set("paletteCustom", e.target.value)}
-            />
-          )}
+        {data.palette === "custom" && (
+          <div style={{ display:"flex", flexDirection:"column", gap:16, background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:20 }}>
+            <p style={{ fontSize:12, color:"#555", margin:0 }}>Pick your two brand colours:</p>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+              <div>
+                <label style={{ fontSize:11, fontWeight:700, color:"#555", display:"block", marginBottom:10, letterSpacing:"1px", textTransform:"uppercase" }}>Primary colour</label>
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+                  <input
+                    type="color"
+                    value={data.paletteCustom?.split("|")[0] || "#6366f1"}
+                    onChange={e => {
+                      const secondary = data.paletteCustom?.split("|")[1] || "#ffffff";
+                      set("paletteCustom", e.target.value + "|" + secondary);
+                    }}
+                    style={{ width:72, height:72, borderRadius:"50%", border:"2px solid rgba(255,255,255,0.1)", cursor:"pointer", background:"none", padding:2 }}
+                  />
+                  <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>
+                    {data.paletteCustom?.split("|")[0] || "#6366f1"}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize:11, fontWeight:700, color:"#555", display:"block", marginBottom:10, letterSpacing:"1px", textTransform:"uppercase" }}>Secondary colour</label>
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+                  <input
+                    type="color"
+                    value={data.paletteCustom?.split("|")[1] || "#ffffff"}
+                    onChange={e => {
+                      const primary = data.paletteCustom?.split("|")[0] || "#6366f1";
+                      set("paletteCustom", primary + "|" + e.target.value);
+                    }}
+                    style={{ width:72, height:72, borderRadius:"50%", border:"2px solid rgba(255,255,255,0.1)", cursor:"pointer", background:"none", padding:2 }}
+                  />
+                  <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>
+                    {data.paletteCustom?.split("|")[1] || "#ffffff"}
+                  </span>
+                </div>
+              </div>
+            </div>
+            {data.paletteCustom && (
+              <div style={{ display:"flex", gap:8, alignItems:"center", background:"#080808", borderRadius:8, padding:"12px 16px" }}>
+                <div style={{ width:20, height:20, borderRadius:"50%", background:data.paletteCustom.split("|")[0], border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }} />
+                <div style={{ width:20, height:20, borderRadius:"50%", background:data.paletteCustom.split("|")[1], border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }} />
+                <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>Your brand colours</span>
+              </div>
+            )}
+          </div>
+        )}
         </div>
       );
 
@@ -1150,8 +1195,9 @@ onClick={async () => {
       "🏢 Business Name": data.bizName,
       "📧 Client Email": data.email,
       "📝 Description": data.bizDesc || "—",
-      "🎨 Colour Palette": PALETTE_OPTIONS.find(p => p.id === data.palette)?.label + (data.paletteCustom ? ` — ${data.paletteCustom}` : "") || "—",
-      "✏️ Font Style": FONT_OPTIONS.find(f => f.id === data.font)?.label + (data.fontCustom ? ` — ${data.fontCustom}` : "") || "—",
+      "🎨 Colour Palette": data.palette === "custom"
+      ? `Custom — Primary: ${data.paletteCustom?.split("|")[0] || "—"}, Secondary: ${data.paletteCustom?.split("|")[1] || "—"}`
+      : PALETTE_OPTIONS.find(p => p.id === data.palette)?.label || "—",      "✏️ Font Style": FONT_OPTIONS.find(f => f.id === data.font)?.label + (data.fontCustom ? ` — ${data.fontCustom}` : "") || "—",
       "🖼️ Header Style": HEADER_STYLES.find(h => h.id === data.headerStyle)?.label || "—",
       "🔗 Reference URL": data.headerUrl || "—",
       "💬 Headline": data.heroHeadline,
