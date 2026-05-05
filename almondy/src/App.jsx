@@ -1049,14 +1049,14 @@ const WebDevOnboardingPage = ({ setPage }) => {
   };
 
   const headings = [
-    ["Let's start with the basics.", "What's your business called?"],
-    ["Now for the look.", "Pick a colour palette."],
-    ["Set the tone.", "Choose your typography style."],
-    ["First impressions matter.", "What kind of header do you want?"],
-    ["Your hero moment.", "What goes above the fold?"],
-    ["Map it out.", "What pages do you need?"],
-    ["Finish it off.", "Any extra features?"],
-    ["Almost there.", "Review & submit."],
+    ["1/8", "What's your business called?"],
+    ["2/8", "Pick a colour palette."],
+    ["3/8", "Choose your typography style."],
+    ["4/8", "What kind of header do you want?"],
+    ["5/8", "What goes above the fold?"],
+    ["6/8", "What pages do you need?"],
+    ["7/8", "Any extra features?"],
+    ["8/8", "Review & submit."],
   ];
 
   const [h1, h2] = headings[step];
