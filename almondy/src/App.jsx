@@ -1143,16 +1143,9 @@ const WebDevOnboardingPage = ({ setPage }) => {
 onClick={async () => {
   if (!canNext()) return;
   try {
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer re_4RdkGGHd_AgbZXfdd5c4wVtgqCKdKqrqx",
-      },
-      body: JSON.stringify({
-        from: "onboarding@almondy.co",
-        to: "alexgasic@yahoo.com",
-        subject: `New Website Request — ${data.bizName}`,
+    await supabase.functions.invoke("send-email", {
+      body: {
+        bizName: data.bizName,
         html: `
           <h2>New Website Request</h2>
           <p><b>Business:</b> ${data.bizName}</p>
@@ -1169,9 +1162,9 @@ onClick={async () => {
           <p><b>Extras:</b> ${data.extras.join(", ") || "None"}</p>
           <p><b>Notes:</b> ${data.otherNotes || "—"}</p>
         `,
-      }),
+      },
     });
-} catch(e) { console.error("Email failed:", e); }
+  } catch(e) { console.error("Email failed:", e); }
   setSubmitted(true);
 }}
               disabled={!canNext()}
