@@ -395,8 +395,8 @@ const HomePage = ({ setPage }) => {
     return () => { el.removeEventListener("mousemove",onMove); el.removeEventListener("mouseleave",onLeave); cancelAnimationFrame(rafRef.current); };
   }, [isMobile]);
 
-  return (
-    <div style={{ paddingTop:62 }}>
+return (
+  <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
       {/* HERO */}
       <div style={{ position:"relative",overflow:"hidden" }}>
         <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
@@ -2150,8 +2150,8 @@ const WebDevPage = ({ setPage }) => {
 const TestimonialsPage = ({ setPage }) => {
   const isMobile = useIsMobile();
   return (
-    <div style={{ paddingTop:62 }}>
-      <div style={{ maxWidth:900,margin:"0 auto",padding:isMobile?"80px 20px":"140px 48px",textAlign:"center",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both" }}>
+    <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
+      <div style={{ maxWidth:900,margin:"0 auto",padding:isMobile?"80px 20px":"140px 48px",textAlign:"center",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both", flex:1 }}>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Testimonials</p>
         <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,52px)":"clamp(40px,5vw,68px)",fontWeight:800,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:16 }}>Coming soon.</h1>
         <p style={{ fontSize:15,color:"#858585" }}>Reviews are being collected. Check back shortly.</p>
