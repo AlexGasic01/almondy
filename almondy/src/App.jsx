@@ -776,9 +776,11 @@ const WebDevOnboardingPage = ({ setPage }) => {
                 <div style={{ display:"flex", gap:5, marginBottom:8 }}>
                   {p.colors.length > 0 ? p.colors.map(c => (
                     <div key={c} style={{ width:16, height:16, borderRadius:"50%", background:c, border:"1px solid rgba(255,255,255,0.1)" }} />
-                                    )) : (
-                    <div style={{ width:16, height:16, borderRadius:"50%", background:"conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)", border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }} />
-                  )}
+)) : (
+  <div style={{ display:"flex", gap:5, marginBottom:8 }}>
+    <div style={{ width:16, height:16, borderRadius:"50%", background:"conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)", flexShrink:0 }} />
+  </div>
+)}
                 </div>
                 <div style={{ fontSize:12, fontWeight:600, color: data.palette===p.id ? "#22c55e" : "#888" }}>{p.label}</div>
               </button>
