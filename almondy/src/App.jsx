@@ -2094,19 +2094,38 @@ const WebDevPage = ({ setPage }) => {
 
 
 
-      {/* PROCESS */}
-      <div style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"0 20px 60px":"0 48px 80px" }}>
-        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:40 }}>How it works.</h2>
-        <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:10 }}>
-          {process.map(({ step,title,desc }) => (
-            <div key={step} style={{ background:"#0c0c0c",border:"1px solid var(--border)",borderRadius:12,padding:"22px 18px" }}>
-              <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2px",color:"var(--green)",fontFamily:"var(--mono)",marginBottom:10 }}>{step}</div>
-              <div style={{ fontSize:14,fontWeight:700,color:"var(--white)",marginBottom:6 }}>{title}</div>
-              <p style={{ fontSize:12.5,color:"#858585",lineHeight:1.7 }}>{desc}</p>
-            </div>
-          ))}
-        </div>
+{/* PROCESS */}
+<div style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"0 20px 60px":"0 48px 80px" }}>
+  <div style={{ textAlign:"center",marginBottom:isMobile?36:56 }}>
+    <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:12,fontFamily:"var(--mono)" }}>The Process</p>
+    <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",lineHeight:1.05 }}>Up and running fast.</h2>
+  </div>
+
+  {/* Step connector bar */}
+  <div style={{ display:"flex",alignItems:"center",marginBottom:isMobile?28:40 }}>
+    {process.map((_,i) => (
+      <div key={i} style={{ display:"contents" }}>
+        <div style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:"1px solid var(--green)",background:"var(--green)",color:"var(--black)",fontSize:isMobile?10:11,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1 }}>{i+1}</div>
+        {i < process.length-1 && (
+          <div style={{ flex:1,height:1,background:"rgba(255,255,255,0.07)",position:"relative" }}>
+            <div style={{ position:"absolute",top:0,left:0,height:"100%",width:"100%",background:"var(--green)" }} />
+          </div>
+        )}
       </div>
+    ))}
+  </div>
+
+  <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:10 }}>
+    {process.map(({ step,title,desc },i) => (
+      <div key={step} style={{ background:"#0c0c0c",border:"1px solid rgba(34,197,94,0.2)",borderRadius:14,padding:"22px 18px",position:"relative",overflow:"hidden" }}>
+        <div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,rgba(34,197,94,0.6),transparent)" }} />
+        <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2px",color:"var(--green)",fontFamily:"var(--mono)",marginBottom:12 }}>{step}</div>
+        <div style={{ fontSize:14,fontWeight:700,color:"var(--white)",marginBottom:6,letterSpacing:"-0.3px" }}>{title}</div>
+        <p style={{ fontSize:12.5,color:"#858585",lineHeight:1.7,margin:0 }}>{desc}</p>
+      </div>
+    ))}
+  </div>
+</div>
 
 
       
