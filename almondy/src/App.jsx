@@ -224,8 +224,9 @@ const GlobalStyle = () => (
     html { scroll-behavior: smooth; }
     body { background: var(--black); color: var(--white); font-family: var(--font); line-height: 1.6; overflow-x: hidden; }
     a { text-decoration: none; }
-    button { cursor: pointer; font-family: var(--font); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    button { cursor: pointer; font-family: var(--font); -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
     button:active { opacity: 0.7; transform: scale(0.97); transition: opacity 0.1s, transform 0.1s; }
+    * { -webkit-touch-callout: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes pulse { 0%,100% { box-shadow: 0 0 0 3px rgba(34,197,94,0.2); } 50% { box-shadow: 0 0 0 6px rgba(34,197,94,0.06); } }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
