@@ -1146,21 +1146,21 @@ onClick={async () => {
     await fetch("https://formspree.io/f/mlgzbpng", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        bizName: data.bizName,
-        email: data.email,
-        description: data.bizDesc || "—",
-        palette: data.palette + (data.paletteCustom ? ` — ${data.paletteCustom}` : ""),
-        font: data.font + (data.fontCustom ? ` — ${data.fontCustom}` : ""),
-        headerStyle: data.headerStyle,
-        referenceUrl: data.headerUrl || "—",
-        headline: data.heroHeadline,
-        subheadline: data.heroSubline || "—",
-        cta: data.heroCta || "—",
-        pages: data.pages.join(", ") || "—",
-        extras: data.extras.join(", ") || "None",
-        notes: data.otherNotes || "—",
-      }),
+    body: JSON.stringify({
+      "🏢 Business Name": data.bizName,
+      "📧 Client Email": data.email,
+      "📝 Description": data.bizDesc || "—",
+      "🎨 Colour Palette": PALETTE_OPTIONS.find(p => p.id === data.palette)?.label + (data.paletteCustom ? ` — ${data.paletteCustom}` : "") || "—",
+      "✏️ Font Style": FONT_OPTIONS.find(f => f.id === data.font)?.label + (data.fontCustom ? ` — ${data.fontCustom}` : "") || "—",
+      "🖼️ Header Style": HEADER_STYLES.find(h => h.id === data.headerStyle)?.label || "—",
+      "🔗 Reference URL": data.headerUrl || "—",
+      "💬 Headline": data.heroHeadline,
+      "💬 Subheadline": data.heroSubline || "—",
+      "🎯 CTA Button": data.heroCta || "—",
+      "📄 Pages": data.pages.map(p => PAGE_OPTIONS.find(x => x.id === p)?.label).join(", ") || "—",
+      "⚙️ Extras": data.extras.map(e => EXTRA_OPTIONS.find(x => x.id === e)?.label).join(", ") || "None",
+      "📌 Notes": data.otherNotes || "—",
+    }),
     });
   } catch(e) { console.error(e); }
   setSubmitted(true);
