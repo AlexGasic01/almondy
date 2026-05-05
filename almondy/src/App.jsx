@@ -266,7 +266,7 @@ const Nav = ({ page, setPage }) => {
   const links = [
     { id: "home", label: "Home" },
     { id: "systems", label: "Systems" },
-    { id: "webdev", label: "Web Dev" },
+    { id: "webdev", label: "Web Devlopment" },
     { id: "paychaser", label: "PayChaser" },
     { id: "testimonials", label: "Testimonials" },
   ];
