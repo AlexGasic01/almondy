@@ -2220,8 +2220,32 @@ export default function App() {
     }
   }, [user]);
 
-  const handleSetPage = (p) => { setPage(p); window.scrollTo(0,0); };
+const handleSetPage = (p) => {
+  setPage(p);
+  window.scrollTo(0,0);
+  const slug = p === "home" ? "/" : `/${p}`;
+  window.history.pushState({ page: p }, "", slug);
+};
 
+useEffect(() => {
+  const path = window.location.pathname.replace("/", "") || "home";
+  const validPages = ["home","systems","webdev","webdev-onboarding","paychaser","testimonials","pricing","auth","onboarding","dashboard","paywall"];
+  if (validPages.includes(path)) setPage(path);
+}, []);
+
+// Handle browser back/forward buttons
+useEffect(() => {
+  const onPop = (e) => {
+    const p = e.state?.page || "home";
+    setPage(p);
+    window.scrollTo(0,0);
+  };
+  window.addEventListener("popstate", onPop);
+  return () => window.removeEventListener("popstate", onPop);
+}, []);
+
+  
+  
   const isAppPage = ["auth","onboarding","dashboard","paywall"].includes(page);
 
   if (authLoading) return (
