@@ -2283,11 +2283,11 @@ export default function App() {
       if (!profile) {
         await supabase.from("profiles").insert({ id:session.user.id,email,plan:"free" });
         setUser({ id:session.user.id,email,plan:"free" });
-        setPage("paywall");
+        setPage("dashboard");
       } else {
         setUser({ id:session.user.id,email,plan:profile.plan||"free",bizName:profile.biz_name });
         const hasActivePlan = profile.plan==="pro"||profile.plan==="max";
-        setPage(hasActivePlan?"dashboard":"paywall");
+        setPage("dashboard");
       }
       window.history.replaceState({},"",window.location.pathname);
       setAuthLoading(false);
