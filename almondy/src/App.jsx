@@ -2099,14 +2099,7 @@ const WebDevPage = ({ setPage }) => {
         ))}
       </div>
 
-      <div style={{ borderTop:"1px solid var(--border)",borderBottom:"1px solid var(--border)",background:"#0a0a0a",padding:isMobile?"48px 20px":"72px 48px",textAlign:"center" }}>
-        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)",fontWeight:800,letterSpacing:"-2px",color:"var(--white)",marginBottom:14 }}>Ready to get started?</h2>
-        <p style={{ fontSize:isMobile?14:15,color:"#444",marginBottom:28 }}>Tell me what you need. We'll get back to you within 24 hours.</p>
-        <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
-          <button onClick={() => setPage("webdev-onboarding")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer" }}>Get Your Website →</button>
-          <button onClick={() => setPage("systems")} style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8 }}>Back to Systems</button>
-        </div>
-      </div>
+    
 
       <Footer setPage={setPage} />
     </div>
