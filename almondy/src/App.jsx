@@ -1624,6 +1624,38 @@ const PricingPage = ({ setPage }) => {
         ))}
       </div>
 
+
+
+      {/* SERVICES GRID */}
+<div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"0 20px 60px":"0 48px 80px" }}>
+  <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)", gap:10 }}>
+    {services.map(({ icon, title, desc, price }) => (
+      <div key={title} style={{ background:"#0c0c0c", border:"1px solid var(--border)", borderRadius:14, padding:"28px 24px", display:"flex", flexDirection:"column", gap:10 }}>
+        <div style={{ fontSize:24 }}>{icon}</div>
+        <div style={{ fontSize:18, fontWeight:800, letterSpacing:"-0.5px", color:"var(--white)" }}>{title}</div>
+        <p style={{ fontSize:13.5, color:"#858585", lineHeight:1.75, flex:1 }}>{desc}</p>
+        <div style={{ fontSize:12, fontWeight:700, color:"var(--green)", fontFamily:"var(--mono)" }}>{price}</div>
+      </div>
+    ))}
+  </div>
+</div>
+
+{/* PROCESS */}
+<div style={{ maxWidth:900, margin:"0 auto", padding:isMobile?"0 20px 60px":"0 48px 80px" }}>
+  <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)", fontWeight:800, letterSpacing:"-1.5px", color:"var(--white)", textAlign:"center", marginBottom:40 }}>How it works.</h2>
+  <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(4,1fr)", gap:10 }}>
+    {process.map(({ step, title, desc }) => (
+      <div key={step} style={{ background:"#0c0c0c", border:"1px solid var(--border)", borderRadius:12, padding:"22px 18px" }}>
+        <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2px", color:"var(--green)", fontFamily:"var(--mono)", marginBottom:10 }}>{step}</div>
+        <div style={{ fontSize:14, fontWeight:700, color:"var(--white)", marginBottom:6 }}>{title}</div>
+        <p style={{ fontSize:12.5, color:"#858585", lineHeight:1.7 }}>{desc}</p>
+      </div>
+    ))}
+  </div>
+</div>
+
+
+      
       <Footer setPage={setPage} />
     </div>
   );
