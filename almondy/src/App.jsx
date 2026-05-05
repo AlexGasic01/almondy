@@ -336,7 +336,7 @@ const Footer = ({ setPage }) => {
         <ul style={{ display:"flex",gap:16,listStyle:"none",flexWrap:"wrap" }}>
           {["Privacy","Terms","Systems","PayChaser","Contact"].map(l => (
             <li key={l}>
-              <button onClick={() => l==="Systems"?setPage("systems"):l==="PayChaser"?setPage("paychaser"):null} style={{ background:"none",border:"none",fontSize:12,color:"var(--muted)",cursor:"pointer" }}>{l}</button>
+              <button onClick={() => l==="Systems"?setPage("systems"):l==="PayChaser"?setPage("paychaser"):l==="Contact"?setPage("contact"):null} style={{ background:"none",border:"none",fontSize:12,color:"var(--muted)",cursor:"pointer" }}>{l}</button>
             </li>
           ))}
         </ul>
@@ -2087,39 +2087,6 @@ const WebDevPage = ({ setPage }) => {
         </div>
       </div>
 
-      <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)" }} />
-
-      <div style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"60px 20px 0":"100px 48px 0" }}>
-        <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>What We Build</p>
-        <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)",fontWeight:800,letterSpacing:"-2px",color:"var(--white)",marginBottom:36 }}>Pick your project.</h2>
-        <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
-          {services.map(({ icon,title,desc,price })=>(
-            <div key={title} style={{ border:"1px solid var(--border)",borderRadius:14,padding:isMobile?24:36,background:"#0c0c0c",display:"flex",flexDirection:"column",gap:10 }}>
-              <div style={{ fontSize:20 }}>{icon}</div>
-              <div style={{ fontSize:20,fontWeight:800,letterSpacing:"-0.8px",color:"var(--white)" }}>{title}</div>
-              <p style={{ fontSize:13.5,color:"#858585",lineHeight:1.7,flex:1 }}>{desc}</p>
-              <div style={{ display:"inline-flex",alignItems:"center",gap:6,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:999,padding:"4px 12px",fontSize:11.5,fontWeight:700,color:"var(--green)",width:"fit-content" }}>{price}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div id="process" style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"60px 20px":"100px 48px" }}>
-        <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>The Process</p>
-        <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)",fontWeight:800,letterSpacing:"-2px",color:"var(--white)",marginBottom:40 }}>Simple. No surprises.</h2>
-        <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4, 1fr)",gap:10 }}>
-          {process.map(({ step,title,desc })=>(
-            <div key={step} style={{ border:"1px solid var(--border)",borderRadius:14,padding:isMobile?20:28,background:"#0c0c0c",display:"flex",flexDirection:"column",gap:10 }}>
-              <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2px",color:"var(--green)",fontFamily:"var(--mono)" }}>{step}</div>
-              <div style={{ fontSize:16,fontWeight:800,letterSpacing:"-0.5px",color:"var(--white)",lineHeight:1.2 }}>{title}</div>
-              <p style={{ fontSize:13,color:"#858585",lineHeight:1.7 }}>{desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)" }} />
-
       <div style={{ maxWidth:660,margin:"0 auto",padding:isMobile?"60px 20px":"80px 48px" }}>
         <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:36 }}>Questions? Answered.</h2>
         {faqs.map(([q,a],i)=>(
@@ -2146,6 +2113,83 @@ const WebDevPage = ({ setPage }) => {
     </div>
   );
 };
+
+
+const ContactPage = ({ setPage }) => {
+  const isMobile = useIsMobile();
+  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState({ name:"", email:"", message:"" });
+  const set = (k,v) => setForm(f => ({ ...f, [k]:v }));
+
+  const inputStyle = {
+    width:"100%", padding:"12px 16px",
+    background:"#0f0f0f", border:"1px solid rgba(255,255,255,0.1)",
+    borderRadius:10, fontSize:15, color:"#fff", outline:"none",
+    fontFamily:"var(--font)", boxSizing:"border-box",
+  };
+
+  const handleSubmit = async () => {
+    if (!form.name.trim() || !form.email.includes("@") || !form.message.trim()) return;
+    try {
+      await fetch("https://formspree.io/f/mlgzbpng", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({
+          "👤 Name": form.name,
+          "📧 Email": form.email,
+          "💬 Message": form.message,
+        }),
+      });
+    } catch(e) { console.error(e); }
+    setSubmitted(true);
+  };
+
+  return (
+    <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
+      <div style={{ maxWidth:580, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px", flex:1 }}>
+        <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Get in Touch</p>
+        <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,48px)":"clamp(36px,4vw,56px)",fontWeight:800,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:12,lineHeight:1.05 }}>
+          Let's build something.
+        </h1>
+        <p style={{ fontSize:15,color:"#858585",lineHeight:1.75,marginBottom:40 }}>
+          Tell us what you need. We'll get back to you within 24 hours.
+        </p>
+
+        {submitted ? (
+          <div style={{ background:"#0c0c0c",border:"1px solid rgba(34,197,94,0.2)",borderRadius:16,padding:"40px 32px",textAlign:"center" }}>
+            <div style={{ width:56,height:56,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,margin:"0 auto 18px" }}>✓</div>
+            <h2 style={{ fontSize:22,fontWeight:800,letterSpacing:"-0.8px",color:"#fff",marginBottom:10 }}>Message sent!</h2>
+            <p style={{ fontSize:14,color:"#666",lineHeight:1.75 }}>We'll get back to you at <strong style={{ color:"#999" }}>{form.email}</strong> within 24 hours.</p>
+          </div>
+        ) : (
+          <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
+            <div>
+              <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Your name</label>
+              <input style={inputStyle} placeholder="Alex Smith" value={form.name} onChange={e=>set("name",e.target.value)} />
+            </div>
+            <div>
+              <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Email address</label>
+              <input style={inputStyle} type="email" placeholder="alex@yourbusiness.com" value={form.email} onChange={e=>set("email",e.target.value)} />
+            </div>
+            <div>
+              <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Message</label>
+              <textarea style={{ ...inputStyle,resize:"vertical",minHeight:130 }} placeholder="Tell us about your project..." value={form.message} onChange={e=>set("message",e.target.value)} />
+            </div>
+            <button
+              onClick={handleSubmit}
+              disabled={!form.name.trim()||!form.email.includes("@")||!form.message.trim()}
+              style={{ padding:"13px 24px",background:"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",opacity:(!form.name.trim()||!form.email.includes("@")||!form.message.trim())?0.4:1,transition:"opacity 0.2s" }}
+            >
+              Send message →
+            </button>
+          </div>
+        )}
+      </div>
+      <Footer setPage={setPage} />
+    </div>
+  );
+};
+
 
 const TestimonialsPage = ({ setPage }) => {
   const isMobile = useIsMobile();
@@ -2268,6 +2312,7 @@ useEffect(() => {
       {page==="paychaser"    && <PaychaserPage    setPage={handleSetPage} />}
       {page==="testimonials" && <TestimonialsPage setPage={handleSetPage} />}
       {page==="pricing"      && <PricingPage      setPage={handleSetPage} />}
+      {page==="contact"      && <ContactPage      setPage={handleSetPage} />}
 
       {page==="auth"         && <AuthPage         setPage={handleSetPage} setUser={setUser} />}
       {page==="onboarding"   && <OnboardingPage   setPage={handleSetPage} user={user} setUser={setUser} />}
