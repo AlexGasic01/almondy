@@ -1351,7 +1351,7 @@ const PaychaserPage = ({ setPage }) => {
             <span className="badge-dot" /> Live Now
           </div>
           <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)",fontWeight:800,letterSpacing:"-3px",lineHeight:1.02,color:"var(--white)",marginBottom:18 }}>
-            Chase money.<br />Not clients.
+            Chase money<br />Not clients.
           </h1>
           <p style={{ fontSize:isMobile?14.5:16,color:"#858585",lineHeight:1.8,maxWidth:520,margin:"0 auto 32px" }}>
             Almondy sends your overdue invoice reminders automatically. <strong style={{ color:"#888" }}>Friendly at first. Firm when needed.</strong>
