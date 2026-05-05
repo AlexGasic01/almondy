@@ -1151,7 +1151,7 @@ onClick={async () => {
       },
       body: JSON.stringify({
         from: "onboarding@almondy.co",
-        to: "hello@almondy.co",
+        to: "alexgasic@yahoo.com",
         subject: `New Website Request — ${data.bizName}`,
         html: `
           <h2>New Website Request</h2>
