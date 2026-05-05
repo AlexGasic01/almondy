@@ -2275,27 +2275,31 @@ export default function App() {
     sessionStorage.setItem("mobileWarningDismissed", "1");
   };
 
-  useEffect(() => {
-    const handleSession = async (session) => {
-      if (!session) { setAuthLoading(false); return; }
-      const email = session.user.email;
-      const { data:profile } = await supabase.from("profiles").select("*").eq("id",session.user.id).single();
-      if (!profile) {
-        await supabase.from("profiles").insert({ id:session.user.id,email,plan:"free" });
-        setUser({ id:session.user.id,email,plan:"free" });
-        setPage("dashboard");
-      } else {
-        setUser({ id:session.user.id,email,plan:profile.plan||"free",bizName:profile.biz_name });
-        const hasActivePlan = profile.plan==="pro"||profile.plan==="max";
-        setPage("dashboard");
-      }
-      window.history.replaceState({},"",window.location.pathname);
-      setAuthLoading(false);
-    };
-    supabase.auth.getSession().then(({ data:{ session } }) => { if(session) handleSession(session); else setAuthLoading(false); });
-    const { data:{ subscription } } = supabase.auth.onAuthStateChange((_event,session) => { 
-      if(session && _event === "SIGNED_IN") handleSession(session); 
-    });
+useEffect(() => {
+  const handleSession = async (session, redirect) => {
+    if (!session) { setAuthLoading(false); return; }
+    const email = session.user.email;
+    const { data: profile } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
+    if (!profile) {
+      await supabase.from("profiles").insert({ id: session.user.id, email, plan: "free" });
+      setUser({ id: session.user.id, email, plan: "free" });
+    } else {
+      setUser({ id: session.user.id, email, plan: profile.plan || "free", bizName: profile.biz_name });
+    }
+    if (redirect) setPage("dashboard");
+    window.history.replaceState({}, "", window.location.pathname);
+    setAuthLoading(false);
+  };
+
+  supabase.auth.getSession().then(({ data: { session } }) => handleSession(session, false));
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    if (_event === "SIGNED_IN") handleSession(session, true);
+    if (_event === "SIGNED_OUT") { setUser(null); setAuthLoading(false); }
+  });
+
+  return () => subscription.unsubscribe();
+}, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
