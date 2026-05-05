@@ -1342,7 +1342,7 @@ const PaychaserPage = ({ setPage }) => {
   const s = STEPS[step];
 
   return (
-    <div style={{ paddingTop:62 }}>
+  <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
       {/* HERO */}
       <div style={{ position:"relative",overflow:"hidden" }}>
         <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
