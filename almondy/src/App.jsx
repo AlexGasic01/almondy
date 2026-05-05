@@ -403,7 +403,7 @@ const HomePage = ({ setPage }) => {
           {/* Left */}
           <div style={{ display:"flex",flexDirection:"column",alignItems:"flex-start",paddingRight:isMobile?0:48,textAlign:isMobile?"left":"left" }}>
             <button onClick={() => setPage("systems")} style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12.5,fontWeight:600,color:"var(--green)",marginBottom:28,animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both",fontFamily:"var(--mono)" }}>
-              <span className="badge-dot" /> Total Users: {userCount}
+              <span className="badge-dot" /> PayChaser Just Released
             </button>
             <h1 style={{ fontSize:isMobile?"clamp(36px,10vw,52px)":"clamp(40px,4.5vw,68px)",fontWeight:800,letterSpacing:"-2.5px",lineHeight:1.05,color:"var(--white)",marginBottom:20,animation:"fadeUp 0.55s 0.08s cubic-bezier(0.22,1,0.36,1) both" }}>
               Get paid faster.<br />Without awkward<br />follow-ups.
