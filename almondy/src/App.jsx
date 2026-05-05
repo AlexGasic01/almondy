@@ -2059,10 +2059,10 @@ const WebDevPage = ({ setPage }) => {
     { icon:"↗",title:"Redesigns",desc:"Got an existing site that's letting you down? Full redesign.",price:"From $500" },
   ];
   const process = [
-    { step:"01",title:"Discovery call",desc:"15 minutes. You tell me what you need, I tell you if I can build it." },
-    { step:"02",title:"Design & build",desc:"I design and develop simultaneously — no lengthy back-and-forth." },
+    { step:"01",title:"Onboarding Process",desc:"3 minutes. You fill out the onboarding form, Get a reply back within 24hrs." },
+    { step:"02",title:"Design & build",desc:"Our team design and develop simultaneously." },
     { step:"03",title:"Review & refine",desc:"Two rounds of revisions. Most clients only need one." },
-    { step:"04",title:"Launch",desc:"Site goes live. I handle deployment, domain setup, everything." },
+    { step:"04",title:"Launch",desc:"Site goes live. We handle deployment, hosting, domain setup." },
   ];
   const faqs = [
     ["How long does it take?","On average most sites are completed within 1-3 days"],
@@ -2093,19 +2093,6 @@ const WebDevPage = ({ setPage }) => {
       </div>
 
 
-            {/* SERVICES */}
-      <div style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"40px 20px 60px":"60px 48px 80px" }}>
-        <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)",gap:10 }}>
-          {services.map(({ icon,title,desc,price }) => (
-            <div key={title} style={{ background:"#0c0c0c",border:"1px solid var(--border)",borderRadius:14,padding:"28px 24px",display:"flex",flexDirection:"column",gap:10 }}>
-              <div style={{ fontSize:24 }}>{icon}</div>
-              <div style={{ fontSize:18,fontWeight:800,letterSpacing:"-0.5px",color:"var(--white)" }}>{title}</div>
-              <p style={{ fontSize:13.5,color:"#858585",lineHeight:1.75,flex:1 }}>{desc}</p>
-              <div style={{ fontSize:12,fontWeight:700,color:"var(--green)",fontFamily:"var(--mono)" }}>{price}</div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* PROCESS */}
       <div style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"0 20px 60px":"0 48px 80px" }}>
