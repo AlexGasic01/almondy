@@ -643,6 +643,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
   const [step, setStep] = useState(0);
   const [animDir, setAnimDir] = useState(1);
   const [visible, setVisible] = useState(true);
+  const [submitted, setSubmitted] = useState(false);
 
   const [data, setData] = useState({
     bizName: "",
@@ -686,6 +687,49 @@ const WebDevOnboardingPage = ({ setPage }) => {
     return true;
   };
 
+
+
+  const WEBHOOK_URL = "https://discord.com/api/webhooks/1501137083794980897/elWrrRCOqvULadIhQ3W8Aa7MLmNCyY9fbHkKXmDRhKAykGUALTgtquUCyPlkkw3hiceV";
+
+const sendToDiscord = async (d) => {
+  const palette = PALETTE_OPTIONS.find(p => p.id === d.palette)?.label ?? d.palette;
+  const font = FONT_OPTIONS.find(f => f.id === d.font)?.label ?? d.font;
+  const header = HEADER_STYLES.find(h => h.id === d.headerStyle)?.label ?? d.headerStyle;
+  const pages = d.pages.map(p => PAGE_OPTIONS.find(x => x.id === p)?.label).join(", ") || "None";
+  const extras = d.extras.map(e => EXTRA_OPTIONS.find(x => x.id === e)?.label).join(", ") || "None";
+
+  const embed = {
+    title: `🌐 New Website Request — ${d.bizName}`,
+    color: 0x22c55e,
+    fields: [
+      { name: "Business", value: d.bizName, inline: true },
+      { name: "Email", value: d.email, inline: true },
+      { name: "Description", value: d.bizDesc || "—", inline: false },
+      { name: "Colour Palette", value: palette + (d.paletteCustom ? ` — "${d.paletteCustom}"` : ""), inline: true },
+      { name: "Font", value: font + (d.fontCustom ? ` — "${d.fontCustom}"` : ""), inline: true },
+      { name: "Header Style", value: header, inline: true },
+      { name: "Reference URL", value: d.headerUrl || "—", inline: true },
+      { name: "Hero Headline", value: d.heroHeadline || "—", inline: false },
+      { name: "Subheadline", value: d.heroSubline || "—", inline: false },
+      { name: "CTA Button", value: d.heroCta || "—", inline: true },
+      { name: "Pages", value: pages, inline: false },
+      { name: "Extra Features", value: extras, inline: false },
+      { name: "Notes", value: d.otherNotes || "—", inline: false },
+    ],
+    timestamp: new Date().toISOString(),
+    footer: { text: "Almondy Web Dev Onboarding" },
+  };
+
+await fetch(WEBHOOK_URL, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ embeds: [embed] }),
+  mode: "no-cors",
+});
+};
+
+
+  
   const inputStyle = {
     width: "100%",
     padding: "12px 16px",
@@ -1044,6 +1088,21 @@ const WebDevOnboardingPage = ({ setPage }) => {
         <div style={{ height:"100%", width:`${((step+1)/STEPS_ONBOARDING.length)*100}%`, background:"var(--green)", transition:"width 0.4s cubic-bezier(0.22,1,0.36,1)" }} />
       </div>
 
+{submitted && (
+  <div style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.75)", backdropFilter:"blur(10px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
+    <div style={{ background:"#111", border:"1px solid rgba(255,255,255,0.1)", borderRadius:20, padding:"40px 32px 32px", maxWidth:400, width:"100%", textAlign:"center", boxShadow:"0 32px 80px rgba(0,0,0,0.8)", position:"relative" }}>
+      <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:120, height:2, background:"linear-gradient(90deg, transparent, rgba(34,197,94,0.7), transparent)", borderRadius:999 }} />
+      <div style={{ width:56, height:56, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.3)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, margin:"0 auto 18px" }}>✓</div>
+      <h2 style={{ fontSize:22, fontWeight:800, letterSpacing:"-0.8px", color:"#fff", marginBottom:10 }}>You're all set, {data.bizName}!</h2>
+      <p style={{ fontSize:14, color:"#666", lineHeight:1.75, marginBottom:28 }}>We'll review your details and get back to you at <strong style={{ color:"#999" }}>{data.email}</strong> within 24 hours.</p>
+      <button onClick={() => { setSubmitted(false); setPage("webdev"); }} style={{ width:"100%", padding:"13px 20px", background:"var(--white)", color:"var(--black)", border:"none", borderRadius:10, fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"var(--font)" }}>
+        Back to Web Dev →
+      </button>
+    </div>
+  </div>
+)}
+
+      
       <div style={{ maxWidth:640, margin:"0 auto", padding:isMobile?"40px 20px 80px":"80px 48px 100px" }}>
 
         {/* Step pills */}
@@ -1101,10 +1160,10 @@ const WebDevOnboardingPage = ({ setPage }) => {
             </button>
           ) : (
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (!canNext()) return;
-                alert(`Thanks ${data.bizName}! We'll be in touch at ${data.email} within 24 hours.`);
-                setPage("webdev");
+                try { await sendToDiscord(data); } catch(e) { console.error("Webhook failed", e); }
+                setSubmitted(true);
               }}
               disabled={!canNext()}
               style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"11px 22px", fontSize:13, fontWeight:700, borderRadius:8, background: canNext() ? "var(--green)" : "rgba(34,197,94,0.15)", color: canNext() ? "#000" : "#1a4a2e", border:"none", cursor: canNext() ? "pointer" : "default" }}
