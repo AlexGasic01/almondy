@@ -2294,7 +2294,7 @@ useEffect(() => {
   supabase.auth.getSession().then(({ data: { session } }) => handleSession(session, false));
 
   const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-    if (_event === "SIGNED_IN") handleSession(session, true);
+    if (_event === "SIGNED_IN") handleSession(session, false);
     if (_event === "SIGNED_OUT") { setUser(null); setAuthLoading(false); }
   });
 
