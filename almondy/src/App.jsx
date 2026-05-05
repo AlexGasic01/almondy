@@ -687,46 +687,26 @@ const WebDevOnboardingPage = ({ setPage }) => {
     return true;
   };
 
-
-
-  const WEBHOOK_URL = "https://discord.com/api/webhooks/1501137083794980897/elWrrRCOqvULadIhQ3W8Aa7MLmNCyY9fbHkKXmDRhKAykGUALTgtquUCyPlkkw3hiceV";
-
-const sendToDiscord = async (d) => {
-  const palette = PALETTE_OPTIONS.find(p => p.id === d.palette)?.label ?? d.palette;
-  const font = FONT_OPTIONS.find(f => f.id === d.font)?.label ?? d.font;
-  const header = HEADER_STYLES.find(h => h.id === d.headerStyle)?.label ?? d.headerStyle;
-  const pages = d.pages.map(p => PAGE_OPTIONS.find(x => x.id === p)?.label).join(", ") || "None";
-  const extras = d.extras.map(e => EXTRA_OPTIONS.find(x => x.id === e)?.label).join(", ") || "None";
-
-  const embed = {
-    title: `🌐 New Website Request — ${d.bizName}`,
-    color: 0x22c55e,
-    fields: [
-      { name: "Business", value: d.bizName, inline: true },
-      { name: "Email", value: d.email, inline: true },
-      { name: "Description", value: d.bizDesc || "—", inline: false },
-      { name: "Colour Palette", value: palette + (d.paletteCustom ? ` — "${d.paletteCustom}"` : ""), inline: true },
-      { name: "Font", value: font + (d.fontCustom ? ` — "${d.fontCustom}"` : ""), inline: true },
-      { name: "Header Style", value: header, inline: true },
-      { name: "Reference URL", value: d.headerUrl || "—", inline: true },
-      { name: "Hero Headline", value: d.heroHeadline || "—", inline: false },
-      { name: "Subheadline", value: d.heroSubline || "—", inline: false },
-      { name: "CTA Button", value: d.heroCta || "—", inline: true },
-      { name: "Pages", value: pages, inline: false },
-      { name: "Extra Features", value: extras, inline: false },
-      { name: "Notes", value: d.otherNotes || "—", inline: false },
-    ],
-    timestamp: new Date().toISOString(),
-    footer: { text: "Almondy Web Dev Onboarding" },
+  const saveSubmission = async (d) => {
+    await supabase.from("webdev_submissions").insert({
+      biz_name: d.bizName,
+      biz_desc: d.bizDesc,
+      email: d.email,
+      palette: d.palette,
+      palette_custom: d.paletteCustom,
+      font: d.font,
+      font_custom: d.fontCustom,
+      header_style: d.headerStyle,
+      header_url: d.headerUrl || null,
+      hero_headline: d.heroHeadline,
+      hero_subline: d.heroSubline,
+      hero_cta: d.heroCta,
+      pages: d.pages,
+      extras: d.extras,
+      notes: d.otherNotes,
+      submitted_at: new Date().toISOString(),
+    });
   };
-
-await fetch(WEBHOOK_URL, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ embeds: [embed] }),
-  mode: "no-cors",
-});
-};
 
 
   
@@ -1160,11 +1140,40 @@ await fetch(WEBHOOK_URL, {
             </button>
           ) : (
             <button
-              onClick={async () => {
-                if (!canNext()) return;
-                try { await sendToDiscord(data); } catch(e) { console.error("Webhook failed", e); }
-                setSubmitted(true);
-              }}
+onClick={async () => {
+  if (!canNext()) return;
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer re_4RdkGGHd_AgbZXfdd5c4wVtgqCKdKqrqx",
+      },
+      body: JSON.stringify({
+        from: "onboarding@almondy.co",
+        to: "hello@almondy.co",
+        subject: `New Website Request — ${data.bizName}`,
+        html: `
+          <h2>New Website Request</h2>
+          <p><b>Business:</b> ${data.bizName}</p>
+          <p><b>Email:</b> ${data.email}</p>
+          <p><b>Description:</b> ${data.bizDesc || "—"}</p>
+          <p><b>Palette:</b> ${data.palette}${data.paletteCustom ? ` — ${data.paletteCustom}` : ""}</p>
+          <p><b>Font:</b> ${data.font}${data.fontCustom ? ` — ${data.fontCustom}` : ""}</p>
+          <p><b>Header style:</b> ${data.headerStyle}</p>
+          <p><b>Reference URL:</b> ${data.headerUrl || "—"}</p>
+          <p><b>Headline:</b> ${data.heroHeadline}</p>
+          <p><b>Subheadline:</b> ${data.heroSubline || "—"}</p>
+          <p><b>CTA:</b> ${data.heroCta || "—"}</p>
+          <p><b>Pages:</b> ${data.pages.join(", ") || "—"}</p>
+          <p><b>Extras:</b> ${data.extras.join(", ") || "None"}</p>
+          <p><b>Notes:</b> ${data.otherNotes || "—"}</p>
+        `,
+      }),
+    });
+  } catch(e) { console.error(e); }
+  setSubmitted(true);
+}}
               disabled={!canNext()}
               style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"11px 22px", fontSize:13, fontWeight:700, borderRadius:8, background: canNext() ? "var(--green)" : "rgba(34,197,94,0.15)", color: canNext() ? "#000" : "#1a4a2e", border:"none", cursor: canNext() ? "pointer" : "default" }}
             >
