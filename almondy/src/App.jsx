@@ -2308,15 +2308,18 @@ export default function App() {
 
 const handleSetPage = (p) => {
   setPage(p);
-  window.scrollTo(0,0);
-  const slug = p === "home" ? "/" : `/${p}`;
-  window.history.pushState({ page: p }, "", slug);
+  window.scrollTo(0, 0);
+  const appPages = ["auth","onboarding","dashboard","paywall"];
+  if (!appPages.includes(p)) {
+    const slug = p === "home" ? "/" : `/${p}`;
+    window.history.pushState({ page: p }, "", slug);
+  }
 };
 
 useEffect(() => {
   const path = window.location.pathname.replace("/", "") || "home";
-  const validPages = ["home","systems","webdev","webdev-onboarding","paychaser","testimonials","pricing","auth","onboarding","dashboard","paywall"];
-  if (validPages.includes(path)) setPage(path);
+  const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","testimonials","pricing","contact"];
+  if (publicPages.includes(path)) setPage(path);
 }, []);
 
 // Handle browser back/forward buttons
