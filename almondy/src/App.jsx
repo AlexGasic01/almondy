@@ -70,6 +70,154 @@ const LockSVG = () => (
   </svg>
 );
 
+/* ─── MOBILE WARNING POPUP ─── */
+const MobileWarningPopup = ({ onDismiss }) => {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    // Slight delay so it doesn't clash with the splash screen entrance
+    const t = setTimeout(() => setVisible(true), 100);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleDismiss = () => {
+    setVisible(false);
+    setTimeout(onDismiss, 350);
+  };
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={handleDismiss}
+        style={{
+          position: "fixed", inset: 0, zIndex: 8000,
+          background: "rgba(0,0,0,0.72)",
+          backdropFilter: "blur(6px)",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.35s ease",
+          pointerEvents: visible ? "auto" : "none",
+        }}
+      />
+
+      {/* Card */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0, left: 0, right: 0,
+          zIndex: 8001,
+          padding: "0 16px 32px",
+          transform: visible ? "translateY(0)" : "translateY(110%)",
+          transition: "transform 0.4s cubic-bezier(0.22,1,0.36,1)",
+        }}
+      >
+        <div
+          style={{
+            background: "#111",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 20,
+            padding: "28px 24px 24px",
+            boxShadow: "0 -8px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          {/* Subtle glow accent */}
+          <div style={{
+            position: "absolute", top: 0, left: "50%",
+            transform: "translateX(-50%)",
+            width: 180, height: 2,
+            background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.7), transparent)",
+            borderRadius: 999,
+          }} />
+
+          {/* Drag handle */}
+          <div style={{
+            width: 36, height: 4, borderRadius: 999,
+            background: "rgba(255,255,255,0.12)",
+            margin: "0 auto 22px",
+          }} />
+
+          {/* Icon */}
+          <div style={{
+            width: 52, height: 52,
+            background: "rgba(245,158,11,0.1)",
+            border: "1px solid rgba(245,158,11,0.25)",
+            borderRadius: 14,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 24, marginBottom: 16,
+          }}>
+            ⚠️
+          </div>
+
+          {/* Badge */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            background: "rgba(245,158,11,0.1)",
+            border: "1px solid rgba(245,158,11,0.25)",
+            borderRadius: 999,
+            padding: "3px 10px",
+            fontSize: 10, fontWeight: 700,
+            color: "#f59e0b",
+            letterSpacing: "1.5px",
+            textTransform: "uppercase",
+            fontFamily: "var(--mono)",
+            marginBottom: 12,
+          }}>
+            Warning
+          </div>
+
+          <h2 style={{
+            fontSize: 22, fontWeight: 800,
+            letterSpacing: "-0.8px",
+            color: "var(--white)",
+            lineHeight: 1.15,
+            marginBottom: 10,
+          }}>
+            Best viewed on desktop
+          </h2>
+
+          <p style={{
+            fontSize: 14, color: "#858585",
+            lineHeight: 1.75, marginBottom: 24,
+          }}>
+            For the best experience please use a{" "}
+            <strong style={{ color: "#aaa" }}>desktop device.</strong>{" "}
+            Some features may appear limited on mobile.
+          </p>
+
+          <button
+            onClick={handleDismiss}
+            style={{
+              width: "100%",
+              padding: "14px 20px",
+              background: "var(--white)",
+              color: "var(--black)",
+              border: "none",
+              borderRadius: 12,
+              fontSize: 15, fontWeight: 700,
+              letterSpacing: "-0.3px",
+              cursor: "pointer",
+              fontFamily: "var(--font)",
+              marginBottom: 10,
+            }}
+          >
+            Got it, continue anyway
+          </button>
+
+          <p style={{
+            textAlign: "center",
+            fontSize: 11, color: "#383838",
+            lineHeight: 1.5,
+          }}>
+            Tap outside or the button above to dismiss
+          </p>
+        </div>
+      </div>
+    </>
+  );
+};
+
 /* ─── GLOBAL STYLES ─── */
 const GlobalStyle = () => (
   <style>{`
@@ -537,7 +685,7 @@ const PaychaserPage = ({ setPage }) => {
         </div>
       </div>
 
-      {/* DASHBOARD mockup — simplified on mobile */}
+      {/* DASHBOARD mockup */}
       {!isMobile && (
         <div style={{ maxWidth:1100,margin:"0 auto",padding:"0 48px" }}>
           <div ref={dashRef} style={{ willChange:"transform",cursor:"default" }}>
@@ -637,7 +785,7 @@ const PaychaserPage = ({ setPage }) => {
           ))}
         </div>
 
-        {/* Step content — stacked on mobile */}
+        {/* Step content */}
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:isMobile?28:64,alignItems:"center",minHeight:isMobile?"auto":340 }}>
           <div style={{ opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(14px)",transition:"all 0.4s cubic-bezier(0.22,1,0.36,1)" }}>
             <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--green)",fontFamily:"var(--mono)",marginBottom:12 }}>{s.num}</div>
@@ -760,7 +908,7 @@ const PricingPage = ({ setPage }) => {
         </div>
       </div>
 
-      {/* Compare Table — scrollable on mobile */}
+      {/* Compare Table */}
       <div style={{ maxWidth:860,margin:"0 auto",padding:isMobile?"0 20px 60px":"0 48px 80px" }}>
         <p style={{ fontSize:11,fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:20,textAlign:"center",fontFamily:"var(--mono)" }}>Full Comparison</p>
         <div className="table-scroll">
@@ -939,7 +1087,6 @@ const AppNav = ({ user, setPage }) => {
   );
 };
 
-/* Mobile bottom tab bar */
 const MobileTabBar = ({ activeTab, setTab }) => {
   const items = [
     { id:"invoices",  icon:"📄", label:"Invoices" },
@@ -994,7 +1141,6 @@ const DashboardPage = ({ setPage, user }) => {
       <div style={{ display:"flex",flex:1,paddingTop:58,paddingBottom:isMobile?64:0 }}>
         {!isMobile && <AppSidebar activeTab={tab} setTab={setTab} />}
         <div style={{ flex:1,padding:isMobile?"20px 16px":"32px 36px",overflowY:"auto" }}>
-          {/* Upgrade banner */}
           {user?.plan==="free"&&showBanner&&(
             <div style={{ background:"rgba(245,158,11,0.07)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:isMobile?"12px 14px":"14px 20px",display:"flex",alignItems:"center",gap:12,marginBottom:20 }}>
               <span style={{ fontSize:16,flexShrink:0 }}>⚡</span>
@@ -1007,7 +1153,6 @@ const DashboardPage = ({ setPage, user }) => {
             </div>
           )}
 
-          {/* Heading */}
           <div style={{ display:"flex",alignItems:isMobile?"flex-start":"center",justifyContent:"space-between",marginBottom:20,flexDirection:isMobile?"column":"row",gap:isMobile?12:0 }}>
             <div>
               <h1 style={{ fontSize:isMobile?20:22,fontWeight:800,letterSpacing:"-0.8px",color:"var(--white)",marginBottom:4 }}>{user?.bizName??"My Dashboard"}</h1>
@@ -1019,7 +1164,6 @@ const DashboardPage = ({ setPage, user }) => {
             </button>
           </div>
 
-          {/* Stats */}
           <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(3, 1fr)",gap:10,marginBottom:20 }}>
             {[
               { label:"Collected",   value:`$${collected.toLocaleString()}`,   sub:`${MOCK_INVOICES.filter(i=>i.status==="paid").length} paid`,    green:true  },
@@ -1034,7 +1178,6 @@ const DashboardPage = ({ setPage, user }) => {
             ))}
           </div>
 
-          {/* Invoice list — card style on mobile, table on desktop */}
           {isMobile ? (
             <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
               {MOCK_INVOICES.map(inv=>{
@@ -1104,7 +1247,6 @@ const DashboardPage = ({ setPage, user }) => {
             </div>
           )}
 
-          {/* Locked features */}
           <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:10,marginTop:12 }}>
             {[{ icon:"🔔",title:"Automated Reminders",desc:"Set it and forget it. PayChaser chases for you." },{ icon:"📊",title:"Analytics & Reports",desc:"See your collection rate, avg days to pay, and more." }].map(({ icon,title,desc })=>(
               <div key={title} onClick={() => setPage("paywall")} style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:"18px",position:"relative",overflow:"hidden",cursor:"pointer" }}>
@@ -1269,7 +1411,6 @@ const WebDevPage = ({ setPage }) => {
 
       <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)" }} />
 
-      {/* Services */}
       <div style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"60px 20px 0":"100px 48px 0" }}>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>What I Build</p>
         <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)",fontWeight:800,letterSpacing:"-2px",color:"var(--white)",marginBottom:36 }}>Pick your project.</h2>
@@ -1285,7 +1426,6 @@ const WebDevPage = ({ setPage }) => {
         </div>
       </div>
 
-      {/* Process */}
       <div id="process" style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"60px 20px":"100px 48px" }}>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>The Process</p>
         <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)",fontWeight:800,letterSpacing:"-2px",color:"var(--white)",marginBottom:40 }}>Simple. No surprises.</h2>
@@ -1302,7 +1442,6 @@ const WebDevPage = ({ setPage }) => {
 
       <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)" }} />
 
-      {/* FAQ */}
       <div style={{ maxWidth:660,margin:"0 auto",padding:isMobile?"60px 20px":"80px 48px" }}>
         <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:36 }}>Questions? Answered.</h2>
         {faqs.map(([q,a],i)=>(
@@ -1316,7 +1455,6 @@ const WebDevPage = ({ setPage }) => {
         ))}
       </div>
 
-      {/* CTA */}
       <div style={{ borderTop:"1px solid var(--border)",borderBottom:"1px solid var(--border)",background:"#0a0a0a",padding:isMobile?"48px 20px":"72px 48px",textAlign:"center" }}>
         <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)",fontWeight:800,letterSpacing:"-2px",color:"var(--white)",marginBottom:14 }}>Ready to get started?</h2>
         <p style={{ fontSize:isMobile?14:15,color:"#444",marginBottom:28 }}>Tell me what you need. I'll get back to you within 24 hours.</p>
@@ -1353,6 +1491,25 @@ export default function App() {
   const [page,setPage] = useState("home");
   const [user,setUser] = useState(null);
   const [authLoading,setAuthLoading] = useState(true);
+  const isMobile = useIsMobile();
+  const [showMobileWarning, setShowMobileWarning] = useState(false);
+
+  // Show mobile warning once per session on mobile devices
+  useEffect(() => {
+    if (isMobile) {
+      const dismissed = sessionStorage.getItem("mobileWarningDismissed");
+      if (!dismissed) {
+        // Delay so it appears after splash
+        const t = setTimeout(() => setShowMobileWarning(true), 3200);
+        return () => clearTimeout(t);
+      }
+    }
+  }, [isMobile]);
+
+  const handleDismissWarning = () => {
+    setShowMobileWarning(false);
+    sessionStorage.setItem("mobileWarningDismissed", "1");
+  };
 
   useEffect(() => {
     const handleSession = async (session) => {
@@ -1398,20 +1555,21 @@ export default function App() {
   return (
     <>
       <GlobalStyle />
-      {showSplash&&<SplashScreen onDone={()=>setShowSplash(false)} />}
-      {!isAppPage&&<Nav page={page} setPage={handleSetPage} />}
+      {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
+      {showMobileWarning && <MobileWarningPopup onDismiss={handleDismissWarning} />}
+      {!isAppPage && <Nav page={page} setPage={handleSetPage} />}
 
-      {page==="home"         &&<HomePage         setPage={handleSetPage} />}
-      {page==="systems"      &&<SystemsPage      setPage={handleSetPage} />}
-      {page==="webdev"       &&<WebDevPage       setPage={handleSetPage} />}
-      {page==="paychaser"    &&<PaychaserPage    setPage={handleSetPage} />}
-      {page==="testimonials" &&<TestimonialsPage setPage={handleSetPage} />}
-      {page==="pricing"      &&<PricingPage      setPage={handleSetPage} />}
+      {page==="home"         && <HomePage         setPage={handleSetPage} />}
+      {page==="systems"      && <SystemsPage      setPage={handleSetPage} />}
+      {page==="webdev"       && <WebDevPage       setPage={handleSetPage} />}
+      {page==="paychaser"    && <PaychaserPage    setPage={handleSetPage} />}
+      {page==="testimonials" && <TestimonialsPage setPage={handleSetPage} />}
+      {page==="pricing"      && <PricingPage      setPage={handleSetPage} />}
 
-      {page==="auth"         &&<AuthPage         setPage={handleSetPage} setUser={setUser} />}
-      {page==="onboarding"   &&<OnboardingPage   setPage={handleSetPage} user={user} setUser={setUser} />}
-      {page==="dashboard"    &&<DashboardPage    setPage={handleSetPage} user={user} />}
-      {page==="paywall"      &&<PaywallPage      setPage={handleSetPage} user={user} setUser={setUser} />}
+      {page==="auth"         && <AuthPage         setPage={handleSetPage} setUser={setUser} />}
+      {page==="onboarding"   && <OnboardingPage   setPage={handleSetPage} user={user} setUser={setUser} />}
+      {page==="dashboard"    && <DashboardPage    setPage={handleSetPage} user={user} />}
+      {page==="paywall"      && <PaywallPage      setPage={handleSetPage} user={user} setUser={setUser} />}
     </>
   );
 }
