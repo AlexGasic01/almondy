@@ -2063,7 +2063,7 @@ const WebDevPage = ({ setPage }) => {
     ["What do you build with?","React for apps and interactive sites. HTML/CSS/JS for simpler sites where speed matters most."],
     ["Do you do ongoing maintenance?","Yes — simple monthly retainer for updates, fixes, and small additions."],
     ["Why do you charge monthly?","We charge monthly as it is more convient for us to make changes and maintain the site rather then going back and fourth with clients"],
-    ["What do you need to get started?","Complete the onboarding by pressing "Get Your Website", after this somebody from the team will be in contact within 24hrs"],
+    ["What do you need to get started?","Complete the onboarding by pressing *Get Your Website*, after this somebody from the team will be in contact within 24hrs"],
   ];
 
   return (
