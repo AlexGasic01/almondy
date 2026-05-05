@@ -1143,28 +1143,26 @@ const WebDevOnboardingPage = ({ setPage }) => {
 onClick={async () => {
   if (!canNext()) return;
   try {
-    await supabase.functions.invoke("send-email", {
-      body: {
+    await fetch("https://formspree.io/f/mlgzbpng", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         bizName: data.bizName,
-        html: `
-          <h2>New Website Request</h2>
-          <p><b>Business:</b> ${data.bizName}</p>
-          <p><b>Email:</b> ${data.email}</p>
-          <p><b>Description:</b> ${data.bizDesc || "—"}</p>
-          <p><b>Palette:</b> ${data.palette}${data.paletteCustom ? ` — ${data.paletteCustom}` : ""}</p>
-          <p><b>Font:</b> ${data.font}${data.fontCustom ? ` — ${data.fontCustom}` : ""}</p>
-          <p><b>Header style:</b> ${data.headerStyle}</p>
-          <p><b>Reference URL:</b> ${data.headerUrl || "—"}</p>
-          <p><b>Headline:</b> ${data.heroHeadline}</p>
-          <p><b>Subheadline:</b> ${data.heroSubline || "—"}</p>
-          <p><b>CTA:</b> ${data.heroCta || "—"}</p>
-          <p><b>Pages:</b> ${data.pages.join(", ") || "—"}</p>
-          <p><b>Extras:</b> ${data.extras.join(", ") || "None"}</p>
-          <p><b>Notes:</b> ${data.otherNotes || "—"}</p>
-        `,
-      },
+        email: data.email,
+        description: data.bizDesc || "—",
+        palette: data.palette + (data.paletteCustom ? ` — ${data.paletteCustom}` : ""),
+        font: data.font + (data.fontCustom ? ` — ${data.fontCustom}` : ""),
+        headerStyle: data.headerStyle,
+        referenceUrl: data.headerUrl || "—",
+        headline: data.heroHeadline,
+        subheadline: data.heroSubline || "—",
+        cta: data.heroCta || "—",
+        pages: data.pages.join(", ") || "—",
+        extras: data.extras.join(", ") || "None",
+        notes: data.otherNotes || "—",
+      }),
     });
-  } catch(e) { console.error("Email failed:", e); }
+  } catch(e) { console.error(e); }
   setSubmitted(true);
 }}
               disabled={!canNext()}
