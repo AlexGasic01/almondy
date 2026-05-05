@@ -2059,11 +2059,11 @@ const WebDevPage = ({ setPage }) => {
     { step:"04",title:"Launch",desc:"Site goes live. I handle deployment, domain setup, everything." },
   ];
   const faqs = [
-    ["How long does it take?","Simple Websites: 1–2 days. Complex sites: 3–4 days"],
-    ["What do you build with?","React for apps and interactive sites. HTML/CSS/JS for simpler sites where speed matters most."],
-    ["Do you do ongoing maintenance?","Yes — simple monthly retainer for updates, fixes, and small additions."],
-    ["Why do you charge monthly?","We charge monthly as it is more convient for us to make changes and maintain the site rather then going back and fourth with clients"],
-    ["What do you need to get started?","Complete the onboarding by pressing *Get Your Website*, after this somebody from the team will be in contact within 24hrs"],
+    ["How long does it take?","On average most sites are completed within 1-3 days"],
+    ["What do you make the websites with?","Our websites are made using high-end programming languages for the best performance, including React, HTML, CSS."],
+    ["Can I get changes done on the website?","Yes, simply contact us through email/sms with the detailed request of what you want changed."],
+    ["Why do you charge monthly?","We charge monthly to make it as simple as possible for our clients to make changes and maintain the site rather then the client trying to figure it out themselves."],
+    ["What do you need to get started?","Complete the onboarding by pressing *Get Your Website*, after this somebody from the team will be in contact within 24hrs."],
   ];
 
   return (
