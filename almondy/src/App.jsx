@@ -75,7 +75,6 @@ const MobileWarningPopup = ({ onDismiss }) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Slight delay so it doesn't clash with the splash screen entrance
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
   }, []);
@@ -92,23 +91,28 @@ const MobileWarningPopup = ({ onDismiss }) => {
         onClick={handleDismiss}
         style={{
           position: "fixed", inset: 0, zIndex: 8000,
-          background: "rgba(0,0,0,0.72)",
-          backdropFilter: "blur(6px)",
+          background: "rgba(0,0,0,0.75)",
+          backdropFilter: "blur(8px)",
           opacity: visible ? 1 : 0,
           transition: "opacity 0.35s ease",
           pointerEvents: visible ? "auto" : "none",
         }}
       />
 
-      {/* Card */}
+      {/* Modal — centered */}
       <div
         style={{
           position: "fixed",
-          bottom: 0, left: 0, right: 0,
+          top: "50%", left: "50%",
+          transform: visible
+            ? "translate(-50%, -50%) scale(1)"
+            : "translate(-50%, -50%) scale(0.94)",
           zIndex: 8001,
-          padding: "0 16px 32px",
-          transform: visible ? "translateY(0)" : "translateY(110%)",
-          transition: "transform 0.4s cubic-bezier(0.22,1,0.36,1)",
+          width: "calc(100% - 40px)",
+          maxWidth: 360,
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.35s cubic-bezier(0.22,1,0.36,1), transform 0.35s cubic-bezier(0.22,1,0.36,1)",
+          pointerEvents: visible ? "auto" : "none",
         }}
       >
         <div
@@ -116,45 +120,41 @@ const MobileWarningPopup = ({ onDismiss }) => {
             background: "#111",
             border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: 20,
-            padding: "28px 24px 24px",
-            boxShadow: "0 -8px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)",
+            padding: "32px 28px 28px",
+            boxShadow: "0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)",
             position: "relative",
             overflow: "hidden",
           }}
         >
-          {/* Subtle glow accent */}
+          {/* Top accent line */}
           <div style={{
             position: "absolute", top: 0, left: "50%",
             transform: "translateX(-50%)",
-            width: 180, height: 2,
-            background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.7), transparent)",
+            width: 160, height: 2,
+            background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.6), transparent)",
             borderRadius: 999,
           }} />
 
-          {/* Drag handle */}
-          <div style={{
-            width: 36, height: 4, borderRadius: 999,
-            background: "rgba(255,255,255,0.12)",
-            margin: "0 auto 22px",
-          }} />
-
-          {/* Icon */}
-          <div style={{
-            width: 52, height: 52,
-            background: "rgba(245,158,11,0.1)",
-            border: "1px solid rgba(245,158,11,0.25)",
-            borderRadius: 14,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 24, marginBottom: 16,
-          }}>
-            ⚠️
-          </div>
+          {/* Close button */}
+          <button
+            onClick={handleDismiss}
+            style={{
+              position: "absolute", top: 16, right: 16,
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "50%",
+              width: 28, height: 28,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#555", fontSize: 14, lineHeight: 1,
+              cursor: "pointer",
+            }}
+          >✕</button>
 
           {/* Badge */}
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(245,158,11,0.1)",
-            border: "1px solid rgba(245,158,11,0.25)",
+            background: "rgba(245,158,11,0.08)",
+            border: "1px solid rgba(245,158,11,0.22)",
             borderRadius: 999,
             padding: "3px 10px",
             fontSize: 10, fontWeight: 700,
@@ -162,13 +162,13 @@ const MobileWarningPopup = ({ onDismiss }) => {
             letterSpacing: "1.5px",
             textTransform: "uppercase",
             fontFamily: "var(--mono)",
-            marginBottom: 12,
+            marginBottom: 14,
           }}>
-            Warning
+            ⚠ Warning
           </div>
 
           <h2 style={{
-            fontSize: 22, fontWeight: 800,
+            fontSize: 21, fontWeight: 800,
             letterSpacing: "-0.8px",
             color: "var(--white)",
             lineHeight: 1.15,
@@ -178,11 +178,11 @@ const MobileWarningPopup = ({ onDismiss }) => {
           </h2>
 
           <p style={{
-            fontSize: 14, color: "#858585",
-            lineHeight: 1.75, marginBottom: 24,
+            fontSize: 13.5, color: "#666",
+            lineHeight: 1.75, marginBottom: 26,
           }}>
-            For the best experience please use a{" "}
-            <strong style={{ color: "#aaa" }}>desktop device.</strong>{" "}
+            For the best experience, use a{" "}
+            <strong style={{ color: "#999" }}>desktop device</strong>.
             Some features may appear limited on mobile.
           </p>
 
@@ -190,28 +190,19 @@ const MobileWarningPopup = ({ onDismiss }) => {
             onClick={handleDismiss}
             style={{
               width: "100%",
-              padding: "14px 20px",
+              padding: "13px 20px",
               background: "var(--white)",
               color: "var(--black)",
               border: "none",
-              borderRadius: 12,
-              fontSize: 15, fontWeight: 700,
+              borderRadius: 10,
+              fontSize: 14, fontWeight: 700,
               letterSpacing: "-0.3px",
               cursor: "pointer",
               fontFamily: "var(--font)",
-              marginBottom: 10,
             }}
           >
             Got it, continue anyway
           </button>
-
-          <p style={{
-            textAlign: "center",
-            fontSize: 11, color: "#383838",
-            lineHeight: 1.5,
-          }}>
-            Tap outside or the button above to dismiss
-          </p>
         </div>
       </div>
     </>
