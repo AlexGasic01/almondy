@@ -2293,9 +2293,9 @@ export default function App() {
       setAuthLoading(false);
     };
     supabase.auth.getSession().then(({ data:{ session } }) => { if(session) handleSession(session); else setAuthLoading(false); });
-    const { data:{ subscription } } = supabase.auth.onAuthStateChange((_event,session) => { if(session) handleSession(session); });
-    return () => subscription.unsubscribe();
-  }, []);
+    const { data:{ subscription } } = supabase.auth.onAuthStateChange((_event,session) => { 
+      if(session && _event === "SIGNED_IN") handleSession(session); 
+    });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
