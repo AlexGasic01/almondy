@@ -2059,11 +2059,11 @@ const WebDevPage = ({ setPage }) => {
     { step:"04",title:"Launch",desc:"Site goes live. I handle deployment, domain setup, everything." },
   ];
   const faqs = [
-    ["How long does it take?","Landing pages: 3–5 days. Full sites: 1–2 weeks. Web apps depend on scope."],
+    ["How long does it take?","Simple Websites: 1–2 days. Complex sites: 3–4 days"],
     ["What do you build with?","React for apps and interactive sites. HTML/CSS/JS for simpler sites where speed matters most."],
     ["Do you do ongoing maintenance?","Yes — simple monthly retainer for updates, fixes, and small additions."],
-    ["Can you redesign my existing site?","Absolutely. Send me the link and I'll give you an honest opinion and a quote."],
-    ["What do you need to get started?","A brief description of what you want, any branding you have, and content if available."],
+    ["Why do you charge monthly?","We charge monthly as it is more convient for us to make changes and maintain the site rather then going back and fourth with clients"],
+    ["What do you need to get started?","Complete the onboarding by pressing "Get Your Website", after this somebody from the team will be in contact within 24hrs"],
   ];
 
   return (
