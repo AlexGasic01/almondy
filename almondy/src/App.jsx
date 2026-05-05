@@ -1050,7 +1050,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
               ["Business", data.bizName],
               ["Colours", PALETTE_OPTIONS.find(p=>p.id===data.palette)?.label ?? "—"],
               ["Font", FONT_OPTIONS.find(f=>f.id===data.font)?.label ?? "—"],
-              ["Header style", HEADER_STYLES.find(h=>h.id===data.headerStyle)?.label ?? "—"],
+              ["Hero style", HEADER_STYLES.find(h=>h.id===data.headerStyle)?.label ?? "—"],
               ["Headline", data.heroHeadline || "—"],
               ["CTA", data.heroCta || "—"],
               ["Pages", data.pages.map(p=>PAGE_OPTIONS.find(x=>x.id===p)?.label).join(", ") || "—"],
@@ -1068,7 +1068,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
               autoFocus
               style={inputStyle}
               type="email"
-              placeholder="you@yourbusiness.com"
+              placeholder="yourname@domain.com"
               value={data.email}
               onChange={e => set("email", e.target.value)}
             />
@@ -1665,7 +1665,7 @@ const AuthPage = ({ setPage, setUser }) => {
             <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
               <div>
                 <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Email address</label>
-                <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSend()} placeholder="you@yourbusiness.com" autoFocus style={{ width:"100%",padding:"13px 16px",background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,fontSize:15,color:"var(--white)",outline:"none",fontFamily:"var(--font)" }} />
+                <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSend()} placeholder="yourname@domain.com" autoFocus style={{ width:"100%",padding:"13px 16px",background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,fontSize:15,color:"var(--white)",outline:"none",fontFamily:"var(--font)" }} />
               </div>
               <button onClick={handleSend} disabled={!email.includes("@")||loading} style={{ width:"100%",padding:14,background:loading?"rgba(255,255,255,0.5)":"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:15,fontWeight:700,opacity:!email.includes("@")?0.4:1 }}>
                 {loading?"Sending...":"Send magic link →"}
