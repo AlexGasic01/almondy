@@ -490,7 +490,7 @@ const HeroLockCard = () => {
 const SystemsPage = ({ setPage }) => {
   const isMobile = useIsMobile();
   return (
-    <div style={{ paddingTop:62 }}>
+    <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
       <div style={{ maxWidth:1280,margin:"0 auto",padding:isMobile?"80px 20px 48px":"140px 64px 72px",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both" }}>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Our Systems</p>
         <h1 style={{ fontSize:isMobile?"clamp(32px,10vw,52px)":"clamp(40px,5vw,72px)",fontWeight:800,letterSpacing:"-2.5px",lineHeight:1.05,color:"var(--white)",marginBottom:16 }}>
@@ -498,7 +498,7 @@ const SystemsPage = ({ setPage }) => {
         </h1>
         <p style={{ fontSize:15.5,color:"#858585",maxWidth:480,lineHeight:1.75 }}>Software built for the real world. Each system solves one problem, and solves it well.</p>
       </div>
-      <div style={{ maxWidth:1280,margin:"0 auto",padding:isMobile?"0 20px":"0 64px" }}>
+      <div style={{ maxWidth:1280,margin:"0 auto",padding:isMobile?"0 20px 48px":"0 64px 72px", flex:1 }}>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
           <SysCard onClick={() => setPage("paychaser")} live name="PayChaser" desc="Track invoices, chase payments, and collect faster — all in one place." />
           <LockedCard />
