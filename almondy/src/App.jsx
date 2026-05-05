@@ -795,8 +795,8 @@ const WebDevOnboardingPage = ({ setPage }) => {
               <div>
                 <label style={{ fontSize:11, fontWeight:700, color:"#555", display:"block", marginBottom:10, letterSpacing:"1px", textTransform:"uppercase" }}>Primary colour</label>
                 <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
-                  <div style={{ width:72, height:72, borderRadius:"50%", overflow:"hidden", border:"2px solid rgba(255,255,255,0.12)", cursor:"pointer", flexShrink:0 }}>
-                    <input type="color" value={data.paletteCustom?.split("|")[0] || "#6366f1"} onChange={e => { const secondary = data.paletteCustom?.split("|")[1] || "#ffffff"; set("paletteCustom", e.target.value + "|" + secondary); }} style={{ width:"150%", height:"150%", marginTop:"-25%", marginLeft:"-25%", border:"none", padding:0, cursor:"pointer" }} />
+                  <div style={{ width:86, height:86, borderRadius:"50%", overflow:"hidden", border:"2px solid rgba(255,255,255,0.12)", cursor:"pointer", flexShrink:0, touchAction:"manipulation" }}>
+                    <input type="color" value={data.paletteCustom?.split("|")[0] || "#6366f1"} onChange={e => { const secondary = data.paletteCustom?.split("|")[1] || "#ffffff"; set("paletteCustom", e.target.value + "|" + secondary); }} style={{ width:"150%", height:"150%", marginTop:"-25%", marginLeft:"-25%", border:"none", padding:0, cursor:"pointer", touchAction:"manipulation", opacity:1 }} />
                   </div>
                   <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>{data.paletteCustom?.split("|")[0] || "#6366f1"}</span>
                 </div>
@@ -804,8 +804,8 @@ const WebDevOnboardingPage = ({ setPage }) => {
               <div>
                 <label style={{ fontSize:11, fontWeight:700, color:"#555", display:"block", marginBottom:10, letterSpacing:"1px", textTransform:"uppercase" }}>Secondary colour</label>
                 <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
-                  <div style={{ width:72, height:72, borderRadius:"50%", overflow:"hidden", border:"2px solid rgba(255,255,255,0.12)", cursor:"pointer", flexShrink:0 }}>
-                    <input type="color" value={data.paletteCustom?.split("|")[1] || "#ffffff"} onChange={e => { const primary = data.paletteCustom?.split("|")[0] || "#6366f1"; set("paletteCustom", primary + "|" + e.target.value); }} style={{ width:"150%", height:"150%", marginTop:"-25%", marginLeft:"-25%", border:"none", padding:0, cursor:"pointer" }} />
+                  <div style={{ width:86, height:86, borderRadius:"50%", overflow:"hidden", border:"2px solid rgba(255,255,255,0.12)", cursor:"pointer", flexShrink:0, touchAction:"manipulation" }}>
+                    <input type="color" value={data.paletteCustom?.split("|")[1] || "#ffffff"} onChange={e => { const primary = data.paletteCustom?.split("|")[0] || "#6366f1"; set("paletteCustom", primary + "|" + e.target.value); }} style={{ width:"150%", height:"150%", marginTop:"-25%", marginLeft:"-25%", border:"none", padding:0, cursor:"pointer", touchAction:"manipulation", opacity:1 }} />
                   </div>
                   <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>{data.paletteCustom?.split("|")[1] || "#ffffff"}</span>
                 </div>
