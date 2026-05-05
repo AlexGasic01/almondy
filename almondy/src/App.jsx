@@ -777,7 +777,10 @@ const WebDevOnboardingPage = ({ setPage }) => {
                   {p.colors.length > 0 ? p.colors.map(c => (
                     <div key={c} style={{ width:16, height:16, borderRadius:"50%", background:c, border:"1px solid rgba(255,255,255,0.1)" }} />
                   )) : (
-                    <div style={{ width:16, height:16, borderRadius:"50%", background:"conic-gradient(red,yellow,green,blue,red)", border:"1px solid rgba(255,255,255,0.1)" }} />
+                    <div style={{ display:"flex", gap:5 }}>
+                      <div style={{ width:16, height:16, borderRadius:"50%", background: data.paletteCustom?.split("|")[0] || "#6366f1", border:"1px solid rgba(255,255,255,0.1)" }} />
+                      <div style={{ width:16, height:16, borderRadius:"50%", background: data.paletteCustom?.split("|")[1] || "#ffffff", border:"1px solid rgba(255,255,255,0.1)" }} />
+                    </div>
                   )}
                 </div>
                 <div style={{ fontSize:12, fontWeight:600, color: data.palette===p.id ? "#22c55e" : "#888" }}>{p.label}</div>
