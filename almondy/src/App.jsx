@@ -785,55 +785,57 @@ const WebDevOnboardingPage = ({ setPage }) => {
             ))}
           </div>
         {data.palette === "custom" && (
-          <div style={{ display:"flex", flexDirection:"column", gap:16, background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:20 }}>
-            <p style={{ fontSize:12, color:"#555", margin:0 }}>Pick your two brand colours:</p>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-              <div>
-                <label style={{ fontSize:11, fontWeight:700, color:"#555", display:"block", marginBottom:10, letterSpacing:"1px", textTransform:"uppercase" }}>Primary colour</label>
-                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
-                  <input
-                    type="color"
-                    value={data.paletteCustom?.split("|")[0] || "#6366f1"}
-                    onChange={e => {
-                      const secondary = data.paletteCustom?.split("|")[1] || "#ffffff";
-                      set("paletteCustom", e.target.value + "|" + secondary);
-                    }}
-                    style={{ width:72, height:72, borderRadius:"50%", border:"2px solid rgba(255,255,255,0.1)", cursor:"pointer", background:"none", padding:2 }}
-                  />
-                  <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>
-                    {data.paletteCustom?.split("|")[0] || "#6366f1"}
-                  </span>
-                </div>
-              </div>
-              <div>
-                <label style={{ fontSize:11, fontWeight:700, color:"#555", display:"block", marginBottom:10, letterSpacing:"1px", textTransform:"uppercase" }}>Secondary colour</label>
-                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
-                  <input
-                    type="color"
-                    value={data.paletteCustom?.split("|")[1] || "#ffffff"}
-                    onChange={e => {
-                      const primary = data.paletteCustom?.split("|")[0] || "#6366f1";
-                      set("paletteCustom", primary + "|" + e.target.value);
-                    }}
-                    style={{ width:72, height:72, borderRadius:"50%", border:"2px solid rgba(255,255,255,0.1)", cursor:"pointer", background:"none", padding:2 }}
-                  />
-                  <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>
-                    {data.paletteCustom?.split("|")[1] || "#ffffff"}
-                  </span>
-                </div>
-              </div>
-            </div>
-            {data.paletteCustom && (
-              <div style={{ display:"flex", gap:8, alignItems:"center", background:"#080808", borderRadius:8, padding:"12px 16px" }}>
-                <div style={{ width:20, height:20, borderRadius:"50%", background:data.paletteCustom.split("|")[0], border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }} />
-                <div style={{ width:20, height:20, borderRadius:"50%", background:data.paletteCustom.split("|")[1], border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }} />
-                <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>Your brand colours</span>
-              </div>
-            )}
+  <div style={{ display:"flex", flexDirection:"column", gap:16, background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:20 }}>
+    <p style={{ fontSize:12, color:"#555", margin:0 }}>Pick your two brand colours:</p>
+    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+      <div>
+        <label style={{ fontSize:11, fontWeight:700, color:"#555", display:"block", marginBottom:10, letterSpacing:"1px", textTransform:"uppercase" }}>Primary colour</label>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+          <div style={{ width:72, height:72, borderRadius:"50%", overflow:"hidden", border:"2px solid rgba(255,255,255,0.12)", cursor:"pointer", flexShrink:0 }}>
+            <input
+              type="color"
+              value={data.paletteCustom?.split("|")[0] || "#6366f1"}
+              onChange={e => {
+                const secondary = data.paletteCustom?.split("|")[1] || "#ffffff";
+                set("paletteCustom", e.target.value + "|" + secondary);
+              }}
+              style={{ width:"150%", height:"150%", marginTop:"-25%", marginLeft:"-25%", border:"none", padding:0, cursor:"pointer" }}
+            />
           </div>
-        )}
+          <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>
+            {data.paletteCustom?.split("|")[0] || "#6366f1"}
+          </span>
         </div>
-      );
+      </div>
+      <div>
+        <label style={{ fontSize:11, fontWeight:700, color:"#555", display:"block", marginBottom:10, letterSpacing:"1px", textTransform:"uppercase" }}>Secondary colour</label>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+          <div style={{ width:72, height:72, borderRadius:"50%", overflow:"hidden", border:"2px solid rgba(255,255,255,0.12)", cursor:"pointer", flexShrink:0 }}>
+            <input
+              type="color"
+              value={data.paletteCustom?.split("|")[1] || "#ffffff"}
+              onChange={e => {
+                const primary = data.paletteCustom?.split("|")[0] || "#6366f1";
+                set("paletteCustom", primary + "|" + e.target.value);
+              }}
+              style={{ width:"150%", height:"150%", marginTop:"-25%", marginLeft:"-25%", border:"none", padding:0, cursor:"pointer" }}
+            />
+          </div>
+          <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>
+            {data.paletteCustom?.split("|")[1] || "#ffffff"}
+          </span>
+        </div>
+      </div>
+    </div>
+    {data.paletteCustom && (
+      <div style={{ display:"flex", gap:8, alignItems:"center", background:"#080808", borderRadius:8, padding:"12px 16px" }}>
+        <div style={{ width:20, height:20, borderRadius:"50%", background:data.paletteCustom.split("|")[0], border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }} />
+        <div style={{ width:20, height:20, borderRadius:"50%", background:data.paletteCustom.split("|")[1], border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }} />
+        <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>Your brand colours</span>
+      </div>
+    )}
+  </div>
+)}
 
       case 2: return (
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
