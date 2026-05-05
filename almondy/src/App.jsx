@@ -266,7 +266,7 @@ const Nav = ({ page, setPage }) => {
   const links = [
     { id: "home", label: "Home" },
     { id: "systems", label: "Systems" },
-    { id: "webdev", label: "Web Devlopment" },
+    { id: "webdev", label: "Web Development" },
     { id: "paychaser", label: "PayChaser" },
     { id: "testimonials", label: "Testimonials" },
   ];
@@ -1075,8 +1075,8 @@ const WebDevOnboardingPage = ({ setPage }) => {
       <div style={{ width:56, height:56, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.3)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, margin:"0 auto 18px" }}>✓</div>
       <h2 style={{ fontSize:22, fontWeight:800, letterSpacing:"-0.8px", color:"#fff", marginBottom:10 }}>You're all set, {data.bizName}!</h2>
       <p style={{ fontSize:14, color:"#666", lineHeight:1.75, marginBottom:28 }}>We'll review your details and get back to you at <strong style={{ color:"#999" }}>{data.email}</strong> within 24 hours.</p>
-      <button onClick={() => { setSubmitted(false); setPage("webdev"); }} style={{ width:"100%", padding:"13px 20px", background:"var(--white)", color:"var(--black)", border:"none", borderRadius:10, fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"var(--font)" }}>
-        Back to Web Dev →
+      <button onClick={() => { setSubmitted(false); setPage("home"); }} style={{ width:"100%", padding:"13px 20px", background:"var(--white)", color:"var(--black)", border:"none", borderRadius:10, fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"var(--font)" }}>
+        Back to Home →
       </button>
     </div>
   </div>
@@ -2056,7 +2056,7 @@ const WebDevPage = ({ setPage }) => {
       <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)" }} />
 
       <div style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"60px 20px 0":"100px 48px 0" }}>
-        <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>What I Build</p>
+        <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>What We Build</p>
         <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)",fontWeight:800,letterSpacing:"-2px",color:"var(--white)",marginBottom:36 }}>Pick your project.</h2>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
           {services.map(({ icon,title,desc,price })=>(
@@ -2101,7 +2101,7 @@ const WebDevPage = ({ setPage }) => {
 
       <div style={{ borderTop:"1px solid var(--border)",borderBottom:"1px solid var(--border)",background:"#0a0a0a",padding:isMobile?"48px 20px":"72px 48px",textAlign:"center" }}>
         <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)",fontWeight:800,letterSpacing:"-2px",color:"var(--white)",marginBottom:14 }}>Ready to get started?</h2>
-        <p style={{ fontSize:isMobile?14:15,color:"#444",marginBottom:28 }}>Tell me what you need. I'll get back to you within 24 hours.</p>
+        <p style={{ fontSize:isMobile?14:15,color:"#444",marginBottom:28 }}>Tell me what you need. We'll get back to you within 24 hours.</p>
         <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
           <button onClick={() => setPage("webdev-onboarding")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer" }}>Get Your Website →</button>
           <button onClick={() => setPage("systems")} style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8 }}>Back to Systems</button>
