@@ -2583,7 +2583,7 @@ const handleSession = async (session, redirect) => {
     
       if (!session) { setAuthLoading(false); return; }
       const email = session.user.email;
-      const { data: profile } = await supabase.from("profiles").select("*").eq("id",session.user.id).single();
+      const { data: profile } = await supabase.from("profiles").select("*").eq("id",session.user.id).maybeSingle();
       if (!profile) {
         await supabase.from("profiles").insert({ id:session.user.id,email,plan:"free" });
         setUser({ id:session.user.id,email,plan:"free" });
