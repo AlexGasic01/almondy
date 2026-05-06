@@ -5,7 +5,11 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
   const { priceId, email, trial } = req.body;
+  subscription_data: {
+    trial_period_days: planId === "growth" ? 7 : undefined,
+  },
 
+  
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     payment_method_types: ["card"],
