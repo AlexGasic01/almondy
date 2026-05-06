@@ -554,11 +554,11 @@ const WebDevOnboardingPage = ({ setPage }) => {
   const [visible, setVisible] = useState(true);
   const [submitted, setSubmitted] = useState(false);
 
-  const [data, setData] = useState({
-    bizName:"",bizDesc:"",palette:"",paletteCustom:"",font:"",fontCustom:"",
-    headerStyle:"",headerUpload:null,headerUploadName:"",heroHeadline:"",
-    heroSubline:"",heroCta:"",pages:[],extras:[],otherNotes:"",email:"",
-  });
+const [data, setData] = useState({
+  bizName:"",bizDesc:"",palette:"",paletteCustom:"",font:"",fontCustom:"",
+  headerStyle:"",headerUpload:null,headerUploadName:"",headerUrl:"",heroHeadline:"",
+  heroSubline:"",heroCta:"",pages:[],extras:[],otherNotes:"",email:"",
+});
 
   const go = (dir) => {
     setAnimDir(dir);
@@ -1719,7 +1719,7 @@ const Spinner = ({ size=16, dark=false }) => (
 
 // ── Supabase helpers ─────────────────────────────────────────────
 async function getOrCreateRCProfile(userId, email) {
-  const { data } = await supabase.from("rc_profiles").select("*").eq("id", userId).single();
+  const { data, error } = await supabase.from("rc_profiles").select("*").eq("id", userId).maybeSingle();
   if (data) return data;
   const fresh = { id:userId, email, plan:"trial", sends_used:0, trial_started_at:new Date().toISOString(), sends_reset_at:new Date().toISOString() };
   await supabase.from("rc_profiles").insert(fresh);
@@ -2164,7 +2164,7 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   return (
     <div style={{ minHeight:"100vh",background:"#080808",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,position:"relative",overflow:"hidden" }}>
       <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
-      <div style={{ position:"fixed",top:0,left:0,right:0,height:2,background:"rgba(255,255,255,0.05)",zIndex:100 }}>
+      <div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:"rgba(255,255,255,0.05)",zIndex:100 }}>
         <div style={{ height:"100%",width:`${((step+1)/3)*100}%`,background:"#22c55e",transition:"width 0.4s cubic-bezier(0.22,1,0.36,1)" }} />
       </div>
       <div style={{ position:"relative",zIndex:1,width:"100%",maxWidth:520,animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
@@ -2289,7 +2289,7 @@ const handleSend = async () => {
 
   try {
     const { data: { session } } = await supabase.auth.getSession()
-    if (!session) { setSendErr("Please sign in again."); return }
+    if (!session) { setSendErr("Please sign in again."); setSending(false); return }
 
     const res = await fetch(
       "https://qmaqmbimnhzyspvnioeb.supabase.co/functions/v1/smooth-worker",
@@ -2306,8 +2306,8 @@ const handleSend = async () => {
     const json = await res.json()
 
     if (!res.ok) {
-      if (json.error === "trial_expired") { setShowPaywall(true); return }
-      if (json.error === "limit_reached") { setShowPaywall(true); return }
+    if (json.error === "trial_expired") { setShowPaywall(true); setSending(false); return }
+    if (json.error === "limit_reached") { setShowPaywall(true); setSending(false); return }
       throw new Error(json.error)
     }
 
@@ -2534,8 +2534,8 @@ function ReviewChaserPage({ setPage, user, setUser }) {
       }, 1500);
     }
 
-    return () => subscription.unsubscribe();
-  }, []);
+  return () => { mounted = false; subscription.unsubscribe(); };
+}, []);
 
   const handleSignOut = async () => { await supabase.auth.signOut(); setView("marketing"); };
 
@@ -2600,8 +2600,10 @@ const handleSession = async (session, redirect) => {
       } else {
         setUser({ id:session.user.id,email,plan:profile.plan||"free",bizName:profile.biz_name });
       }
-      if (redirect) setPage("dashboard");
-      window.history.replaceState({},"",window.location.pathname);
+      if (redirect) {
+        setPage("dashboard");
+        window.history.replaceState({},"",window.location.pathname);
+      }
       setAuthLoading(false);
     };
 
@@ -2648,7 +2650,6 @@ const handleSession = async (session, redirect) => {
 
   // ReviewChaser handles its own nav entirely — exclude from isAppPage logic
   const isAppPage = ["auth","onboarding","dashboard","paywall"].includes(page);
-  const isReviewChaser = page === "reviewchaser";
 
   if (authLoading) return (
     <div style={{ minHeight:"100vh",background:"#080808",display:"flex",alignItems:"center",justifyContent:"center" }}>
