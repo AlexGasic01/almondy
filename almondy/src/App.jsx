@@ -156,8 +156,7 @@ const Nav = ({ page, setPage }) => {
     { id: "home",         label: "Home" },
     { id: "systems",      label: "Systems" },
     { id: "webdev",       label: "Web Development" },
-    { id: "paychaser",    label: "PayChaser" },
-    { id: "reviewchaser", label: "ReviewChaser" }, // ← ADDED
+    { id: "reviewchaser", label: "ReviewChaser" },
     { id: "testimonials", label: "Testimonials" },
   ];
 
@@ -224,7 +223,6 @@ const Footer = ({ setPage }) => {
             ["Privacy", null],
             ["Terms", null],
             ["Systems", "systems"],
-            ["PayChaser", "paychaser"],
             ["ReviewChaser", "reviewchaser"], // ← ADDED
             ["Contact", "contact"],
           ].map(([label, pageId]) => (
@@ -302,20 +300,20 @@ const HomePage = ({ setPage }) => {
         <div style={{ position:"relative",zIndex:1,minHeight:isMobile?"auto":"100vh",display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",alignItems:"center",maxWidth:1280,margin:"0 auto",padding:isMobile?"40px 20px 48px":"40px 48px 0 64px" }}>
           <div style={{ display:"flex",flexDirection:"column",alignItems:"flex-start",paddingRight:isMobile?0:48,textAlign:isMobile?"left":"left" }}>
             <button onClick={() => setPage("systems")} style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12.5,fontWeight:600,color:"var(--green)",marginBottom:28,animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both",fontFamily:"var(--mono)" }}>
-              <span className="badge-dot" /> PayChaser Just Released
+              <span className="badge-dot" /> ReviewChaser Just Released
             </button>
             <h1 style={{ fontSize:isMobile?"clamp(36px,10vw,52px)":"clamp(40px,4.5vw,68px)",fontWeight:800,letterSpacing:"-2.5px",lineHeight:1.05,color:"var(--white)",marginBottom:20,animation:"fadeUp 0.55s 0.08s cubic-bezier(0.22,1,0.36,1) both" }}>
-              Get paid faster.<br />Without awkward<br />follow-ups.
+              More Google reviews.<br />Zero awkwardness.
             </h1>
             <p style={{ fontSize:isMobile?15:15.5,color:"#666",maxWidth:420,lineHeight:1.75,marginBottom:36,animation:"fadeUp 0.55s 0.16s cubic-bezier(0.22,1,0.36,1) both" }}>
-              Almondy sends your customers overdue invoice reminders automatically. <strong style={{ color:"#999" }}>Friendly at first. Firm when needed.</strong> You focus on the work — Almondy chases the money.
+              Send a mobile number. Hit send. Your customer gets a friendly SMS with your Google Review link. <strong style={{ color:"#999" }}>Takes 5 seconds. Works every time.</strong>
             </p>
             <div style={{ display:"flex",gap:10,flexWrap:"wrap",animation:"fadeUp 0.55s 0.24s cubic-bezier(0.22,1,0.36,1) both",width:isMobile?"100%":"auto" }}>
-              <button onClick={() => setPage("systems")} style={{ background:"var(--white)",color:"var(--black)",border:"none",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,letterSpacing:"-0.3px",flex:isMobile?"1":"none" }}>
+              <button onClick={() => setPage("reviewchaser")} style={{ background:"var(--white)",color:"var(--black)",border:"none",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,letterSpacing:"-0.3px",flex:isMobile?"1":"none" }}>
                 Learn More →
               </button>
-              <button onClick={() => setPage("pricing")} style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8,letterSpacing:"-0.3px",flex:isMobile?"1":"none" }}>
-                Pricing
+              <button onClick={() => setPage("systems")} style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8,letterSpacing:"-0.3px",flex:isMobile?"1":"none" }}>
+                Our Products
               </button>
             </div>
             <div style={{ marginTop:40,display:"flex",alignItems:"center",gap:14,animation:"fadeUp 0.55s 0.32s cubic-bezier(0.22,1,0.36,1) both" }}>
@@ -333,7 +331,7 @@ const HomePage = ({ setPage }) => {
           {!isMobile && (
             <div style={{ display:"flex",alignItems:"center",justifyContent:"flex-end",position:"relative",animation:"fadeRight 0.7s 0.3s cubic-bezier(0.22,1,0.36,1) both" }}>
               <div ref={mockupRef} style={{ position:"relative",zIndex:1,width:"100%",maxWidth:560,cursor:"pointer",willChange:"transform" }}>
-                <HeroLockCard />
+                <HeroProductMockup />
               </div>
             </div>
           )}
@@ -351,9 +349,9 @@ const HomePage = ({ setPage }) => {
         </h2>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
           {/* PayChaser */}
-          <button onClick={() => setPage("paychaser")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"#0c0c0c",cursor:"pointer",textAlign:"left" }}>
-            <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--green)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
-              <span className="badge-dot" style={{ width:6,height:6 }} /> Live Now
+          <div style={() => setPage("paychaser")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"#0c0c0c",cursor:"pointer",textAlign:"left" }}>
+            <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
+              <span className="badge-dot" style={{ width:6,height:6 }} /> In Development
             </div>
             <div style={{ fontSize:isMobile?36:48,fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>PayChaser</div>
             <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>Track invoices, chase payments, and collect faster — all in one place.</p>
@@ -379,14 +377,74 @@ const HomePage = ({ setPage }) => {
   );
 };
 
-const HeroLockCard = () => {
-  const [shaking,setShaking] = useState(false);
+const HeroProductMockup = () => {
+  const [demoMobile, setDemoMobile] = useState("");
+  const [demoSent, setDemoSent] = useState(false);
+  const [demoSending, setDemoSending] = useState(false);
+
+  const handleDemoSend = () => {
+    if (demoMobile.replace(/\s/g,"").length < 10) return;
+    setDemoSending(true);
+    setTimeout(() => { setDemoSending(false); setDemoSent(true); }, 1200);
+    setTimeout(() => { setDemoSent(false); setDemoMobile(""); }, 4000);
+  };
+
   return (
-    <div onClick={() => { setShaking(true); setTimeout(()=>setShaking(false),600); }} style={{ width:"100%",aspectRatio:"4/3",borderRadius:14,border:"1px solid rgba(255,255,255,0.07)",boxShadow:"0 32px 80px rgba(0,0,0,0.7)",background:"#0a0a0a",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12 }}>
-      <div className={shaking?"shaking":""} style={{ width:48,height:48,background:"#111",border:"1px solid #2e2e2e",borderRadius:10,padding:9,boxShadow:"0 4px 20px rgba(0,0,0,0.6)",display:"flex",alignItems:"center",justifyContent:"center" }}>
-        <LockSVG />
+    <div style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.09)", borderRadius:16, overflow:"hidden", boxShadow:"0 40px 100px rgba(0,0,0,0.7)", width:"100%", maxWidth:480 }}>
+      {/* Title bar */}
+      <div style={{ background:"#090909", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"12px 16px", display:"flex", alignItems:"center", gap:6 }}>
+        {["#ff5f57","#febc2e","#28c840"].map(c => <div key={c} style={{ width:10, height:10, borderRadius:"50%", background:c }} />)}
+        <div style={{ flex:1, textAlign:"center", fontSize:11, fontWeight:600, color:"#2a2a2a", fontFamily:"var(--mono)" }}>ReviewChaser</div>
       </div>
-      <p style={{ fontSize:10,fontWeight:700,letterSpacing:"2.5px",color:"#383838",textTransform:"uppercase" }}>In Progress</p>
+
+      <div style={{ padding:24 }}>
+        {/* Sends counter */}
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
+          <div style={{ fontSize:11, color:"#383838", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase" }}>Sends this month</div>
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <span style={{ fontSize:12, fontWeight:700, color:"#22c55e", fontFamily:"var(--mono)" }}>23 / 140</span>
+            <div style={{ width:72, height:5, background:"rgba(255,255,255,0.06)", borderRadius:999 }}>
+              <div style={{ width:"16%", height:"100%", background:"#22c55e", borderRadius:999 }} />
+            </div>
+          </div>
+        </div>
+
+        {!demoSent ? (
+          <>
+            <label style={{ fontSize:11.5, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Customer mobile</label>
+            <input
+              value={demoMobile}
+              onChange={e => setDemoMobile(e.target.value)}
+              placeholder="04XX XXX XXX"
+              maxLength={12}
+              style={{ width:"100%", padding:"13px 16px", background:"#0f0f0f", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, fontSize:16, color:"#fff", outline:"none", fontFamily:"var(--font)", letterSpacing:"0.5px", boxSizing:"border-box", marginBottom:12 }}
+              onKeyDown={e => e.key === "Enter" && handleDemoSend()}
+            />
+            {/* SMS preview */}
+            <div style={{ background:"#080808", border:"1px solid rgba(255,255,255,0.05)", borderRadius:10, padding:"12px 14px", marginBottom:14 }}>
+              <div style={{ fontSize:10, color:"#2a2a2a", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>SMS preview</div>
+              <div style={{ fontSize:12.5, color:"#555", lineHeight:1.75 }}>
+                Hi! Thanks for choosing <span style={{ color:"#777" }}>Your Business</span>. If you have a moment, we'd love a Google review! <span style={{ color:"#22c55e" }}>g.co/r/yourbusiness</span>
+              </div>
+              <div style={{ fontSize:10, color:"#2a2a2a", marginTop:6, fontFamily:"var(--mono)" }}>152 / 160 chars ✓</div>
+            </div>
+            <button
+              onClick={handleDemoSend}
+              disabled={demoMobile.replace(/\s/g,"").length < 10 || demoSending}
+              style={{ width:"100%", padding:"13px 20px", background:demoMobile.replace(/\s/g,"").length >= 10 ? "#22c55e" : "rgba(34,197,94,0.1)", color:demoMobile.replace(/\s/g,"").length >= 10 ? "#000" : "#1a4a2e", border:"none", borderRadius:10, fontSize:14, fontWeight:700, cursor:demoMobile.replace(/\s/g,"").length >= 10 ? "pointer" : "default", transition:"all 0.2s", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+              {demoSending
+                ? <><div style={{ width:14, height:14, border:"2px solid rgba(0,0,0,0.2)", borderTop:"2px solid #000", borderRadius:"50%", animation:"spin 0.7s linear infinite" }} /> Sending…</>
+                : "Send Review Request ✦"}
+            </button>
+          </>
+        ) : (
+          <div style={{ textAlign:"center", padding:"20px 0" }}>
+            <div style={{ fontSize:36, marginBottom:10 }}>✅</div>
+            <div style={{ fontSize:15, fontWeight:700, color:"#fff", marginBottom:6 }}>Demo sent!</div>
+            <div style={{ fontSize:12.5, color:"#555" }}>Sign up to send real review requests.</div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -408,9 +466,9 @@ const SystemsPage = ({ setPage }) => {
       </div>
       <div style={{ maxWidth:1280,margin:"0 auto",padding:isMobile?"0 20px 48px":"0 64px 72px", flex:1 }}>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
-          <SysCard onClick={() => setPage("paychaser")} live name="PayChaser" desc="Track invoices, chase payments, and collect faster — all in one place." />
+            <SysCard onClick={() => setPage("reviewchaser")} live name="ReviewChaser" desc="Send SMS review requests in seconds. More Google reviews, zero awkwardness." />
           {/* ReviewChaser — ADDED */}
-          <SysCard onClick={() => setPage("reviewchaser")} live name="ReviewChaser" desc="Send SMS review requests in seconds. More Google reviews, zero awkwardness." />
+            <SysCard onClick={null} live={false} name="PayChaser" desc="Automated invoice reminders and payment tracking. Coming soon." />
           <LockedCard />
           {!isMobile && <LockedCard />}
         </div>
