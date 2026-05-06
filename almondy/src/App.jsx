@@ -2238,7 +2238,35 @@ const RCPaywallScreen = ({ isMobile, profile, onClose }) => {
 };
 
 // ── Dashboard App ─────────────────────────────────────────────────
-const RCDashboardApp = ({ isMobile, profile:initialProfile, userId, onSignOut }) => {
+const RC_MESSAGE_TEMPLATES = [
+  {
+    id: "friendly",
+    label: "Friendly & warm",
+    preview: (biz, link) => `Hi! Thanks for choosing ${biz}. If you have a moment, we'd love a Google review — it really helps! ${link}`,
+  },
+  {
+    id: "brief",
+    label: "Short & direct",
+    preview: (biz, link) => `Hey! Thanks for using ${biz}. Mind leaving us a quick Google review? ${link} — takes 30 seconds!`,
+  },
+  {
+    id: "tradies",
+    label: "Tradie style",
+    preview: (biz, link) => `G'day! Job's done — if you're happy with the work, a Google review would mean a lot. ${link} Cheers!`,
+  },
+  {
+    id: "professional",
+    label: "Professional",
+    preview: (biz, link) => `Thank you for choosing ${biz}. We'd appreciate a Google review to help others find us. ${link}`,
+  },
+  {
+    id: "custom",
+    label: "Write my own",
+    preview: () => "",
+  },
+];
+
+const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }) => {
   const [profile, setProfile] = useState(initialProfile);
   const [tab, setTab] = useState("send");
   const [mobile, setMobile] = useState("");
@@ -2250,19 +2278,33 @@ const RCDashboardApp = ({ isMobile, profile:initialProfile, userId, onSignOut })
   const [sendsUsed, setSendsUsed] = useState(0);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [settingsData, setSettingsData] = useState({ bizName:initialProfile?.biz_name??"", googleLink:initialProfile?.google_link??"" });
+  const [settingsData, setSettingsData] = useState({
+    bizName: initialProfile?.biz_name ?? "",
+    googleLink: initialProfile?.google_link ?? "",
+    templateId: initialProfile?.template_id ?? "friendly",
+    customMsg: initialProfile?.custom_msg ?? "",
+  });
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsSaved, setSettingsSaved] = useState(false);
+  const [cancelStep, setCancelStep] = useState(null); // null | "confirm" | "done"
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [contactSent, setContactSent] = useState(false);
+  const [contactMsg, setContactMsg] = useState("");
 
   const plan = profile?.plan ?? "trial";
   const sendLimit = getSendLimit(plan);
   const trialExpired = isTrialExpired(profile);
-  const pct = Math.min(100, Math.round((sendsUsed/sendLimit)*100));
+  const pct = Math.min(100, Math.round((sendsUsed / sendLimit) * 100));
   const atLimit = sendsUsed >= sendLimit;
 
-  useEffect(() => {
-    getRCSendsThisMonth(userId).then(setSendsUsed);
-  }, [userId, sent]);
+  const canCustomise = plan === "growth" || plan === "crew";
+
+  const activeTemplate = RC_MESSAGE_TEMPLATES.find(t => t.id === settingsData.templateId) ?? RC_MESSAGE_TEMPLATES[0];
+  const livePreview = activeTemplate.id === "custom"
+    ? settingsData.customMsg
+    : activeTemplate.preview(settingsData.bizName || "Your Business", settingsData.googleLink || "your-link");
+
+  useEffect(() => { getRCSendsThisMonth(userId).then(setSendsUsed); }, [userId, sent]);
 
   const loadHistory = useCallback(async () => {
     setHistoryLoading(true);
@@ -2270,215 +2312,323 @@ const RCDashboardApp = ({ isMobile, profile:initialProfile, userId, onSignOut })
     setHistoryLoading(false);
   }, [userId]);
 
-  useEffect(() => { if(tab==="history") loadHistory(); }, [tab, loadHistory]);
-  useEffect(() => { if(trialExpired||atLimit) setShowPaywall(true); }, [trialExpired, atLimit]);
+  useEffect(() => { if (tab === "history") loadHistory(); }, [tab, loadHistory]);
+  useEffect(() => { if (trialExpired || atLimit) setShowPaywall(true); }, [trialExpired, atLimit]);
 
-const handleSend = async () => {
-  const clean = mobile.replace(/\s/g, "").replace(/^0/, "+61")
-  if (clean.length < 10) return
-  if (!profile?.biz_name || !profile?.google_link) {
-    setSendErr("Please complete your profile in Settings first.")
-    return
-  }
-
-  setSending(true); setSendErr("")
-
-  try {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) { setSendErr("Please sign in again."); setSending(false); return }
-
-    const res = await fetch(
-      "https://qmaqmbimnhzyspvnioeb.supabase.co/functions/v1/smooth-worker",
-      {
+  const handleSend = async () => {
+    const clean = mobile.replace(/\s/g, "").replace(/^0/, "+61");
+    if (clean.length < 10) return;
+    if (!profile?.biz_name || !profile?.google_link) { setSendErr("Please complete your profile in Settings first."); return; }
+    setSending(true); setSendErr("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { setSendErr("Please sign in again."); setSending(false); return; }
+      const res = await fetch("https://qmaqmbimnhzyspvnioeb.supabase.co/functions/v1/smooth-worker", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.access_token}`,
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
         body: JSON.stringify({ mobile }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.error === "trial_expired") { setShowPaywall(true); setSending(false); return; }
+        if (json.error === "limit_reached") { setShowPaywall(true); setSending(false); return; }
+        throw new Error(json.error);
       }
-    )
-
-    const json = await res.json()
-
-    if (!res.ok) {
-    if (json.error === "trial_expired") { setShowPaywall(true); setSending(false); return }
-    if (json.error === "limit_reached") { setShowPaywall(true); setSending(false); return }
-      throw new Error(json.error)
-    }
-
-    setSent(true); setMobile("")
-    setTimeout(() => setSent(false), 4000)
-
-  } catch (e) {
-    setSendErr("Failed to send. Check the number and try again.")
-  } finally {
-    setSending(false)
-  }
-}
+      setSent(true); setMobile("");
+      setTimeout(() => setSent(false), 4000);
+    } catch (e) { setSendErr("Failed to send. Check the number and try again."); }
+    finally { setSending(false); }
+  };
 
   const handleSaveSettings = async () => {
     setSettingsSaving(true);
-    await supabase.from("rc_profiles").update({ biz_name:settingsData.bizName.trim(), google_link:settingsData.googleLink.trim() }).eq("id", userId);
-    setProfile(p=>({ ...p, biz_name:settingsData.bizName.trim(), google_link:settingsData.googleLink.trim() }));
+    await supabase.from("rc_profiles").update({
+      biz_name: settingsData.bizName.trim(),
+      google_link: settingsData.googleLink.trim(),
+      template_id: settingsData.templateId,
+      custom_msg: settingsData.customMsg.trim(),
+    }).eq("id", userId);
+    setProfile(p => ({ ...p, biz_name: settingsData.bizName.trim(), google_link: settingsData.googleLink.trim() }));
     setSettingsSaving(false); setSettingsSaved(true);
-    setTimeout(()=>setSettingsSaved(false), 2500);
+    setTimeout(() => setSettingsSaved(false), 2500);
+  };
+
+  const handleCancelPlan = async () => {
+    setCancelLoading(true);
+    try {
+      await fetch("https://formspree.io/f/mlgzbpng", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ "❌ Cancel request": "ReviewChaser", "📧 Email": profile?.email ?? "unknown", "📦 Plan": plan }),
+      });
+      await supabase.from("rc_profiles").update({ plan: "expired" }).eq("id", userId);
+      setProfile(p => ({ ...p, plan: "expired" }));
+      setCancelStep("done");
+    } catch (e) { console.error(e); }
+    finally { setCancelLoading(false); }
+  };
+
+  const handleContactSupport = async () => {
+    if (!contactMsg.trim()) return;
+    try {
+      await fetch("https://formspree.io/f/mlgzbpng", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ "💬 Support request": contactMsg, "📧 Email": profile?.email ?? "unknown", "📦 Plan": plan }),
+      });
+    } catch (e) { console.error(e); }
+    setContactSent(true); setContactMsg("");
+    setTimeout(() => setContactSent(false), 3500);
   };
 
   const formatDate = iso => {
-    const d = new Date(iso); const now = new Date(); const diff = (now-d)/1000;
-    if(diff<60) return "Just now";
-    if(diff<3600) return `${Math.floor(diff/60)}m ago`;
-    if(diff<86400) return `${Math.floor(diff/3600)}h ago`;
-    return d.toLocaleDateString("en-AU",{ day:"numeric",month:"short" });
+    const d = new Date(iso); const now = new Date(); const diff = (now - d) / 1000;
+    if (diff < 60) return "Just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return d.toLocaleDateString("en-AU", { day: "numeric", month: "short" });
   };
 
   const planConfig = PLAN_CONFIG[plan] ?? PLAN_CONFIG.trial;
 
   return (
     <>
-      {(showPaywall||trialExpired) && <RCPaywallScreen isMobile={isMobile} profile={profile} onClose={()=>!trialExpired&&setShowPaywall(false)} />}
-      <div style={{ minHeight:"100vh",background:"#060606" }}>
-        <div style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,height:58,background:"rgba(8,8,8,0.96)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(255,255,255,0.07)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"0 16px":"0 28px" }}>
-          <div style={{ display:"flex",alignItems:"center",gap:10 }}>
-            <div style={{ fontSize:15,fontWeight:800,letterSpacing:"-0.5px",color:"#fff" }}>ReviewChaser</div>
-            <div style={{ fontSize:10,fontWeight:700,color:planConfig.color,background:`${planConfig.color}18`,border:`1px solid ${planConfig.color}38`,borderRadius:999,padding:"2px 8px",fontFamily:"var(--mono)" }}>{planConfig.label.toUpperCase()}</div>
+      {(showPaywall || trialExpired) && <RCPaywallScreen isMobile={isMobile} profile={profile} onClose={() => !trialExpired && setShowPaywall(false)} />}
+      <div style={{ minHeight: "100vh", background: "#060606" }}>
+        {/* ── TOPBAR ── */}
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: 62, background: "rgba(8,8,8,0.96)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "0 16px" : "0 48px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <WordmarkSVG height={isMobile ? 17 : 20} />
+            <div style={{ fontSize: 10, fontWeight: 700, color: planConfig.color, background: `${planConfig.color}18`, border: `1px solid ${planConfig.color}38`, borderRadius: 999, padding: "2px 8px", fontFamily: "var(--mono)" }}>{planConfig.label.toUpperCase()}</div>
           </div>
-          <div style={{ display:"flex",alignItems:"center",gap:10 }}>
-            {plan==="trial" && <button onClick={()=>setShowPaywall(true)} style={{ padding:isMobile?"6px 12px":"7px 16px",background:"#22c55e",color:"#000",border:"none",borderRadius:7,fontSize:isMobile?11:12.5,fontWeight:700,cursor:"pointer" }}>Upgrade</button>}
-            <div style={{ fontSize:12,color:"#656565",fontFamily:"var(--mono)",display:isMobile?"none":"block" }}>{sendsUsed}/{sendLimit}</div>
-            <button onClick={()=>setShowSettings(s=>!s)} style={{ width:32,height:32,borderRadius:"50%",background:"linear-gradient(135deg,#22c55e,#16a34a)",border:"none",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#000",cursor:"pointer" }}>
-              {(profile?.biz_name||"R")[0].toUpperCase()}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {plan === "trial" && <button onClick={() => setShowPaywall(true)} style={{ padding: isMobile ? "6px 12px" : "7px 16px", background: "#22c55e", color: "#000", border: "none", borderRadius: 7, fontSize: isMobile ? 11 : 12.5, fontWeight: 700, cursor: "pointer" }}>Upgrade</button>}
+            <div style={{ fontSize: 12, color: "#656565", fontFamily: "var(--mono)", display: isMobile ? "none" : "block" }}>{sendsUsed}/{sendLimit}</div>
+            <button onClick={() => { setShowSettings(s => !s); setCancelStep(null); }} style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#22c55e,#16a34a)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#000", cursor: "pointer" }}>
+              {(profile?.biz_name || "R")[0].toUpperCase()}
             </button>
           </div>
         </div>
-        <div style={{ maxWidth:900,margin:"0 auto",padding:`${isMobile?0:36}px ${isMobile?0:36}px`,paddingTop:isMobile?72:90 }}>
-          <div style={{ padding:isMobile?"0 16px":0 }}>
+
+        <div style={{ maxWidth: 900, margin: "0 auto", padding: `${isMobile ? 0 : 36}px ${isMobile ? 0 : 36}px`, paddingTop: isMobile ? 72 : 90 }}>
+          <div style={{ padding: isMobile ? "0 16px" : 0 }}>
+
+            {/* ── SETTINGS PANEL ── */}
             {showSettings && (
-              <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:isMobile?20:28,marginBottom:16,animation:"rc-fadeIn 0.25s both" }}>
-                <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20 }}>
-                  <h3 style={{ fontSize:16,fontWeight:700,color:"#ccc",letterSpacing:"-0.4px" }}>Account Settings</h3>
-                  <button onClick={()=>setShowSettings(false)} style={{ background:"none",border:"none",color:"#444",fontSize:18,cursor:"pointer" }}>✕</button>
+              <div style={{ background: "#0c0c0c", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: isMobile ? 20 : 28, marginBottom: 16, animation: "rc-fadeIn 0.25s both" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "#ccc", letterSpacing: "-0.4px" }}>Settings</h3>
+                  <button onClick={() => setShowSettings(false)} style={{ background: "none", border: "none", color: "#444", fontSize: 18, cursor: "pointer" }}>✕</button>
                 </div>
-                <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
-                  <div>
-                    <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Business name</label>
-                    <input className="rc-input" style={RC_INPUT} value={settingsData.bizName} onChange={e=>setSettingsData(d=>({...d,bizName:e.target.value}))} placeholder="Smith Electrical" />
-                  </div>
-                  <div>
-                    <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Google Review link</label>
-                    <input className="rc-input" style={RC_INPUT} value={settingsData.googleLink} onChange={e=>setSettingsData(d=>({...d,googleLink:e.target.value}))} placeholder="https://g.page/r/..." />
-                  </div>
-                  {(plan==="growth"||plan==="crew") ? (
+
+                {cancelStep === null && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+
+                    {/* Account */}
                     <div>
-                      <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Custom SMS message <span style={{ color:"#22c55e" }}>✦</span></label>
-                      <textarea className="rc-input" style={{ ...RC_INPUT,minHeight:90,resize:"vertical" }} placeholder={`Hi! Thanks for choosing ${settingsData.bizName||"Your Business"}. We'd love a Google review! ${settingsData.googleLink||"your-link"}`} />
-                      <p style={{ fontSize:11.5,color:"#383838",marginTop:6 }}>Keep under 160 characters to avoid double billing.</p>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Account</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 }}>Business name</label>
+                          <input className="rc-input" style={RC_INPUT} value={settingsData.bizName} onChange={e => setSettingsData(d => ({ ...d, bizName: e.target.value }))} placeholder="Smith Electrical" />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 }}>Google Review link</label>
+                          <input className="rc-input" style={RC_INPUT} value={settingsData.googleLink} onChange={e => setSettingsData(d => ({ ...d, googleLink: e.target.value }))} placeholder="https://g.page/r/..." />
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <div style={{ background:"rgba(245,158,11,0.04)",border:"1px solid rgba(245,158,11,0.15)",borderRadius:9,padding:"12px 14px",display:"flex",alignItems:"center",gap:8 }}>
-                      <span style={{ fontSize:14 }}>🔒</span>
-                      <p style={{ fontSize:12.5,color:"#555",margin:0 }}>Custom SMS message is available on <strong style={{ color:"#f59e0b" }}>Growth & Crew</strong> plans. <button onClick={()=>{setShowSettings(false);setShowPaywall(true);}} style={{ background:"none",border:"none",color:"#f59e0b",fontWeight:700,fontSize:12.5,cursor:"pointer",padding:0 }}>Upgrade →</button></p>
+
+                    {/* Message template */}
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>
+                        Message template {!canCustomise && <span style={{ color: "#f59e0b", fontSize: 10 }}>— Growth & Crew only</span>}
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+                        {RC_MESSAGE_TEMPLATES.map(t => {
+                          const locked = t.id === "custom" && !canCustomise;
+                          const active = settingsData.templateId === t.id;
+                          return (
+                            <button key={t.id} onClick={() => !locked && setSettingsData(d => ({ ...d, templateId: t.id }))} style={{ background: active ? "rgba(34,197,94,0.07)" : "#080808", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "11px 14px", cursor: locked ? "default" : "pointer", display: "flex", alignItems: "center", gap: 10, textAlign: "left", opacity: locked ? 0.4 : 1 }}>
+                              <div style={{ width: 14, height: 14, borderRadius: "50%", border: `1px solid ${active ? "rgba(34,197,94,0.5)" : "#383838"}`, background: active ? "#22c55e" : "transparent", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: "#000", fontWeight: 900 }}>{active ? "✓" : ""}</div>
+                              <span style={{ fontSize: 13, fontWeight: 600, color: active ? "#22c55e" : "#666" }}>{t.label}</span>
+                              {locked && <span style={{ fontSize: 10, color: "#f59e0b", marginLeft: "auto" }}>🔒</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {settingsData.templateId === "custom" && canCustomise && (
+                        <div>
+                          <textarea className="rc-input" style={{ ...RC_INPUT, minHeight: 80, resize: "vertical" }} placeholder={`Hi! Thanks for choosing ${settingsData.bizName || "Your Business"}...`} value={settingsData.customMsg} onChange={e => setSettingsData(d => ({ ...d, customMsg: e.target.value }))} />
+                          <p style={{ fontSize: 11, color: "#383838", marginTop: 6 }}>Keep under 160 chars to avoid double billing. {settingsData.customMsg.length}/160</p>
+                        </div>
+                      )}
+                      {settingsData.templateId !== "custom" && (
+                        <div style={{ background: "#080808", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 10, padding: "12px 14px" }}>
+                          <div style={{ fontSize: 10, color: "#2a2a2a", fontFamily: "var(--mono)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>Preview</div>
+                          <div style={{ fontSize: 13, color: "#666", lineHeight: 1.75 }}>{livePreview}</div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                  <div style={{ display:"flex",gap:10,flexWrap:"wrap" }}>
-                    <button onClick={handleSaveSettings} disabled={settingsSaving} style={{ flex:1,minWidth:140,padding:"11px 20px",background:settingsSaved?"rgba(34,197,94,0.15)":settingsSaving?"rgba(255,255,255,0.5)":"#fff",color:settingsSaved?"#22c55e":settingsSaving?"#aaa":"#000",border:settingsSaved?"1px solid rgba(34,197,94,0.3)":"none",borderRadius:9,fontSize:13,fontWeight:700,cursor:settingsSaving?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8 }}>
+
+                    {/* Save */}
+                    <button onClick={handleSaveSettings} disabled={settingsSaving} style={{ width: "100%", padding: "12px 20px", background: settingsSaved ? "rgba(34,197,94,0.15)" : settingsSaving ? "rgba(255,255,255,0.5)" : "#fff", color: settingsSaved ? "#22c55e" : settingsSaving ? "#aaa" : "#000", border: settingsSaved ? "1px solid rgba(34,197,94,0.3)" : "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: settingsSaving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
                       {settingsSaving ? <><Spinner size={13} dark />Saving…</> : settingsSaved ? "✓ Saved!" : "Save changes"}
                     </button>
-                    <button onClick={onSignOut} style={{ padding:"11px 18px",background:"transparent",border:"1px solid rgba(255,255,255,0.08)",color:"#555",borderRadius:9,fontSize:13,fontWeight:600,cursor:"pointer" }}>Sign out</button>
+
+                    <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
+
+                    {/* Contact support */}
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Contact support</div>
+                      {!contactSent ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                          <textarea className="rc-input" style={{ ...RC_INPUT, minHeight: 70, resize: "vertical" }} placeholder="Describe your issue or question…" value={contactMsg} onChange={e => setContactMsg(e.target.value)} />
+                          <button onClick={handleContactSupport} disabled={!contactMsg.trim()} style={{ padding: "10px 18px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "#666", cursor: contactMsg.trim() ? "pointer" : "default", opacity: contactMsg.trim() ? 1 : 0.4 }}>Send to support →</button>
+                        </div>
+                      ) : (
+                        <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 9, padding: "12px 14px", fontSize: 13, color: "#22c55e" }}>✓ Message sent — we'll get back to you within 24h.</div>
+                      )}
+                    </div>
+
+                    <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
+
+                    {/* Danger zone */}
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Account actions</div>
+                      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                        <button onClick={onSignOut} style={{ flex: 1, minWidth: 120, padding: "10px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", color: "#555", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Sign out</button>
+                        {plan !== "trial" && plan !== "expired" && (
+                          <button onClick={() => setCancelStep("confirm")} style={{ flex: 1, minWidth: 120, padding: "10px 16px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Cancel plan</button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {/* ── CANCEL CONFIRM ── */}
+                {cancelStep === "confirm" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)", borderRadius: 12, padding: "18px 20px" }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#f87171", marginBottom: 8 }}>Cancel your plan?</div>
+                      <p style={{ fontSize: 13, color: "#666", lineHeight: 1.7, margin: 0 }}>You're on the <strong style={{ color: "#aaa" }}>{planConfig.label}</strong> plan. Cancelling will stop your sends immediately and your account will move to expired status.</p>
+                    </div>
+                    <div style={{ display: "flex", gap: 10 }}>
+                      <button onClick={() => setCancelStep(null)} style={{ flex: 1, padding: "11px 16px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Keep my plan</button>
+                      <button onClick={handleCancelPlan} disabled={cancelLoading} style={{ flex: 1, padding: "11px 16px", background: "rgba(239,68,68,0.1)", color: "#f87171", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: cancelLoading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                        {cancelLoading ? <><Spinner size={13} />Cancelling…</> : "Confirm cancel"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── CANCEL DONE ── */}
+                {cancelStep === "done" && (
+                  <div style={{ textAlign: "center", padding: "16px 0" }}>
+                    <div style={{ fontSize: 32, marginBottom: 12 }}>👋</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 8 }}>Plan cancelled</div>
+                    <p style={{ fontSize: 13, color: "#555", lineHeight: 1.7, marginBottom: 18 }}>Your account has been downgraded. You can re-subscribe any time.</p>
+                    <button onClick={() => { setShowSettings(false); setCancelStep(null); }} style={{ padding: "10px 20px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Close</button>
+                  </div>
+                )}
               </div>
             )}
-            {/* Stats */}
-            <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr 1fr":"repeat(3,1fr)",gap:10,marginBottom:16 }}>
-              {[{label:"Sent this month",val:sendsUsed,green:false},{label:"Remaining",val:Math.max(0,sendLimit-sendsUsed),green:true},{label:"Monthly cap",val:sendLimit,green:false}].map(({label,val,green}) => (
-                <div key={label} style={{ background:green?"rgba(34,197,94,0.04)":"rgba(255,255,255,0.025)",border:`1px solid ${green?"rgba(34,197,94,0.18)":"rgba(255,255,255,0.06)"}`,borderRadius:12,padding:isMobile?"12px 14px":"18px 20px" }}>
-                  <div style={{ fontSize:9.5,color:"#383838",fontFamily:"var(--mono)",letterSpacing:"1.2px",textTransform:"uppercase",marginBottom:6,fontWeight:600 }}>{label}</div>
-                  <div style={{ fontSize:isMobile?22:28,fontWeight:800,letterSpacing:"-1px",color:green?"#22c55e":"#fff",lineHeight:1 }}>{val}</div>
+
+            {/* ── STATS ── */}
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr 1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 16 }}>
+              {[{ label: "Sent this month", val: sendsUsed, green: false }, { label: "Remaining", val: Math.max(0, sendLimit - sendsUsed), green: true }, { label: "Monthly cap", val: sendLimit, green: false }].map(({ label, val, green }) => (
+                <div key={label} style={{ background: green ? "rgba(34,197,94,0.04)" : "rgba(255,255,255,0.025)", border: `1px solid ${green ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.06)"}`, borderRadius: 12, padding: isMobile ? "12px 14px" : "18px 20px" }}>
+                  <div style={{ fontSize: 9.5, color: "#383838", fontFamily: "var(--mono)", letterSpacing: "1.2px", textTransform: "uppercase", marginBottom: 6, fontWeight: 600 }}>{label}</div>
+                  <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, letterSpacing: "-1px", color: green ? "#22c55e" : "#fff", lineHeight: 1 }}>{val}</div>
                 </div>
               ))}
             </div>
+
             {/* Progress */}
-            <div style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.06)",borderRadius:10,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12 }}>
-              <div style={{ flex:1,height:5,background:"rgba(255,255,255,0.05)",borderRadius:999,overflow:"hidden" }}>
-                <div style={{ width:`${pct}%`,height:"100%",background:pct>=90?"#ef4444":pct>=75?"#f59e0b":"#22c55e",borderRadius:999,transition:"width 0.5s" }} />
+            <div style={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ flex: 1, height: 5, background: "rgba(255,255,255,0.05)", borderRadius: 999, overflow: "hidden" }}>
+                <div style={{ width: `${pct}%`, height: "100%", background: pct >= 90 ? "#ef4444" : pct >= 75 ? "#f59e0b" : "#22c55e", borderRadius: 999, transition: "width 0.5s" }} />
               </div>
-              <div style={{ fontSize:12,color:pct>=90?"#f87171":pct>=75?"#f59e0b":"#444",fontFamily:"var(--mono)",flexShrink:0 }}>{pct}% used</div>
-              {pct>=80 && <button onClick={()=>setShowPaywall(true)} style={{ fontSize:11,fontWeight:700,color:"#f59e0b",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:999,padding:"3px 9px",cursor:"pointer",flexShrink:0 }}>Upgrade</button>}
+              <div style={{ fontSize: 12, color: pct >= 90 ? "#f87171" : pct >= 75 ? "#f59e0b" : "#444", fontFamily: "var(--mono)", flexShrink: 0 }}>{pct}% used</div>
+              {pct >= 80 && <button onClick={() => setShowPaywall(true)} style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 999, padding: "3px 9px", cursor: "pointer", flexShrink: 0 }}>Upgrade</button>}
             </div>
-            {plan==="trial"&&!trialExpired && (
-              <div style={{ background:"rgba(245,158,11,0.04)",border:"1px solid rgba(245,158,11,0.18)",borderRadius:10,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12 }}>
-                <div style={{ fontSize:13,color:"#858585" }}>⚡ <strong style={{ color:"#f59e0b" }}>Free trial</strong> — 7 days, 20 sends. Keep your reviews coming after trial.</div>
-                <button onClick={()=>setShowPaywall(true)} style={{ padding:"7px 14px",background:"transparent",color:"#f59e0b",border:"1px solid rgba(245,158,11,0.3)",borderRadius:7,fontSize:12,fontWeight:700,cursor:"pointer",flexShrink:0,whiteSpace:"nowrap" }}>Upgrade →</button>
+
+            {plan === "trial" && !trialExpired && (
+              <div style={{ background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.18)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                <div style={{ fontSize: 13, color: "#858585" }}>⚡ <strong style={{ color: "#f59e0b" }}>Free trial</strong> — 7 days, 20 sends.</div>
+                <button onClick={() => setShowPaywall(true)} style={{ padding: "7px 14px", background: "transparent", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 7, fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Upgrade →</button>
               </div>
             )}
+
             {/* Tabs */}
-            <div style={{ display:"flex",background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:10,padding:4,marginBottom:16,gap:4 }}>
-              {[["send","Send Request"],["history","Send History"]].map(([id,label]) => (
-                <button key={id} onClick={()=>setTab(id)} style={{ flex:1,padding:"10px 16px",borderRadius:8,background:tab===id?"rgba(255,255,255,0.07)":"transparent",color:tab===id?"#fff":"#444",fontSize:13,fontWeight:600,border:"none",transition:"all 0.2s" }}>{label}</button>
+            <div style={{ display: "flex", background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: 4, marginBottom: 16, gap: 4 }}>
+              {[["send", "Send Requests"], ["history", "Send History"]].map(([id, label]) => (
+                <button key={id} onClick={() => setTab(id)} style={{ flex: 1, padding: "10px 16px", borderRadius: 8, background: tab === id ? "rgba(255,255,255,0.07)" : "transparent", color: tab === id ? "#fff" : "#444", fontSize: 13, fontWeight: 600, border: "none", transition: "all 0.2s" }}>{label}</button>
               ))}
             </div>
-            {/* Send Tab */}
-            {tab==="send" && (
-              <div style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,padding:isMobile?20:32,animation:"rc-fadeIn 0.3s both" }}>
-                <h2 style={{ fontSize:isMobile?20:24,fontWeight:800,letterSpacing:"-1px",color:"#fff",marginBottom:6 }}>Send a review request</h2>
-                <p style={{ fontSize:13.5,color:"#555",marginBottom:24 }}>Enter your customer's mobile. They'll get a friendly SMS with your Google Review link.</p>
+
+            {/* ── SEND TAB ── */}
+            {tab === "send" && (
+              <div style={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: isMobile ? 20 : 32, animation: "rc-fadeIn 0.3s both" }}>
+                <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 800, letterSpacing: "-1px", color: "#fff", marginBottom: 6 }}>Send a review request</h2>
+                <p style={{ fontSize: 13.5, color: "#555", marginBottom: 24 }}>Enter your customer's mobile. They'll get a friendly SMS with your Google Review link.</p>
                 {!sent ? (
                   <>
-                    <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:10 }}>Customer mobile number</label>
-                    <input value={mobile} onChange={e=>{setMobile(e.target.value);setSendErr("");}} placeholder="04XX XXX XXX" maxLength={13} className="rc-input" style={{ ...RC_INPUT,fontSize:18,letterSpacing:"1px",marginBottom:12 }} onKeyDown={e=>e.key==="Enter"&&handleSend()} disabled={atLimit||trialExpired} />
-                    {mobile.length>3 && (
-                      <div style={{ background:"#080808",border:"1px solid rgba(255,255,255,0.05)",borderRadius:10,padding:"14px 16px",marginBottom:14,animation:"rc-fadeIn 0.3s both" }}>
-                        <div style={{ fontSize:10,color:"#2a2a2a",fontFamily:"var(--mono)",letterSpacing:1,textTransform:"uppercase",marginBottom:8 }}>What {mobile} will receive</div>
-                        <div style={{ fontSize:14,color:"#bbb",lineHeight:1.8 }}>Hi! Thanks for choosing <strong style={{ color:"#ddd" }}>{profile?.biz_name||"Your Business"}</strong>. If you have a moment, we'd love a Google review — it really helps! <span style={{ color:"#22c55e" }}>{profile?.google_link||"your-link"}</span></div>
-                        <div style={{ fontSize:11,color:"#2a2a2a",marginTop:8,display:"flex",justifyContent:"space-between",fontFamily:"var(--mono)" }}><span>From: AU mobile number</span><span style={{ color:"rgba(34,197,94,0.4)" }}>✓ Under 160 chars</span></div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 10 }}>Customer mobile number</label>
+                    <input value={mobile} onChange={e => { setMobile(e.target.value); setSendErr(""); }} placeholder="04XX XXX XXX" maxLength={13} className="rc-input" style={{ ...RC_INPUT, fontSize: 18, letterSpacing: "1px", marginBottom: 12 }} onKeyDown={e => e.key === "Enter" && handleSend()} disabled={atLimit || trialExpired} />
+                    {mobile.length > 3 && (
+                      <div style={{ background: "#080808", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 10, padding: "14px 16px", marginBottom: 14, animation: "rc-fadeIn 0.3s both" }}>
+                        <div style={{ fontSize: 10, color: "#2a2a2a", fontFamily: "var(--mono)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>What {mobile} will receive</div>
+                        <div style={{ fontSize: 14, color: "#bbb", lineHeight: 1.8 }}>{livePreview || <span style={{ color: "#383838" }}>Complete your message template in Settings.</span>}</div>
+                        <div style={{ fontSize: 11, color: "#2a2a2a", marginTop: 8, display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)" }}><span>From: AU mobile number</span><span style={{ color: "rgba(34,197,94,0.4)" }}>✓ Under 160 chars</span></div>
                       </div>
                     )}
-                    {sendErr && <p style={{ fontSize:13,color:"#f87171",marginBottom:12 }}>{sendErr}</p>}
-                    <button onClick={handleSend} disabled={mobile.replace(/\s/g,"").length<10||sending||atLimit||trialExpired} style={{ width:"100%",padding:"15px 20px",background:atLimit||trialExpired?"rgba(255,255,255,0.04)":mobile.replace(/\s/g,"").length>=10?"#22c55e":"rgba(34,197,94,0.08)",color:atLimit||trialExpired?"#656565":mobile.replace(/\s/g,"").length>=10?"#000":"#1a4a2e",border:"none",borderRadius:12,fontSize:15,fontWeight:700,transition:"all 0.2s",display:"flex",alignItems:"center",justifyContent:"center",gap:10 }}>
-                      {sending ? <><Spinner size={16} dark />Sending SMS…</> : atLimit||trialExpired ? "🔒 Upgrade to Send" : "Send Review Request ✦"}
+                    {sendErr && <p style={{ fontSize: 13, color: "#f87171", marginBottom: 12 }}>{sendErr}</p>}
+                    <button onClick={handleSend} disabled={mobile.replace(/\s/g, "").length < 10 || sending || atLimit || trialExpired} style={{ width: "100%", padding: "15px 20px", background: atLimit || trialExpired ? "rgba(255,255,255,0.04)" : mobile.replace(/\s/g, "").length >= 10 ? "#22c55e" : "rgba(34,197,94,0.08)", color: atLimit || trialExpired ? "#656565" : mobile.replace(/\s/g, "").length >= 10 ? "#000" : "#1a4a2e", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 700, transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                      {sending ? <><Spinner size={16} dark />Sending SMS…</> : atLimit || trialExpired ? "🔒 Upgrade to Send" : "Send Review Request ✦"}
                     </button>
                   </>
                 ) : (
-                  <div style={{ textAlign:"center",padding:"32px 0",animation:"rc-fadeIn 0.4s both" }}>
-                    <div style={{ fontSize:52,marginBottom:14 }}>🌟</div>
-                    <div style={{ fontSize:22,fontWeight:800,letterSpacing:"-0.8px",color:"#fff",marginBottom:8 }}>Request sent!</div>
-                    <div style={{ fontSize:14,color:"#555",marginBottom:18 }}>Your customer will receive the SMS shortly.</div>
-                    <div style={{ display:"inline-flex",alignItems:"center",gap:6,background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:999,padding:"5px 14px",fontSize:12,fontWeight:600,color:"#22c55e" }}>
-                      <span className="rc-badge-dot" style={{ width:6,height:6 }} /> Delivered to AU network
+                  <div style={{ textAlign: "center", padding: "32px 0", animation: "rc-fadeIn 0.4s both" }}>
+                    <div style={{ fontSize: 52, marginBottom: 14 }}>🌟</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.8px", color: "#fff", marginBottom: 8 }}>Request sent!</div>
+                    <div style={{ fontSize: 14, color: "#555", marginBottom: 18 }}>Your customer will receive the SMS shortly.</div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 999, padding: "5px 14px", fontSize: 12, fontWeight: 600, color: "#22c55e" }}>
+                      <span className="rc-badge-dot" style={{ width: 6, height: 6 }} /> Delivered to AU network
                     </div>
                   </div>
                 )}
               </div>
             )}
-            {/* History Tab */}
-            {tab==="history" && (
-              <div style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,overflow:"hidden",animation:"rc-fadeIn 0.3s both" }}>
-                <div style={{ padding:"16px 24px",borderBottom:"1px solid rgba(255,255,255,0.05)",display:"flex",alignItems:"center",justifyContent:"space-between" }}>
-                  <div style={{ fontSize:14,fontWeight:700,color:"#777" }}>Send history</div>
-                  {historyLoading ? <Spinner size={14} /> : <div style={{ fontSize:12,color:"#656565",fontFamily:"var(--mono)" }}>{history.length} records</div>}
+
+            {/* ── HISTORY TAB ── */}
+            {tab === "history" && (
+              <div style={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflow: "hidden", animation: "rc-fadeIn 0.3s both" }}>
+                <div style={{ padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#777" }}>Send history</div>
+                  {historyLoading ? <Spinner size={14} /> : <div style={{ fontSize: 12, color: "#656565", fontFamily: "var(--mono)" }}>{history.length} records</div>}
                 </div>
                 {historyLoading ? (
-                  <div style={{ padding:"40px 24px",display:"flex",justifyContent:"center" }}><Spinner /></div>
-                ) : history.length===0 ? (
-                  <div style={{ padding:"40px 24px",textAlign:"center",color:"#656565",fontSize:14 }}>No sends yet. Send your first review request!</div>
-                ) : history.map((row,i) => (
-                  <div key={row.id} className="rc-hover-row" style={{ display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"12px 16px":"14px 24px",borderBottom:i<history.length-1?"1px solid rgba(255,255,255,0.04)":"none",background:"transparent",transition:"background 0.15s" }}>
-                    <div style={{ display:"flex",alignItems:"center",gap:10 }}>
-                      <div style={{ width:7,height:7,borderRadius:"50%",background:"#22c55e",flexShrink:0 }} />
+                  <div style={{ padding: "40px 24px", display: "flex", justifyContent: "center" }}><Spinner /></div>
+                ) : history.length === 0 ? (
+                  <div style={{ padding: "40px 24px", textAlign: "center", color: "#656565", fontSize: 14 }}>No sends yet. Send your first review request!</div>
+                ) : history.map((row, i) => (
+                  <div key={row.id} className="rc-hover-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 16px" : "14px 24px", borderBottom: i < history.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", background: "transparent", transition: "background 0.15s" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />
                       <div>
-                        <div style={{ fontSize:14,fontWeight:600,color:"#aaa",fontFamily:"var(--mono)" }}>{row.mobile}</div>
-                        <div style={{ fontSize:11,color:"#2a2a2a" }}>{formatDate(row.sent_at)}</div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: "#aaa", fontFamily: "var(--mono)" }}>{row.mobile}</div>
+                        <div style={{ fontSize: 11, color: "#2a2a2a" }}>{formatDate(row.sent_at)}</div>
                       </div>
                     </div>
-                    <div style={{ display:"inline-flex",alignItems:"center",gap:5,background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:999,padding:"3px 9px" }}>
-                      <span style={{ fontSize:10,fontWeight:700,color:"#22c55e" }}>Sent</span>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 999, padding: "3px 9px" }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: "#22c55e" }}>Sent</span>
                     </div>
                   </div>
                 ))}
               </div>
             )}
+
           </div>
         </div>
       </div>
