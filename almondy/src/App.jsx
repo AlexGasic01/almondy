@@ -2455,7 +2455,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
             {/* Tabs */}
             <div style={{ display: "flex", background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: 4, marginBottom: 16, gap: 4 }}>
               {[["send", "Send"], ["history", "History"], ["settings", "Settings"]].map(([id, label]) => (
-                <button key={id} onClick={() => { setTab(id); if (id !== "settings") setCancelStep(null); }} style={{ flex: 1, padding: "10px 16px", borderRadius: 8, background: tab === id ? "rgba(255,255,255,0.07)" : "transparent", color: tab === id ? "#fff" : "#444", fontSize: 13, fontWeight: 600, border: "none", transition: "all 0.2s", cursor: "pointer" }}>{label}</button>
+                <button key={id} onClick={() => { setTab(id); if (id !== "settings") setCancelStep(null); }} style={{ flex: 1, padding: isMobile ? "10px 6px" : "10px 16px", borderRadius: 8, background: tab === id ? "rgba(255,255,255,0.07)" : "transparent", color: tab === id ? "#fff" : "#444", fontSize: isMobile ? 12 : 13, fontWeight: 600, border: "none", transition: "all 0.2s", cursor: "pointer" }}>{label}</button>
               ))}
             </div>
 
