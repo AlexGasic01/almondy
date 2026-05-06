@@ -2655,7 +2655,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
     const profile = await getOrCreateRCProfile(uid, session.user.email);
     if (!mounted) return;
     setRcProfile(profile);
-    setView(!profile.biz_name ? "onboarding" : (profile.plan === "trial" || profile.plan === "expired") ? "paywall" : "dashboard");
+    setView(!profile.biz_name ? "onboarding" : profile.plan === "expired" ? "paywall" : "dashboard");
   };
   init();
 
@@ -2665,7 +2665,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
       setRcUserId(uid);
       const profile = await getOrCreateRCProfile(uid, session.user.email);
       setRcProfile(profile);
-      setView(!profile.biz_name ? "onboarding" : (profile.plan === "trial" || profile.plan === "expired") ? "paywall" : "dashboard");
+      setView(!profile.biz_name ? "onboarding" : profile.plan === "expired" ? "paywall" : "dashboard");
       window.history.replaceState({}, "", window.location.pathname);
     }
     if (event==="SIGNED_OUT") { setRcProfile(null); setRcUserId(null); setView("marketing"); }
@@ -2704,7 +2704,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
       <RCStyles />
       {view==="marketing" && <div style={{ paddingTop:62 }}><RCMarketingPage isMobile={isMobile} onStartTrial={()=>setView("auth")} onSignIn={()=>setView("auth")} setPage={setPage} /></div>}
       {view==="auth" && <RCAuthScreen isMobile={isMobile} onBack={()=>setView("marketing")} />}
-      {view==="onboarding"&&rcUserId && <RCOnboardingWizard isMobile={isMobile} userId={rcUserId} email={rcProfile?.email??""} onComplete={profile=>{ setRcProfile(p=>({...p,...profile})); setView("paywall"); }} />}
+      {view==="onboarding"&&rcUserId && <RCOnboardingWizard isMobile={isMobile} userId={rcUserId} email={rcProfile?.email??""} onComplete={profile=>{ setRcProfile(p=>({...p,...profile})); setView("dashboard"); }} />}
       {view==="paywall"&&rcUserId&&rcProfile && <RCPaywallScreen isMobile={isMobile} profile={rcProfile} onClose={null} />}
       {view==="dashboard"&&rcUserId&&rcProfile && <RCDashboardApp isMobile={isMobile} profile={rcProfile} userId={rcUserId} onSignOut={handleSignOut} />}
     </>
