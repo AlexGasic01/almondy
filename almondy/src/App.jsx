@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import ReviewChaserPage from "./ReviewChaserPage"; // ← ReviewChaser drop-in
 
 const supabase = createClient(
   "https://qmaqmbimnhzyspvnioeb.supabase.co",
@@ -73,136 +74,25 @@ const LockSVG = () => (
 /* ─── MOBILE WARNING POPUP ─── */
 const MobileWarningPopup = ({ onDismiss }) => {
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
   }, []);
-
   const handleDismiss = () => {
     setVisible(false);
     setTimeout(onDismiss, 350);
   };
-
   return (
     <>
-      {/* Backdrop */}
-      <div
-        onClick={handleDismiss}
-        style={{
-          position: "fixed", inset: 0, zIndex: 8000,
-          background: "rgba(0,0,0,0.75)",
-          backdropFilter: "blur(8px)",
-          opacity: visible ? 1 : 0,
-          transition: "opacity 0.35s ease",
-          pointerEvents: visible ? "auto" : "none",
-        }}
-      />
-
-      {/* Modal — centered */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%", left: "50%",
-          transform: visible
-            ? "translate(-50%, -50%) scale(1)"
-            : "translate(-50%, -50%) scale(0.94)",
-          zIndex: 8001,
-          width: "calc(100% - 40px)",
-          maxWidth: 360,
-          opacity: visible ? 1 : 0,
-          transition: "opacity 0.35s cubic-bezier(0.22,1,0.36,1), transform 0.35s cubic-bezier(0.22,1,0.36,1)",
-          pointerEvents: visible ? "auto" : "none",
-        }}
-      >
-        <div
-          style={{
-            background: "#111",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 20,
-            padding: "32px 28px 28px",
-            boxShadow: "0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          {/* Top accent line */}
-          <div style={{
-            position: "absolute", top: 0, left: "50%",
-            transform: "translateX(-50%)",
-            width: 160, height: 2,
-            background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.6), transparent)",
-            borderRadius: 999,
-          }} />
-
-          {/* Close button */}
-          <button
-            onClick={handleDismiss}
-            style={{
-              position: "absolute", top: 16, right: 16,
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "50%",
-              width: 28, height: 28,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#555", fontSize: 14, lineHeight: 1,
-              cursor: "pointer",
-            }}
-          >✕</button>
-
-          {/* Badge */}
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(245,158,11,0.08)",
-            border: "1px solid rgba(245,158,11,0.22)",
-            borderRadius: 999,
-            padding: "3px 10px",
-            fontSize: 10, fontWeight: 700,
-            color: "#f59e0b",
-            letterSpacing: "1.5px",
-            textTransform: "uppercase",
-            fontFamily: "var(--mono)",
-            marginBottom: 14,
-          }}>
-            ⚠ Warning
-          </div>
-
-          <h2 style={{
-            fontSize: 21, fontWeight: 800,
-            letterSpacing: "-0.8px",
-            color: "var(--white)",
-            lineHeight: 1.15,
-            marginBottom: 10,
-          }}>
-            Best viewed on desktop
-          </h2>
-
-          <p style={{
-            fontSize: 13.5, color: "#666",
-            lineHeight: 1.75, marginBottom: 26,
-          }}>
-            For the best experience, use a{" "}
-            <strong style={{ color: "#999" }}>desktop device</strong>.
-            Some features may appear limited on mobile.
-          </p>
-
-          <button
-            onClick={handleDismiss}
-            style={{
-              width: "100%",
-              padding: "13px 20px",
-              background: "var(--white)",
-              color: "var(--black)",
-              border: "none",
-              borderRadius: 10,
-              fontSize: 14, fontWeight: 700,
-              letterSpacing: "-0.3px",
-              cursor: "pointer",
-              fontFamily: "var(--font)",
-            }}
-          >
-            Got it, continue anyway
-          </button>
+      <div onClick={handleDismiss} style={{ position:"fixed",inset:0,zIndex:8000,background:"rgba(0,0,0,0.75)",backdropFilter:"blur(8px)",opacity:visible?1:0,transition:"opacity 0.35s ease",pointerEvents:visible?"auto":"none" }} />
+      <div style={{ position:"fixed",top:"50%",left:"50%",transform:visible?"translate(-50%, -50%) scale(1)":"translate(-50%, -50%) scale(0.94)",zIndex:8001,width:"calc(100% - 40px)",maxWidth:360,opacity:visible?1:0,transition:"opacity 0.35s cubic-bezier(0.22,1,0.36,1), transform 0.35s cubic-bezier(0.22,1,0.36,1)",pointerEvents:visible?"auto":"none" }}>
+        <div style={{ background:"#111",border:"1px solid rgba(255,255,255,0.1)",borderRadius:20,padding:"32px 28px 28px",boxShadow:"0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)",position:"relative",overflow:"hidden" }}>
+          <div style={{ position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:160,height:2,background:"linear-gradient(90deg, transparent, rgba(245,158,11,0.6), transparent)",borderRadius:999 }} />
+          <button onClick={handleDismiss} style={{ position:"absolute",top:16,right:16,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:"50%",width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",color:"#555",fontSize:14,cursor:"pointer" }}>✕</button>
+          <div style={{ display:"inline-flex",alignItems:"center",gap:6,background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.22)",borderRadius:999,padding:"3px 10px",fontSize:10,fontWeight:700,color:"#f59e0b",letterSpacing:"1.5px",textTransform:"uppercase",fontFamily:"var(--mono)",marginBottom:14 }}>⚠ Warning</div>
+          <h2 style={{ fontSize:21,fontWeight:800,letterSpacing:"-0.8px",color:"var(--white)",lineHeight:1.15,marginBottom:10 }}>Best viewed on desktop</h2>
+          <p style={{ fontSize:13.5,color:"#666",lineHeight:1.75,marginBottom:26 }}>For the best experience, use a <strong style={{ color:"#999" }}>desktop device</strong>. Some features may appear limited on mobile.</p>
+          <button onClick={handleDismiss} style={{ width:"100%",padding:"13px 20px",background:"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"var(--font)" }}>Got it, continue anyway</button>
         </div>
       </div>
     </>
@@ -250,12 +140,10 @@ const GlobalStyle = () => (
       background: var(--green); box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
       animation: pulse 2.2s ease infinite; flex-shrink: 0; display: inline-block;
     }
-    /* Mobile drawer overlay */
     .mobile-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.6);
       z-index: 199; backdrop-filter: blur(4px);
     }
-    /* Scrollable x on mobile tables */
     .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   `}</style>
 );
@@ -266,10 +154,11 @@ const Nav = ({ page, setPage }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const links = [
-    { id: "home", label: "Home" },
-    { id: "systems", label: "Systems" },
-    { id: "webdev", label: "Web Development" },
-    { id: "paychaser", label: "PayChaser" },
+    { id: "home",         label: "Home" },
+    { id: "systems",      label: "Systems" },
+    { id: "webdev",       label: "Web Development" },
+    { id: "paychaser",    label: "PayChaser" },
+    { id: "reviewchaser", label: "ReviewChaser" }, // ← ADDED
     { id: "testimonials", label: "Testimonials" },
   ];
 
@@ -283,17 +172,16 @@ const Nav = ({ page, setPage }) => {
         </button>
 
         {isMobile ? (
-          /* Hamburger */
           <button onClick={() => setMenuOpen(v => !v)} style={{ background:"none",border:"none",display:"flex",flexDirection:"column",gap:5,padding:6 }}>
             <span style={{ display:"block",width:22,height:2,background:menuOpen?"transparent":"var(--white)",transition:"all 0.2s",transform:menuOpen?"rotate(45deg) translate(5px,5px)":"none" }} />
             <span style={{ display:"block",width:22,height:2,background:"var(--white)",transition:"all 0.2s",transform:menuOpen?"rotate(-45deg)":"none" }} />
           </button>
         ) : (
           <>
-            <ul style={{ display:"flex",gap:32,listStyle:"none" }}>
+            <ul style={{ display:"flex",gap:28,listStyle:"none" }}>
               {links.map(l => (
                 <li key={l.id}>
-                  <button onClick={() => go(l.id)} style={{ background:"none",border:"none",color:page===l.id?"var(--white)":"var(--gray)",fontSize:13.5,fontWeight:500,letterSpacing:"-0.1px",transition:"color 0.15s" }}>{l.label}</button>
+                  <button onClick={() => go(l.id)} style={{ background:"none",border:"none",color:page===l.id?"var(--white)":"var(--gray)",fontSize:13,fontWeight:500,letterSpacing:"-0.1px",transition:"color 0.15s" }}>{l.label}</button>
                 </li>
               ))}
             </ul>
@@ -302,7 +190,6 @@ const Nav = ({ page, setPage }) => {
         )}
       </nav>
 
-      {/* Mobile drawer */}
       {isMobile && menuOpen && (
         <>
           <div className="mobile-overlay" onClick={() => setMenuOpen(false)} />
@@ -334,9 +221,21 @@ const Footer = ({ setPage }) => {
         </button>
         <span style={{ fontSize:12,color:"var(--muted)",fontFamily:"var(--mono)" }}>© 2026 Almondy. All rights reserved.</span>
         <ul style={{ display:"flex",gap:16,listStyle:"none",flexWrap:"wrap" }}>
-          {["Privacy","Terms","Systems","PayChaser","Contact"].map(l => (
-            <li key={l}>
-              <button onClick={() => l==="Systems"?setPage("systems"):l==="PayChaser"?setPage("paychaser"):l==="Contact"?setPage("contact"):null} style={{ background:"none",border:"none",fontSize:12,color:"var(--muted)",cursor:"pointer" }}>{l}</button>
+          {[
+            ["Privacy", null],
+            ["Terms", null],
+            ["Systems", "systems"],
+            ["PayChaser", "paychaser"],
+            ["ReviewChaser", "reviewchaser"], // ← ADDED
+            ["Contact", "contact"],
+          ].map(([label, pageId]) => (
+            <li key={label}>
+              <button
+                onClick={() => pageId && setPage(pageId)}
+                style={{ background:"none",border:"none",fontSize:12,color:"var(--muted)",cursor:pageId?"pointer":"default" }}
+              >
+                {label}
+              </button>
             </li>
           ))}
         </ul>
@@ -395,14 +294,13 @@ const HomePage = ({ setPage }) => {
     return () => { el.removeEventListener("mousemove",onMove); el.removeEventListener("mouseleave",onLeave); cancelAnimationFrame(rafRef.current); };
   }, [isMobile]);
 
-return (
-  <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
+  return (
+    <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
       {/* HERO */}
       <div style={{ position:"relative",overflow:"hidden" }}>
         <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
         <div style={{ position:"absolute",inset:0,background:"radial-gradient(ellipse 70% 60% at 50% 45%, rgba(50,50,50,0.5) 0%, transparent 70%)",pointerEvents:"none" }} />
         <div style={{ position:"relative",zIndex:1,minHeight:isMobile?"auto":"100vh",display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",alignItems:"center",maxWidth:1280,margin:"0 auto",padding:isMobile?"40px 20px 48px":"40px 48px 0 64px" }}>
-          {/* Left */}
           <div style={{ display:"flex",flexDirection:"column",alignItems:"flex-start",paddingRight:isMobile?0:48,textAlign:isMobile?"left":"left" }}>
             <button onClick={() => setPage("systems")} style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12.5,fontWeight:600,color:"var(--green)",marginBottom:28,animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both",fontFamily:"var(--mono)" }}>
               <span className="badge-dot" /> PayChaser Just Released
@@ -433,7 +331,6 @@ return (
               </div>
             </div>
           </div>
-          {/* Right — Lock (hidden on mobile) */}
           {!isMobile && (
             <div style={{ display:"flex",alignItems:"center",justifyContent:"flex-end",position:"relative",animation:"fadeRight 0.7s 0.3s cubic-bezier(0.22,1,0.36,1) both" }}>
               <div ref={mockupRef} style={{ position:"relative",zIndex:1,width:"100%",maxWidth:560,cursor:"pointer",willChange:"transform" }}>
@@ -447,13 +344,14 @@ return (
       <div style={{ height:isMobile?0:48 }} />
       <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)" }} />
 
-      {/* PRODUCTS */}
+      {/* PRODUCTS — now includes ReviewChaser */}
       <div style={{ maxWidth:1180,margin:"0 auto",padding:isMobile?"60px 20px":"100px 48px" }}>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Our Systems</p>
         <h2 style={{ fontSize:isMobile?"clamp(28px,8vw,40px)":"clamp(32px,3.5vw,52px)",fontWeight:800,letterSpacing:"-2px",lineHeight:1.05,color:"var(--white)",marginBottom:36 }}>
           Tools that get things done.
         </h2>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
+          {/* PayChaser */}
           <button onClick={() => setPage("paychaser")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"#0c0c0c",cursor:"pointer",textAlign:"left" }}>
             <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--green)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
               <span className="badge-dot" style={{ width:6,height:6 }} /> Live Now
@@ -462,7 +360,17 @@ return (
             <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>Track invoices, chase payments, and collect faster — all in one place.</p>
             <span style={{ fontSize:20,color:"var(--muted)" }}>↗</span>
           </button>
-          <LockedCard />
+
+          {/* ReviewChaser — ADDED */}
+          <button onClick={() => setPage("reviewchaser")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"#0c0c0c",cursor:"pointer",textAlign:"left" }}>
+            <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--green)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
+              <span className="badge-dot" style={{ width:6,height:6 }} /> Live Now
+            </div>
+            <div style={{ fontSize:isMobile?36:48,fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>ReviewChaser</div>
+            <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>Send SMS review requests in seconds. Get more Google reviews without the awkwardness.</p>
+            <span style={{ fontSize:20,color:"var(--muted)" }}>↗</span>
+          </button>
+
           {!isMobile && <LockedCard />}
         </div>
       </div>
@@ -501,7 +409,8 @@ const SystemsPage = ({ setPage }) => {
       <div style={{ maxWidth:1280,margin:"0 auto",padding:isMobile?"0 20px 48px":"0 64px 72px", flex:1 }}>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
           <SysCard onClick={() => setPage("paychaser")} live name="PayChaser" desc="Track invoices, chase payments, and collect faster — all in one place." />
-          <LockedCard />
+          {/* ReviewChaser — ADDED */}
+          <SysCard onClick={() => setPage("reviewchaser")} live name="ReviewChaser" desc="Send SMS review requests in seconds. More Google reviews, zero awkwardness." />
           <LockedCard />
           {!isMobile && <LockedCard />}
         </div>
@@ -636,14 +545,7 @@ const EXTRA_OPTIONS = [
 ];
 
 const STEPS_ONBOARDING = [
-  "Business",
-  "Colours",
-  "Typography",
-  "Header",
-  "Hero",
-  "Pages",
-  "Extras",
-  "Review",
+  "Business","Colours","Typography","Header","Hero","Pages","Extras","Review",
 ];
 
 const WebDevOnboardingPage = ({ setPage }) => {
@@ -654,22 +556,9 @@ const WebDevOnboardingPage = ({ setPage }) => {
   const [submitted, setSubmitted] = useState(false);
 
   const [data, setData] = useState({
-    bizName: "",
-    bizDesc: "",
-    palette: "",
-    paletteCustom: "",
-    font: "",
-    fontCustom: "",
-    headerStyle: "",
-    headerUpload: null,
-    headerUploadName: "",
-    heroHeadline: "",
-    heroSubline: "",
-    heroCta: "",
-    pages: [],
-    extras: [],
-    otherNotes: "",
-    email: "",
+    bizName:"",bizDesc:"",palette:"",paletteCustom:"",font:"",fontCustom:"",
+    headerStyle:"",headerUpload:null,headerUploadName:"",heroHeadline:"",
+    heroSubline:"",heroCta:"",pages:[],extras:[],otherNotes:"",email:"",
   });
 
   const go = (dir) => {
@@ -695,515 +584,221 @@ const WebDevOnboardingPage = ({ setPage }) => {
     return true;
   };
 
-  const saveSubmission = async (d) => {
-    await supabase.from("webdev_submissions").insert({
-      biz_name: d.bizName,
-      biz_desc: d.bizDesc,
-      email: d.email,
-      palette: d.palette,
-      palette_custom: d.paletteCustom,
-      font: d.font,
-      font_custom: d.fontCustom,
-      header_style: d.headerStyle,
-      header_url: d.headerUrl || null,
-      hero_headline: d.heroHeadline,
-      hero_subline: d.heroSubline,
-      hero_cta: d.heroCta,
-      pages: d.pages,
-      extras: d.extras,
-      notes: d.otherNotes,
-      submitted_at: new Date().toISOString(),
-    });
-  };
-
-
-  
   const inputStyle = {
-    width: "100%",
-    padding: "12px 16px",
-    background: "#0f0f0f",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 10,
-    fontSize: 15,
-    color: "#fff",
-    outline: "none",
-    fontFamily: "var(--font)",
-    boxSizing: "border-box",
+    width:"100%",padding:"12px 16px",background:"#0f0f0f",
+    border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,
+    fontSize:15,color:"#fff",outline:"none",fontFamily:"var(--font)",boxSizing:"border-box",
   };
-  const textareaStyle = { ...inputStyle, resize: "vertical", minHeight: 90 };
+  const textareaStyle = { ...inputStyle, resize:"vertical", minHeight:90 };
 
   const stepContent = () => {
     switch(step) {
       case 0: return (
-        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+        <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
           <div>
-            <label style={{ fontSize:12, fontWeight:600, color:"#666", display:"block", marginBottom:8 }}>Business / project name</label>
-            <input
-              autoFocus
-              style={inputStyle}
-              placeholder="e.g. Smith Electrical"
-              value={data.bizName}
-              onChange={e => set("bizName", e.target.value)}
-              onKeyDown={e => e.key==="Enter" && canNext() && go(1)}
-            />
+            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Business / project name</label>
+            <input autoFocus style={inputStyle} placeholder="e.g. Smith Electrical" value={data.bizName} onChange={e=>set("bizName",e.target.value)} onKeyDown={e=>e.key==="Enter"&&canNext()&&go(1)} />
           </div>
           <div>
-            <label style={{ fontSize:12, fontWeight:600, color:"#666", display:"block", marginBottom:8 }}>What do you do? <span style={{color:"#383838",fontWeight:400}}>(brief)</span></label>
-            <textarea
-              style={textareaStyle}
-              placeholder="e.g. We install solar panels for residential homes in Brisbane."
-              value={data.bizDesc}
-              onChange={e => set("bizDesc", e.target.value)}
-            />
+            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>What do you do? <span style={{color:"#383838",fontWeight:400}}>(brief)</span></label>
+            <textarea style={textareaStyle} placeholder="e.g. We install solar panels for residential homes in Brisbane." value={data.bizDesc} onChange={e=>set("bizDesc",e.target.value)} />
           </div>
         </div>
       );
-
       case 1: return (
-        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
             {PALETTE_OPTIONS.map(p => (
-              <button
-                key={p.id}
-                onClick={() => set("palette", p.id)}
-                style={{
-                  background: data.palette===p.id ? "rgba(34,197,94,0.07)" : "#0c0c0c",
-                  border: `1px solid ${data.palette===p.id ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.07)"}`,
-                  borderRadius: 10,
-                  padding: "12px 14px",
-                  cursor: "pointer",
-                  textAlign: "left",
-                }}
-              >
-                <div style={{ display:"flex", gap:5, marginBottom:8 }}>
-                  {p.colors.length > 0 ? p.colors.map(c => (
-                    <div key={c} style={{ width:16, height:16, borderRadius:"50%", background:c, border:"1px solid rgba(255,255,255,0.1)" }} />
-)) : (
-  <div style={{ display:"flex", gap:5, marginBottom:8 }}>
-    <div style={{ width:16, height:16, borderRadius:"50%", background:"conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)", flexShrink:0 }} />
-  </div>
-)}
+              <button key={p.id} onClick={()=>set("palette",p.id)} style={{ background:data.palette===p.id?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${data.palette===p.id?"rgba(34,197,94,0.4)":"rgba(255,255,255,0.07)"}`,borderRadius:10,padding:"12px 14px",cursor:"pointer",textAlign:"left" }}>
+                <div style={{ display:"flex",gap:5,marginBottom:8 }}>
+                  {p.colors.length>0?p.colors.map(c=>(<div key={c} style={{ width:16,height:16,borderRadius:"50%",background:c,border:"1px solid rgba(255,255,255,0.1)" }} />)):(<div style={{ width:16,height:16,borderRadius:"50%",background:"conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)",flexShrink:0 }} />)}
                 </div>
-                <div style={{ fontSize:12, fontWeight:600, color: data.palette===p.id ? "#22c55e" : "#888" }}>{p.label}</div>
+                <div style={{ fontSize:12,fontWeight:600,color:data.palette===p.id?"#22c55e":"#888" }}>{p.label}</div>
               </button>
             ))}
           </div>
-                {data.palette === "custom" && (
-          <div style={{ display:"flex", flexDirection:"column", gap:16, background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:20 }}>
-            <p style={{ fontSize:12, color:"#555", margin:0 }}>Pick your two brand colours:</p>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-              <div>
-                <label style={{ fontSize:11, fontWeight:700, color:"#555", display:"block", marginBottom:10, letterSpacing:"1px", textTransform:"uppercase" }}>Primary colour</label>
-                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
-                  <div style={{ width:86, height:86, borderRadius:"50%", overflow:"hidden", border:"2px solid rgba(255,255,255,0.12)", cursor:"pointer", flexShrink:0, touchAction:"manipulation" }}>
-                    <input type="color" value={data.paletteCustom?.split("|")[0] || "#6366f1"} onChange={e => { const secondary = data.paletteCustom?.split("|")[1] || "#ffffff"; set("paletteCustom", e.target.value + "|" + secondary); }} style={{ width:"150%", height:"150%", marginTop:"-25%", marginLeft:"-25%", border:"none", padding:0, cursor:"pointer", touchAction:"manipulation", opacity:1 }} />
+          {data.palette==="custom"&&(
+            <div style={{ display:"flex",flexDirection:"column",gap:16,background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:12,padding:20 }}>
+              <p style={{ fontSize:12,color:"#555",margin:0 }}>Pick your two brand colours:</p>
+              <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
+                <div>
+                  <label style={{ fontSize:11,fontWeight:700,color:"#555",display:"block",marginBottom:10,letterSpacing:"1px",textTransform:"uppercase" }}>Primary</label>
+                  <div style={{ width:86,height:86,borderRadius:"50%",overflow:"hidden",border:"2px solid rgba(255,255,255,0.12)",cursor:"pointer" }}>
+                    <input type="color" value={data.paletteCustom?.split("|")[0]||"#6366f1"} onChange={e=>{const s=data.paletteCustom?.split("|")[1]||"#ffffff";set("paletteCustom",e.target.value+"|"+s);}} style={{ width:"150%",height:"150%",marginTop:"-25%",marginLeft:"-25%",border:"none",padding:0,cursor:"pointer" }} />
                   </div>
-                  <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>{data.paletteCustom?.split("|")[0] || "#6366f1"}</span>
                 </div>
-              </div>
-              <div>
-                <label style={{ fontSize:11, fontWeight:700, color:"#555", display:"block", marginBottom:10, letterSpacing:"1px", textTransform:"uppercase" }}>Secondary colour</label>
-                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
-                  <div style={{ width:86, height:86, borderRadius:"50%", overflow:"hidden", border:"2px solid rgba(255,255,255,0.12)", cursor:"pointer", flexShrink:0, touchAction:"manipulation" }}>
-                    <input type="color" value={data.paletteCustom?.split("|")[1] || "#ffffff"} onChange={e => { const primary = data.paletteCustom?.split("|")[0] || "#6366f1"; set("paletteCustom", primary + "|" + e.target.value); }} style={{ width:"150%", height:"150%", marginTop:"-25%", marginLeft:"-25%", border:"none", padding:0, cursor:"pointer", touchAction:"manipulation", opacity:1 }} />
+                <div>
+                  <label style={{ fontSize:11,fontWeight:700,color:"#555",display:"block",marginBottom:10,letterSpacing:"1px",textTransform:"uppercase" }}>Secondary</label>
+                  <div style={{ width:86,height:86,borderRadius:"50%",overflow:"hidden",border:"2px solid rgba(255,255,255,0.12)",cursor:"pointer" }}>
+                    <input type="color" value={data.paletteCustom?.split("|")[1]||"#ffffff"} onChange={e=>{const p=data.paletteCustom?.split("|")[0]||"#6366f1";set("paletteCustom",p+"|"+e.target.value);}} style={{ width:"150%",height:"150%",marginTop:"-25%",marginLeft:"-25%",border:"none",padding:0,cursor:"pointer" }} />
                   </div>
-                  <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>{data.paletteCustom?.split("|")[1] || "#ffffff"}</span>
                 </div>
               </div>
             </div>
-            {data.paletteCustom && (
-              <div style={{ display:"flex", gap:8, alignItems:"center", background:"#080808", borderRadius:8, padding:"12px 16px" }}>
-                <div style={{ width:20, height:20, borderRadius:"50%", background:data.paletteCustom.split("|")[0], border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }} />
-                <div style={{ width:20, height:20, borderRadius:"50%", background:data.paletteCustom.split("|")[1], border:"1px solid rgba(255,255,255,0.1)", flexShrink:0 }} />
-                <span style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)" }}>Your brand colours</span>
-              </div>
-            )}
-          </div>
-        )}
+          )}
         </div>
       );
-
       case 2: return (
-        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-          {FONT_OPTIONS.map(f => (
-            <button
-              key={f.id}
-              onClick={() => set("font", f.id)}
-              style={{
-                background: data.font===f.id ? "rgba(34,197,94,0.07)" : "#0c0c0c",
-                border: `1px solid ${data.font===f.id ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.07)"}`,
-                borderRadius: 10,
-                padding: "14px 18px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
-              }}
-            >
-              <span style={{ font: f.style, color: data.font===f.id ? "#22c55e" : "#ccc", fontSize: 16 }}>Aa — {f.label}</span>
-              <span style={{ fontSize:12, color:"#444" }}>{f.desc}</span>
+        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
+          {FONT_OPTIONS.map(f=>(
+            <button key={f.id} onClick={()=>set("font",f.id)} style={{ background:data.font===f.id?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${data.font===f.id?"rgba(34,197,94,0.4)":"rgba(255,255,255,0.07)"}`,borderRadius:10,padding:"14px 18px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12 }}>
+              <span style={{ font:f.style,color:data.font===f.id?"#22c55e":"#ccc",fontSize:16 }}>Aa — {f.label}</span>
+              <span style={{ fontSize:12,color:"#444" }}>{f.desc}</span>
             </button>
           ))}
-          {data.font === "custom" && (
-            <input
-              autoFocus
-              style={inputStyle}
-              placeholder="Font name e.g. 'Raleway', 'Bebas Neue'"
-              value={data.fontCustom}
-              onChange={e => set("fontCustom", e.target.value)}
-            />
-          )}
+          {data.font==="custom"&&<input autoFocus style={inputStyle} placeholder="Font name e.g. 'Raleway'" value={data.fontCustom} onChange={e=>set("fontCustom",e.target.value)} />}
         </div>
       );
-
       case 3: return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-            {HEADER_STYLES.map(h => (
-              <button
-                key={h.id}
-                onClick={() => set("headerStyle", h.id)}
-                style={{
-                  background: "transparent",
-                  border: `2px solid ${data.headerStyle===h.id ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.07)"}`,
-                  borderRadius: 12,
-                  padding: 0,
-                  cursor: "pointer",
-                  textAlign: "left",
-                  overflow: "hidden",
-                }}
-              >
+        <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
+            {HEADER_STYLES.map(h=>(
+              <button key={h.id} onClick={()=>set("headerStyle",h.id)} style={{ background:"transparent",border:`2px solid ${data.headerStyle===h.id?"rgba(34,197,94,0.5)":"rgba(255,255,255,0.07)"}`,borderRadius:12,padding:0,cursor:"pointer",textAlign:"left",overflow:"hidden" }}>
                 <div style={{ pointerEvents:"none" }}>{h.preview}</div>
-                <div style={{ padding:"10px 12px", borderTop:"1px solid rgba(255,255,255,0.05)" }}>
-                  <div style={{ fontSize:12, fontWeight:700, color: data.headerStyle===h.id ? "#22c55e" : "#888", marginBottom:3 }}>{h.label}</div>
-                  <div style={{ fontSize:11, color:"#444", lineHeight:1.5 }}>{h.desc}</div>
+                <div style={{ padding:"10px 12px",borderTop:"1px solid rgba(255,255,255,0.05)" }}>
+                  <div style={{ fontSize:12,fontWeight:700,color:data.headerStyle===h.id?"#22c55e":"#888",marginBottom:3 }}>{h.label}</div>
+                  <div style={{ fontSize:11,color:"#444",lineHeight:1.5 }}>{h.desc}</div>
                 </div>
               </button>
             ))}
           </div>
-
-          <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:14 }}>
-            <p style={{ fontSize:12, color:"#555", marginBottom:10 }}>Have a site you love the look of? Upload a screenshot or paste a URL.</p>
-            <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-              <label style={{
-                flex:1, minWidth:140,
-                background:"#0c0c0c",
-                border:"1px dashed rgba(255,255,255,0.12)",
-                borderRadius:10,
-                padding:"13px 16px",
-                display:"flex",
-                alignItems:"center",
-                gap:10,
-                cursor:"pointer",
-                fontSize:13,
-                color: data.headerUploadName ? "#22c55e" : "#555",
-              }}>
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display:"none" }}
-                  onChange={e => {
-                    const f = e.target.files?.[0];
-                    if (f) { set("headerUpload", f); set("headerUploadName", f.name); }
-                  }}
-                />
-                {data.headerUploadName ? `✓ ${data.headerUploadName}` : "Upload image reference"}
+          <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)",paddingTop:14 }}>
+            <p style={{ fontSize:12,color:"#555",marginBottom:10 }}>Have a site you love? Upload a screenshot or paste a URL.</p>
+            <div style={{ display:"flex",gap:10,flexWrap:"wrap" }}>
+              <label style={{ flex:1,minWidth:140,background:"#0c0c0c",border:"1px dashed rgba(255,255,255,0.12)",borderRadius:10,padding:"13px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer",fontSize:13,color:data.headerUploadName?"#22c55e":"#555" }}>
+                <input type="file" accept="image/*" style={{ display:"none" }} onChange={e=>{const f=e.target.files?.[0];if(f){set("headerUpload",f);set("headerUploadName",f.name);}}} />
+                {data.headerUploadName?`✓ ${data.headerUploadName}`:"Upload image reference"}
               </label>
-              <input
-                style={{ ...inputStyle, flex:1, minWidth:140 }}
-                placeholder="or paste a URL (e.g. apple.com)"
-                value={data.headerUrl || ""}
-                onChange={e => set("headerUrl", e.target.value)}
-              />
+              <input style={{ ...inputStyle,flex:1,minWidth:140 }} placeholder="or paste a URL" value={data.headerUrl||""} onChange={e=>set("headerUrl",e.target.value)} />
             </div>
           </div>
         </div>
       );
-
       case 4: return (
-        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+        <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
           <div>
-            <label style={{ fontSize:12, fontWeight:600, color:"#666", display:"block", marginBottom:8 }}>Main headline <span style={{color:"#383838",fontWeight:400}}>(big bold text)</span></label>
-            <input
-              autoFocus
-              style={inputStyle}
-              placeholder='e.g. "Solar done right. Every time."'
-              value={data.heroHeadline}
-              onChange={e => set("heroHeadline", e.target.value)}
-            />
+            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Main headline</label>
+            <input autoFocus style={inputStyle} placeholder='"Solar done right. Every time."' value={data.heroHeadline} onChange={e=>set("heroHeadline",e.target.value)} />
           </div>
           <div>
-            <label style={{ fontSize:12, fontWeight:600, color:"#666", display:"block", marginBottom:8 }}>Subheadline <span style={{color:"#383838",fontWeight:400}}>(optional)</span></label>
-            <textarea
-              style={textareaStyle}
-              placeholder="A short supporting line that adds context."
-              value={data.heroSubline}
-              onChange={e => set("heroSubline", e.target.value)}
-            />
+            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Subheadline <span style={{color:"#383838",fontWeight:400}}>(optional)</span></label>
+            <textarea style={textareaStyle} placeholder="A short supporting line." value={data.heroSubline} onChange={e=>set("heroSubline",e.target.value)} />
           </div>
           <div>
-            <label style={{ fontSize:12, fontWeight:600, color:"#666", display:"block", marginBottom:8 }}>Call-to-action button text</label>
-            <input
-              style={inputStyle}
-              placeholder='e.g. "Get a free quote" or "Book a call"'
-              value={data.heroCta}
-              onChange={e => set("heroCta", e.target.value)}
-            />
+            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>CTA button text</label>
+            <input style={inputStyle} placeholder='"Get a free quote"' value={data.heroCta} onChange={e=>set("heroCta",e.target.value)} />
           </div>
-          {data.heroHeadline && (
-            <div style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, padding:20, marginTop:4 }}>
-              <div style={{ fontSize:9, color:"#383838", fontFamily:"var(--mono)", letterSpacing:2, marginBottom:10 }}>PREVIEW</div>
-              <div style={{ fontSize:20, fontWeight:800, color:"#fff", letterSpacing:"-0.8px", lineHeight:1.1, marginBottom:6 }}>{data.heroHeadline}</div>
-              {data.heroSubline && <div style={{ fontSize:13, color:"#666", lineHeight:1.7, marginBottom:12 }}>{data.heroSubline}</div>}
-              {data.heroCta && <div style={{ display:"inline-block", background:"#fff", color:"#000", borderRadius:7, padding:"8px 16px", fontSize:12, fontWeight:700 }}>{data.heroCta} →</div>}
+          {data.heroHeadline&&(
+            <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:10,padding:20,marginTop:4 }}>
+              <div style={{ fontSize:9,color:"#383838",fontFamily:"var(--mono)",letterSpacing:2,marginBottom:10 }}>PREVIEW</div>
+              <div style={{ fontSize:20,fontWeight:800,color:"#fff",letterSpacing:"-0.8px",lineHeight:1.1,marginBottom:6 }}>{data.heroHeadline}</div>
+              {data.heroSubline&&<div style={{ fontSize:13,color:"#666",lineHeight:1.7,marginBottom:12 }}>{data.heroSubline}</div>}
+              {data.heroCta&&<div style={{ display:"inline-block",background:"#fff",color:"#000",borderRadius:7,padding:"8px 16px",fontSize:12,fontWeight:700 }}>{data.heroCta} →</div>}
             </div>
           )}
         </div>
       );
-
       case 5: return (
-        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-          <p style={{ fontSize:13, color:"#666", marginBottom:4 }}>Select all pages you need:</p>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-            {PAGE_OPTIONS.map(p => {
-              const on = data.pages.includes(p.id);
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => toggle("pages", p.id)}
-                  style={{
-                    background: on ? "rgba(34,197,94,0.07)" : "#0c0c0c",
-                    border: `1px solid ${on ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`,
-                    borderRadius: 9,
-                    padding: "11px 14px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 9,
-                    cursor: "pointer",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: on ? "#22c55e" : "#666",
-                    textAlign: "left",
-                  }}
-                >
-                  <div style={{ width:14, height:14, borderRadius:"50%", border:`1px solid ${on?"rgba(34,197,94,0.5)":"#333"}`, background: on ? "#22c55e" : "transparent", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#000", fontWeight:900 }}>
-                    {on ? "✓" : ""}
-                  </div>
-                  {p.label}
-                </button>
-              );
-            })}
+        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
+          <p style={{ fontSize:13,color:"#666",marginBottom:4 }}>Select all pages you need:</p>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
+            {PAGE_OPTIONS.map(p=>{const on=data.pages.includes(p.id);return(
+              <button key={p.id} onClick={()=>toggle("pages",p.id)} style={{ background:on?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${on?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.07)"}`,borderRadius:9,padding:"11px 14px",display:"flex",alignItems:"center",gap:9,cursor:"pointer",fontSize:13,fontWeight:600,color:on?"#22c55e":"#666",textAlign:"left" }}>
+                <div style={{ width:14,height:14,borderRadius:"50%",border:`1px solid ${on?"rgba(34,197,94,0.5)":"#333"}`,background:on?"#22c55e":"transparent",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#000",fontWeight:900 }}>{on?"✓":""}</div>
+                {p.label}
+              </button>
+            );})}
           </div>
         </div>
       );
-
       case 6: return (
-        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-          <p style={{ fontSize:13, color:"#666", marginBottom:4 }}>Any extra features you need? <span style={{color:"#383838"}}>(optional)</span></p>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-            {EXTRA_OPTIONS.map(e => {
-              const on = data.extras.includes(e.id);
-              return (
-                <button
-                  key={e.id}
-                  onClick={() => toggle("extras", e.id)}
-                  style={{
-                    background: on ? "rgba(34,197,94,0.07)" : "#0c0c0c",
-                    border: `1px solid ${on ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`,
-                    borderRadius: 9,
-                    padding: "11px 14px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 9,
-                    cursor: "pointer",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: on ? "#22c55e" : "#666",
-                    textAlign: "left",
-                  }}
-                >
-                  <div style={{ width:14, height:14, borderRadius:"50%", border:`1px solid ${on?"rgba(34,197,94,0.5)":"#333"}`, background: on ? "#22c55e" : "transparent", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#000", fontWeight:900 }}>
-                    {on ? "✓" : ""}
-                  </div>
-                  {e.label}
-                </button>
-              );
-            })}
+        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
+          <p style={{ fontSize:13,color:"#666",marginBottom:4 }}>Extra features? <span style={{color:"#383838"}}>(optional)</span></p>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
+            {EXTRA_OPTIONS.map(e=>{const on=data.extras.includes(e.id);return(
+              <button key={e.id} onClick={()=>toggle("extras",e.id)} style={{ background:on?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${on?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.07)"}`,borderRadius:9,padding:"11px 14px",display:"flex",alignItems:"center",gap:9,cursor:"pointer",fontSize:13,fontWeight:600,color:on?"#22c55e":"#666",textAlign:"left" }}>
+                <div style={{ width:14,height:14,borderRadius:"50%",border:`1px solid ${on?"rgba(34,197,94,0.5)":"#333"}`,background:on?"#22c55e":"transparent",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#000",fontWeight:900 }}>{on?"✓":""}</div>
+                {e.label}
+              </button>
+            );})}
           </div>
           <div style={{ marginTop:4 }}>
-            <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Anything else you want to mention?</label>
-            <textarea
-              style={textareaStyle}
-              placeholder="Competitors, inspirations, must-haves, dealbreakers..."
-              value={data.otherNotes}
-              onChange={e => set("otherNotes", e.target.value)}
-            />
+            <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Anything else?</label>
+            <textarea style={textareaStyle} placeholder="Competitors, inspirations, must-haves..." value={data.otherNotes} onChange={e=>set("otherNotes",e.target.value)} />
           </div>
         </div>
       );
-
       case 7: return (
-        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-          <div style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:20, display:"flex", flexDirection:"column", gap:10 }}>
+        <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
+          <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:12,padding:20,display:"flex",flexDirection:"column",gap:10 }}>
             {[
-              ["Business", data.bizName],
-              ["Colours", PALETTE_OPTIONS.find(p=>p.id===data.palette)?.label ?? "—"],
-              ["Font", FONT_OPTIONS.find(f=>f.id===data.font)?.label ?? "—"],
-              ["Hero style", HEADER_STYLES.find(h=>h.id===data.headerStyle)?.label ?? "—"],
-              ["Headline", data.heroHeadline || "—"],
-              ["CTA", data.heroCta || "—"],
-              ["Pages", data.pages.map(p=>PAGE_OPTIONS.find(x=>x.id===p)?.label).join(", ") || "—"],
-              ["Extras", data.extras.length ? data.extras.map(e=>EXTRA_OPTIONS.find(x=>x.id===e)?.label).join(", ") : "None"],
-            ].map(([k,v]) => (
-              <div key={k} style={{ display:"flex", gap:12, alignItems:"flex-start", borderBottom:"1px solid rgba(255,255,255,0.04)", paddingBottom:8 }}>
-                <div style={{ fontSize:11, color:"#444", fontFamily:"var(--mono)", minWidth:100, paddingTop:2 }}>{k}</div>
-                <div style={{ fontSize:13, color:"#aaa", lineHeight:1.5, flex:1 }}>{v}</div>
+              ["Business",data.bizName],
+              ["Colours",PALETTE_OPTIONS.find(p=>p.id===data.palette)?.label??"—"],
+              ["Font",FONT_OPTIONS.find(f=>f.id===data.font)?.label??"—"],
+              ["Hero style",HEADER_STYLES.find(h=>h.id===data.headerStyle)?.label??"—"],
+              ["Headline",data.heroHeadline||"—"],
+              ["CTA",data.heroCta||"—"],
+              ["Pages",data.pages.map(p=>PAGE_OPTIONS.find(x=>x.id===p)?.label).join(", ")||"—"],
+              ["Extras",data.extras.length?data.extras.map(e=>EXTRA_OPTIONS.find(x=>x.id===e)?.label).join(", "):"None"],
+            ].map(([k,v])=>(
+              <div key={k} style={{ display:"flex",gap:12,alignItems:"flex-start",borderBottom:"1px solid rgba(255,255,255,0.04)",paddingBottom:8 }}>
+                <div style={{ fontSize:11,color:"#444",fontFamily:"var(--mono)",minWidth:100,paddingTop:2 }}>{k}</div>
+                <div style={{ fontSize:13,color:"#aaa",lineHeight:1.5,flex:1 }}>{v}</div>
               </div>
             ))}
           </div>
           <div>
-            <label style={{ fontSize:12, fontWeight:600, color:"#666", display:"block", marginBottom:8 }}>Your email <span style={{color:"#22c55e"}}>*</span></label>
-            <input
-              autoFocus
-              style={inputStyle}
-              type="email"
-              placeholder="yourname@domain.com"
-              value={data.email}
-              onChange={e => set("email", e.target.value)}
-            />
-            <p style={{ fontSize:11.5, color:"#383838", marginTop:8 }}>We'll get back to you within 24 hours with a quote.</p>
+            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Your email <span style={{color:"#22c55e"}}>*</span></label>
+            <input autoFocus style={inputStyle} type="email" placeholder="yourname@domain.com" value={data.email} onChange={e=>set("email",e.target.value)} />
+            <p style={{ fontSize:11.5,color:"#383838",marginTop:8 }}>We'll get back to you within 24 hours with a quote.</p>
           </div>
         </div>
       );
-
       default: return null;
     }
   };
 
-  const headings = [
-    ["1/8", "What's your business called?"],
-    ["2/8", "Pick a colour palette"],
-    ["3/8", "Choose your typography style"],
-    ["4/8", "What kind of header do you want?"],
-    ["5/8", "What content goes on the hero?"],
-    ["6/8", "What pages do you need?"],
-    ["7/8", "Any extra features?"],
-    ["8/8", "Review & submit"],
-  ];
-
-  const [h1, h2] = headings[step];
+  const headings=[["1/8","What's your business called?"],["2/8","Pick a colour palette"],["3/8","Choose your typography style"],["4/8","What kind of header do you want?"],["5/8","What content goes on the hero?"],["6/8","What pages do you need?"],["7/8","Any extra features?"],["8/8","Review & submit"]];
+  const [h1,h2]=headings[step];
 
   return (
-    <div style={{ paddingTop:62, minHeight:"100vh" }}>
-      {/* Progress bar */}
-      <div style={{ position:"fixed", top:62, left:0, right:0, height:2, background:"rgba(255,255,255,0.05)", zIndex:100 }}>
-        <div style={{ height:"100%", width:`${((step+1)/STEPS_ONBOARDING.length)*100}%`, background:"var(--green)", transition:"width 0.4s cubic-bezier(0.22,1,0.36,1)" }} />
+    <div style={{ paddingTop:62,minHeight:"100vh" }}>
+      <div style={{ position:"fixed",top:62,left:0,right:0,height:2,background:"rgba(255,255,255,0.05)",zIndex:100 }}>
+        <div style={{ height:"100%",width:`${((step+1)/STEPS_ONBOARDING.length)*100}%`,background:"var(--green)",transition:"width 0.4s cubic-bezier(0.22,1,0.36,1)" }} />
       </div>
 
-{submitted && (
-  <div style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.75)", backdropFilter:"blur(10px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
-    <div style={{ background:"#111", border:"1px solid rgba(255,255,255,0.1)", borderRadius:20, padding:"40px 32px 32px", maxWidth:400, width:"100%", textAlign:"center", boxShadow:"0 32px 80px rgba(0,0,0,0.8)", position:"relative" }}>
-      <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:120, height:2, background:"linear-gradient(90deg, transparent, rgba(34,197,94,0.7), transparent)", borderRadius:999 }} />
-      <div style={{ width:56, height:56, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.3)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, margin:"0 auto 18px" }}>✓</div>
-      <h2 style={{ fontSize:22, fontWeight:800, letterSpacing:"-0.8px", color:"#fff", marginBottom:10 }}>You're all set, {data.bizName}!</h2>
-      <p style={{ fontSize:14, color:"#666", lineHeight:1.75, marginBottom:28 }}>We'll review your details and get back to you at <strong style={{ color:"#999" }}>{data.email}</strong> within 24 hours.</p>
-      <button onClick={() => { setSubmitted(false); setPage("home"); }} style={{ width:"100%", padding:"13px 20px", background:"var(--white)", color:"var(--black)", border:"none", borderRadius:10, fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"var(--font)" }}>
-        Back to Home →
-      </button>
-    </div>
-  </div>
-)}
+      {submitted&&(
+        <div style={{ position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,0.75)",backdropFilter:"blur(10px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24 }}>
+          <div style={{ background:"#111",border:"1px solid rgba(255,255,255,0.1)",borderRadius:20,padding:"40px 32px 32px",maxWidth:400,width:"100%",textAlign:"center",boxShadow:"0 32px 80px rgba(0,0,0,0.8)",position:"relative" }}>
+            <div style={{ position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:120,height:2,background:"linear-gradient(90deg, transparent, rgba(34,197,94,0.7), transparent)",borderRadius:999 }} />
+            <div style={{ width:56,height:56,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,margin:"0 auto 18px" }}>✓</div>
+            <h2 style={{ fontSize:22,fontWeight:800,letterSpacing:"-0.8px",color:"#fff",marginBottom:10 }}>You're all set, {data.bizName}!</h2>
+            <p style={{ fontSize:14,color:"#666",lineHeight:1.75,marginBottom:28 }}>We'll review your details and get back to you at <strong style={{ color:"#999" }}>{data.email}</strong> within 24 hours.</p>
+            <button onClick={()=>{setSubmitted(false);setPage("home");}} style={{ width:"100%",padding:"13px 20px",background:"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"var(--font)" }}>Back to Home →</button>
+          </div>
+        </div>
+      )}
 
-      
-      <div style={{ maxWidth:640, margin:"0 auto", padding:isMobile?"40px 20px 80px":"80px 48px 100px" }}>
-
-        {/* Step pills */}
-        <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:32 }}>
-          {STEPS_ONBOARDING.map((s,i) => (
-            <div key={s} style={{
-              fontSize:10, fontWeight:700, letterSpacing:"0.5px",
-              padding:"3px 10px", borderRadius:999,
-              background: i<step ? "rgba(34,197,94,0.1)" : i===step ? "var(--green)" : "rgba(255,255,255,0.04)",
-              color: i<step ? "#22c55e" : i===step ? "#000" : "#333",
-              border: `1px solid ${i<step?"rgba(34,197,94,0.25)":i===step?"transparent":"rgba(255,255,255,0.06)"}`,
-              transition:"all 0.3s",
-            }}>{s}</div>
+      <div style={{ maxWidth:640,margin:"0 auto",padding:isMobile?"40px 20px 80px":"80px 48px 100px" }}>
+        <div style={{ display:"flex",gap:6,flexWrap:"wrap",marginBottom:32 }}>
+          {STEPS_ONBOARDING.map((s,i)=>(
+            <div key={s} style={{ fontSize:10,fontWeight:700,letterSpacing:"0.5px",padding:"3px 10px",borderRadius:999,background:i<step?"rgba(34,197,94,0.1)":i===step?"var(--green)":"rgba(255,255,255,0.04)",color:i<step?"#22c55e":i===step?"#000":"#333",border:`1px solid ${i<step?"rgba(34,197,94,0.25)":i===step?"transparent":"rgba(255,255,255,0.06)"}`,transition:"all 0.3s" }}>{s}</div>
           ))}
         </div>
-
-        {/* Heading */}
-        <div style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : `translateY(${animDir > 0 ? 14 : -14}px)`,
-          transition: "all 0.25s cubic-bezier(0.22,1,0.36,1)",
-          marginBottom: 28,
-        }}>
-          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2px", textTransform:"uppercase", color:"var(--muted)", fontFamily:"var(--mono)", marginBottom:8 }}>{h1}</p>
-          <h1 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(26px,4vw,40px)", fontWeight:800, letterSpacing:"-1.5px", color:"var(--white)", lineHeight:1.05, marginBottom:0 }}>{h2}</h1>
+        <div style={{ opacity:visible?1:0,transform:visible?"translateY(0)":`translateY(${animDir>0?14:-14}px)`,transition:"all 0.25s cubic-bezier(0.22,1,0.36,1)",marginBottom:28 }}>
+          <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2px",textTransform:"uppercase",color:"var(--muted)",fontFamily:"var(--mono)",marginBottom:8 }}>{h1}</p>
+          <h1 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(26px,4vw,40px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",lineHeight:1.05,marginBottom:0 }}>{h2}</h1>
         </div>
-
-        {/* Content */}
-        <div style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : `translateY(${animDir > 0 ? 14 : -14}px)`,
-          transition: "all 0.25s 0.04s cubic-bezier(0.22,1,0.36,1)",
-        }}>
+        <div style={{ opacity:visible?1:0,transform:visible?"translateY(0)":`translateY(${animDir>0?14:-14}px)`,transition:"all 0.25s 0.04s cubic-bezier(0.22,1,0.36,1)" }}>
           {stepContent()}
         </div>
-
-        {/* Nav */}
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:36, paddingTop:24, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-          <button
-            onClick={() => step === 0 ? setPage("webdev") : go(-1)}
-            style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"11px 20px", fontSize:13, fontWeight:600, borderRadius:8, background:"transparent", color:"#555", border:"1px solid rgba(255,255,255,0.08)", cursor:"pointer" }}
-          >
-            ← {step===0 ? "Back" : "Previous"}
-          </button>
-
-          <span style={{ fontSize:11, color:"#333", fontFamily:"var(--mono)" }}>{step+1} / {STEPS_ONBOARDING.length}</span>
-
-          {step < STEPS_ONBOARDING.length - 1 ? (
-            <button
-              onClick={() => canNext() && go(1)}
-              disabled={!canNext()}
-              style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"11px 22px", fontSize:13, fontWeight:700, borderRadius:8, background: canNext() ? "var(--white)" : "rgba(255,255,255,0.08)", color: canNext() ? "var(--black)" : "#333", border:"none", cursor: canNext() ? "pointer" : "default", transition:"all 0.2s" }}
-            >
-              Next →
-            </button>
-          ) : (
-            <button
-onClick={async () => {
-  if (!canNext()) return;
-  try {
-    await fetch("https://formspree.io/f/mlgzbpng", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      "🏢 Business Name": data.bizName,
-      "📧 Client Email": data.email,
-      "📝 Description": data.bizDesc || "—",
-      "🎨 Colour Palette": data.palette === "custom"
-      ? `Custom — Primary: ${data.paletteCustom?.split("|")[0] || "—"}, Secondary: ${data.paletteCustom?.split("|")[1] || "—"}`
-      : PALETTE_OPTIONS.find(p => p.id === data.palette)?.label || "—",      "✏️ Font Style": FONT_OPTIONS.find(f => f.id === data.font)?.label + (data.fontCustom ? ` — ${data.fontCustom}` : "") || "—",
-      "🖼️ Header Style": HEADER_STYLES.find(h => h.id === data.headerStyle)?.label || "—",
-      "🔗 Reference URL": data.headerUrl || "—",
-      "💬 Headline": data.heroHeadline,
-      "💬 Subheadline": data.heroSubline || "—",
-      "🎯 CTA Button": data.heroCta || "—",
-      "📄 Pages": data.pages.map(p => PAGE_OPTIONS.find(x => x.id === p)?.label).join(", ") || "—",
-      "⚙️ Extras": data.extras.map(e => EXTRA_OPTIONS.find(x => x.id === e)?.label).join(", ") || "None",
-      "📌 Notes": data.otherNotes || "—",
-    }),
-    });
-  } catch(e) { console.error(e); }
-  setSubmitted(true);
-}}
-              disabled={!canNext()}
-              style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"11px 22px", fontSize:13, fontWeight:700, borderRadius:8, background: canNext() ? "var(--green)" : "rgba(34,197,94,0.15)", color: canNext() ? "#000" : "#1a4a2e", border:"none", cursor: canNext() ? "pointer" : "default" }}
-            >
-              Submit →
-            </button>
+        <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:36,paddingTop:24,borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+          <button onClick={()=>step===0?setPage("webdev"):go(-1)} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"11px 20px",fontSize:13,fontWeight:600,borderRadius:8,background:"transparent",color:"#555",border:"1px solid rgba(255,255,255,0.08)",cursor:"pointer" }}>← {step===0?"Back":"Previous"}</button>
+          <span style={{ fontSize:11,color:"#333",fontFamily:"var(--mono)" }}>{step+1} / {STEPS_ONBOARDING.length}</span>
+          {step<STEPS_ONBOARDING.length-1?(
+            <button onClick={()=>canNext()&&go(1)} disabled={!canNext()} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:canNext()?"var(--white)":"rgba(255,255,255,0.08)",color:canNext()?"var(--black)":"#333",border:"none",cursor:canNext()?"pointer":"default",transition:"all 0.2s" }}>Next →</button>
+          ):(
+            <button onClick={async()=>{if(!canNext())return;try{await fetch("https://formspree.io/f/mlgzbpng",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({"🏢 Business Name":data.bizName,"📧 Client Email":data.email,"📝 Description":data.bizDesc||"—","🎨 Colour Palette":data.palette==="custom"?`Custom — Primary: ${data.paletteCustom?.split("|")[0]||"—"}, Secondary: ${data.paletteCustom?.split("|")[1]||"—"}`:PALETTE_OPTIONS.find(p=>p.id===data.palette)?.label||"—","✏️ Font Style":FONT_OPTIONS.find(f=>f.id===data.font)?.label+(data.fontCustom?` — ${data.fontCustom}`:""),"🖼️ Header Style":HEADER_STYLES.find(h=>h.id===data.headerStyle)?.label||"—","🔗 Reference URL":data.headerUrl||"—","💬 Headline":data.heroHeadline,"💬 Subheadline":data.heroSubline||"—","🎯 CTA Button":data.heroCta||"—","📄 Pages":data.pages.map(p=>PAGE_OPTIONS.find(x=>x.id===p)?.label).join(", ")||"—","⚙️ Extras":data.extras.map(e=>EXTRA_OPTIONS.find(x=>x.id===e)?.label).join(", ")||"None","📌 Notes":data.otherNotes||"—"})});}catch(e){console.error(e);}setSubmitted(true);}} disabled={!canNext()} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:canNext()?"var(--green)":"rgba(34,197,94,0.15)",color:canNext()?"#000":"#1a4a2e",border:"none",cursor:canNext()?"pointer":"default" }}>Submit →</button>
           )}
         </div>
       </div>
@@ -1225,7 +820,7 @@ function VisInvoiceImport() {
   return (
     <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
       <div style={{ display:"flex",gap:8 }}>
-        {[["Invoices Added","14","Ready to track"],["Total Value","$82k","Across 6 clients"]].map(([label,val,sub]) => (
+        {[["Invoices Added","14","Ready to track"],["Total Value","$82k","Across 6 clients"]].map(([label,val,sub])=>(
           <div key={label} style={{ background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.055)",borderRadius:8,padding:12,flex:1 }}>
             <div style={{ fontSize:9,color:"#222",fontFamily:"var(--mono)",letterSpacing:1,textTransform:"uppercase",marginBottom:6 }}>{label}</div>
             <div style={{ fontSize:18,fontWeight:800,letterSpacing:"-0.8px",color:"var(--green)" }}>{val}</div>
@@ -1233,7 +828,7 @@ function VisInvoiceImport() {
           </div>
         ))}
       </div>
-      {[["Buildco Systems","INV-0051","$6,400"],["Apex Design Co.","INV-0047","$3,200"],["NovaTech Ltd.","INV-0052","$11,750"]].map(([name,inv,amt]) => (
+      {[["Buildco Systems","INV-0051","$6,400"],["Apex Design Co.","INV-0047","$3,200"],["NovaTech Ltd.","INV-0052","$11,750"]].map(([name,inv,amt])=>(
         <div key={name} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:7,padding:"9px 12px",display:"flex",alignItems:"center",gap:8 }}>
           <div style={{ width:6,height:6,borderRadius:"50%",background:"#22c55e",flexShrink:0 }} />
           <div style={{ flex:1,fontSize:11,fontWeight:600,color:"#444",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{name}</div>
@@ -1255,7 +850,7 @@ function VisSchedule() {
           <div style={{ fontSize:9.5,color:"rgba(74,222,128,0.3)",fontFamily:"var(--mono)",marginTop:2 }}>Updated now</div>
         </div>
       </div>
-      {[["Day 3 — Friendly nudge","Warm reminder","#22c55e"],["Day 7 — Firmer tone","Direct, professional","#f59e0b"],["Day 14 — Final notice","Last chance","#ef4444"]].map(([title,sub,dot],i) => (
+      {[["Day 3 — Friendly nudge","Warm reminder","#22c55e"],["Day 7 — Firmer tone","Direct, professional","#f59e0b"],["Day 14 — Final notice","Last chance","#ef4444"]].map(([title,sub,dot],i)=>(
         <div key={i} style={{ display:"flex",gap:12,padding:"8px 0",borderBottom:i<2?"1px solid rgba(255,255,255,0.04)":"none",alignItems:"flex-start" }}>
           <div style={{ display:"flex",flexDirection:"column",alignItems:"center",flexShrink:0,width:28 }}>
             <div style={{ width:8,height:8,borderRadius:"50%",background:dot,marginTop:3 }} />
@@ -1275,14 +870,14 @@ function VisTrack() {
   return (
     <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
       <div style={{ display:"flex",gap:8 }}>
-        {[["Collected","$124k",true],["Overdue","$9.8k",false]].map(([label,val,green]) => (
+        {[["Collected","$124k",true],["Overdue","$9.8k",false]].map(([label,val,green])=>(
           <div key={label} style={{ background:green?"rgba(34,197,94,0.04)":"rgba(255,255,255,0.03)",border:`1px solid ${green?"rgba(34,197,94,0.2)":"rgba(255,255,255,0.055)"}`,borderRadius:8,padding:12,flex:1 }}>
             <div style={{ fontSize:9,color:"#222",fontFamily:"var(--mono)",letterSpacing:1,textTransform:"uppercase",marginBottom:6 }}>{label}</div>
             <div style={{ fontSize:18,fontWeight:800,color:green?"var(--green)":"var(--white)" }}>{val}</div>
           </div>
         ))}
       </div>
-      {[["Buildco Systems","#22c55e","Paid","paid","$6,400"],["Apex Design Co.","#ef4444","Overdue","late","$3,200"],["NovaTech Ltd.","#f59e0b","Reminder sent","due","$11,750"]].map(([name,dot,badge,cls,amt]) => (
+      {[["Buildco Systems","#22c55e","Paid","paid","$6,400"],["Apex Design Co.","#ef4444","Overdue","late","$3,200"],["NovaTech Ltd.","#f59e0b","Reminder sent","due","$11,750"]].map(([name,dot,badge,cls,amt])=>(
         <div key={name} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:7,padding:"9px 12px",display:"flex",alignItems:"center",gap:8 }}>
           <div style={{ width:6,height:6,borderRadius:"50%",background:dot,flexShrink:0 }} />
           <div style={{ flex:1,fontSize:11,fontWeight:600,color:"#444",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{name}</div>
@@ -1306,7 +901,7 @@ function VisCelebrate() {
         </div>
       </div>
       <div style={{ display:"flex",gap:8 }}>
-        {[["Collected Today","$1,750",true],["Collection Rate","98%",false]].map(([label,val,green]) => (
+        {[["Collected Today","$1,750",true],["Collection Rate","98%",false]].map(([label,val,green])=>(
           <div key={label} style={{ background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.055)",borderRadius:8,padding:12,flex:1 }}>
             <div style={{ fontSize:9,color:"#222",fontFamily:"var(--mono)",letterSpacing:1,textTransform:"uppercase",marginBottom:6 }}>{label}</div>
             <div style={{ fontSize:18,fontWeight:800,color:green?"var(--green)":"var(--white)" }}>{val}</div>
@@ -1330,41 +925,35 @@ const PaychaserPage = ({ setPage }) => {
     if (isMobile) return;
     const el = dashRef.current;
     if (!el) return;
-    const onMove = e=>{ const r=el.getBoundingClientRect(); dtRef.current.tx=((e.clientX-r.left)/r.width-0.5)*2*5; dtRef.current.ty=((e.clientY-r.top)/r.height-0.5)*2*-5; };
-    const onLeave = ()=>{ dtRef.current.tx=0; dtRef.current.ty=0; };
-    el.addEventListener("mousemove",onMove); el.addEventListener("mouseleave",onLeave);
+    const onMove=e=>{const r=el.getBoundingClientRect();dtRef.current.tx=((e.clientX-r.left)/r.width-0.5)*2*5;dtRef.current.ty=((e.clientY-r.top)/r.height-0.5)*2*-5;};
+    const onLeave=()=>{dtRef.current.tx=0;dtRef.current.ty=0;};
+    el.addEventListener("mousemove",onMove);el.addEventListener("mouseleave",onLeave);
     let raf;
-    const loop = () => { dtRef.current.cx+=(dtRef.current.ty-dtRef.current.cx)*0.1; dtRef.current.cy+=(dtRef.current.tx-dtRef.current.cy)*0.1; if(el) el.style.transform=`perspective(900px) rotateX(${dtRef.current.cx.toFixed(3)}deg) rotateY(${dtRef.current.cy.toFixed(3)}deg)`; raf=requestAnimationFrame(loop); };
+    const loop=()=>{dtRef.current.cx+=(dtRef.current.ty-dtRef.current.cx)*0.1;dtRef.current.cy+=(dtRef.current.tx-dtRef.current.cy)*0.1;if(el)el.style.transform=`perspective(900px) rotateX(${dtRef.current.cx.toFixed(3)}deg) rotateY(${dtRef.current.cy.toFixed(3)}deg)`;raf=requestAnimationFrame(loop);};
     loop();
-    return () => { el.removeEventListener("mousemove",onMove); el.removeEventListener("mouseleave",onLeave); cancelAnimationFrame(raf); };
+    return ()=>{el.removeEventListener("mousemove",onMove);el.removeEventListener("mouseleave",onLeave);cancelAnimationFrame(raf);};
   }, [isMobile]);
 
   const s = STEPS[step];
 
   return (
-  <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
-      {/* HERO */}
+    <div style={{ paddingTop:62,minHeight:"100vh",display:"flex",flexDirection:"column" }}>
       <div style={{ position:"relative",overflow:"hidden" }}>
         <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
         <div style={{ position:"relative",zIndex:1,maxWidth:900,margin:"0 auto",padding:isMobile?"64px 20px 48px":"96px 48px 72px",textAlign:"center",animation:"fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:24,fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> Live Now
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)",fontWeight:800,letterSpacing:"-3px",lineHeight:1.02,color:"var(--white)",marginBottom:18 }}>
-            Chase money<br />Not clients.
-          </h1>
-          <p style={{ fontSize:isMobile?14.5:16,color:"#858585",lineHeight:1.8,maxWidth:520,margin:"0 auto 32px" }}>
-            Almondy sends your overdue invoice reminders automatically. <strong style={{ color:"#888" }}>Friendly at first. Firm when needed.</strong>
-          </p>
+          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)",fontWeight:800,letterSpacing:"-3px",lineHeight:1.02,color:"var(--white)",marginBottom:18 }}>Chase money<br />Not clients.</h1>
+          <p style={{ fontSize:isMobile?14.5:16,color:"#858585",lineHeight:1.8,maxWidth:520,margin:"0 auto 32px" }}>Almondy sends your overdue invoice reminders automatically. <strong style={{ color:"#888" }}>Friendly at first. Firm when needed.</strong></p>
           <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
-            <button onClick={() => setPage("auth")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer",fontFamily:"var(--font)" }}>Get Started →</button>
+            <button onClick={()=>setPage("auth")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer",fontFamily:"var(--font)" }}>Get Started →</button>
             <a href="#how" style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8,display:"inline-flex",alignItems:"center" }}>See How It Works</a>
           </div>
         </div>
       </div>
 
-      {/* DASHBOARD mockup */}
-      {!isMobile && (
+      {!isMobile&&(
         <div style={{ maxWidth:1100,margin:"0 auto",padding:"0 48px" }}>
           <div ref={dashRef} style={{ willChange:"transform",cursor:"default" }}>
             <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.09)",borderRadius:16,overflow:"hidden",boxShadow:"0 40px 100px rgba(0,0,0,0.8)" }}>
@@ -1374,11 +963,11 @@ const PaychaserPage = ({ setPage }) => {
               </div>
               <div style={{ display:"grid",gridTemplateColumns:"200px 1fr",minHeight:420 }}>
                 <div style={{ background:"#0a0a0a",borderRight:"1px solid rgba(255,255,255,0.05)",padding:"20px 0",display:"flex",flexDirection:"column",gap:2 }}>
-                  {["Overview",null,null,null,"Reports",null,null,"Settings",null].map((sec,i) => {
+                  {["Overview",null,null,null,"Reports",null,null,"Settings",null].map((sec,i)=>{
                     const items=[null,"◈ Dashboard","📄 Invoices","🔔 Reminders","","📊 Analytics","💳 Payments","","⚙️ Settings"];
-                    if(sec) return <div key={i} style={{ fontSize:9,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"#222",padding:"14px 18px 6px",fontFamily:"var(--mono)" }}>{sec}</div>;
-                    if(!items[i]) return null;
-                    return <div key={i} style={{ display:"flex",alignItems:"center",gap:10,padding:"9px 18px",fontSize:12,fontWeight:500,color:i===1?"#aaa":"#333",background:i===1?"rgba(255,255,255,0.04)":"transparent" }}>{items[i]}</div>;
+                    if(sec)return<div key={i} style={{ fontSize:9,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"#222",padding:"14px 18px 6px",fontFamily:"var(--mono)" }}>{sec}</div>;
+                    if(!items[i])return null;
+                    return<div key={i} style={{ display:"flex",alignItems:"center",gap:10,padding:"9px 18px",fontSize:12,fontWeight:500,color:i===1?"#aaa":"#333",background:i===1?"rgba(255,255,255,0.04)":"transparent" }}>{items[i]}</div>;
                   })}
                 </div>
                 <div style={{ padding:28,display:"flex",flexDirection:"column",gap:20 }}>
@@ -1410,8 +999,7 @@ const PaychaserPage = ({ setPage }) => {
         </div>
       )}
 
-      {/* Mobile stats preview */}
-      {isMobile && (
+      {isMobile&&(
         <div style={{ maxWidth:600,margin:"0 auto",padding:"0 20px" }}>
           <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.09)",borderRadius:14,overflow:"hidden" }}>
             <div style={{ background:"#090909",borderBottom:"1px solid rgba(255,255,255,0.05)",padding:"12px 16px",display:"flex",alignItems:"center",gap:6 }}>
@@ -1427,43 +1015,26 @@ const PaychaserPage = ({ setPage }) => {
                   </div>
                 ))}
               </div>
-              {[["paid","Buildco Systems","Paid","$6,400"],["late","Apex Design","Overdue","$3,200"]].map(([status,name,badge,amt])=>(
-                <div key={name} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:7,padding:"10px 12px",display:"flex",alignItems:"center",gap:10 }}>
-                  <div style={{ width:7,height:7,borderRadius:"50%",flexShrink:0,background:status==="paid"?"var(--green)":"#ef4444" }} />
-                  <div style={{ flex:1,fontSize:12,fontWeight:600,color:"#858585",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{name}</div>
-                  <div style={{ fontSize:9,fontWeight:700,padding:"2px 7px",borderRadius:999,flexShrink:0,...(status==="paid"?{background:"rgba(34,197,94,0.1)",color:"var(--green)",border:"1px solid rgba(34,197,94,0.2)"}:{background:"rgba(239,68,68,0.1)",color:"#f87171",border:"1px solid rgba(239,68,68,0.2)"}) }}>{badge}</div>
-                  <div style={{ fontSize:12,fontWeight:700,color:"#444",fontFamily:"var(--mono)",flexShrink:0 }}>{amt}</div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
       )}
 
-      <div style={{ height:isMobile?40:0,maxWidth:1100,margin:isMobile?0:"-120px auto 0",padding:isMobile?"0 20px":"0 48px",background:isMobile?"transparent":`linear-gradient(to bottom, transparent, var(--black))`,pointerEvents:"none",position:"relative",zIndex:1 }} />
+      <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)",marginTop:isMobile?40:0 }} />
 
-      <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)" }} />
-
-      {/* HOW IT WORKS */}
       <div id="how" style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"60px 20px 80px":"100px 48px 120px" }}>
         <div style={{ textAlign:"center",marginBottom:isMobile?40:72 }}>
           <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:12,fontFamily:"var(--mono)" }}>How It Works</p>
-          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)",fontWeight:800,letterSpacing:"-2px",lineHeight:1.05,color:"var(--white)" }}>
-            Up and running in minutes.
-          </h2>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)",fontWeight:800,letterSpacing:"-2px",lineHeight:1.05,color:"var(--white)" }}>Up and running in minutes.</h2>
         </div>
-
-        {/* Progress */}
         <div style={{ display:"flex",alignItems:"center",marginBottom:isMobile?36:56 }}>
-          {STEPS.map((_,i) => (
+          {STEPS.map((_,i)=>(
             <div key={i} style={{ display:"contents" }}>
-              <button onClick={() => goTo(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<step?"rgba(34,197,94,0.4)":i===step?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i<step?"rgba(34,197,94,0.15)":i===step?"var(--green)":"var(--black)",color:i<step?"var(--green)":i===step?"var(--black)":"#333",fontSize:isMobile?10:11,fontWeight:800,boxShadow:i===step?"0 0 0 4px rgba(34,197,94,0.15)":"none",flexShrink:0,zIndex:1,transition:"all 0.35s" }}>{i+1}</button>
+              <button onClick={()=>goTo(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<step?"rgba(34,197,94,0.4)":i===step?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i<step?"rgba(34,197,94,0.15)":i===step?"var(--green)":"var(--black)",color:i<step?"var(--green)":i===step?"var(--black)":"#333",fontSize:isMobile?10:11,fontWeight:800,boxShadow:i===step?"0 0 0 4px rgba(34,197,94,0.15)":"none",flexShrink:0,zIndex:1,transition:"all 0.35s" }}>{i+1}</button>
               {i<STEPS.length-1&&<div style={{ flex:1,height:1,background:"rgba(255,255,255,0.07)",position:"relative" }}><div style={{ position:"absolute",top:0,left:0,height:"100%",width:step>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s" }} /></div>}
             </div>
           ))}
         </div>
-
-        {/* Step content */}
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:isMobile?28:64,alignItems:"center",minHeight:isMobile?"auto":340 }}>
           <div style={{ opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(14px)",transition:"all 0.4s cubic-bezier(0.22,1,0.36,1)" }}>
             <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--green)",fontFamily:"var(--mono)",marginBottom:12 }}>{s.num}</div>
@@ -1478,24 +1049,21 @@ const PaychaserPage = ({ setPage }) => {
             <div style={{ padding:isMobile?16:22 }}>{s.vis}</div>
           </div>
         </div>
-
-        {/* Nav */}
         <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:40,paddingTop:28,borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-          <button onClick={() => goTo(step-1)} disabled={step===0} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:isMobile?"10px 16px":"11px 22px",fontSize:13,fontWeight:600,borderRadius:8,background:"transparent",color:"#858585",border:"1px solid rgba(255,255,255,0.08)",opacity:step===0?0.2:1,cursor:step===0?"default":"pointer" }}>← {isMobile?"":"Previous"}</button>
+          <button onClick={()=>goTo(step-1)} disabled={step===0} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:isMobile?"10px 16px":"11px 22px",fontSize:13,fontWeight:600,borderRadius:8,background:"transparent",color:"#858585",border:"1px solid rgba(255,255,255,0.08)",opacity:step===0?0.2:1,cursor:step===0?"default":"pointer" }}>← {isMobile?"":"Previous"}</button>
           <span style={{ fontSize:12,color:"#333",fontFamily:"var(--mono)" }}>{step+1}/4</span>
-          <button onClick={() => step<STEPS.length-1?goTo(step+1):setPage("auth")} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:isMobile?"10px 16px":"11px 22px",fontSize:13,fontWeight:600,borderRadius:8,background:step===STEPS.length-1?"var(--green)":"var(--white)",color:"var(--black)",border:"none" }}>
+          <button onClick={()=>step<STEPS.length-1?goTo(step+1):setPage("auth")} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:isMobile?"10px 16px":"11px 22px",fontSize:13,fontWeight:600,borderRadius:8,background:step===STEPS.length-1?"var(--green)":"var(--white)",color:"var(--black)",border:"none" }}>
             {step===STEPS.length-1?"Get Started →":"Next →"}
           </button>
         </div>
       </div>
 
-      {/* CTA */}
       <div style={{ borderTop:"1px solid var(--border)",borderBottom:"1px solid var(--border)",background:"#0a0a0a",padding:isMobile?"48px 20px":"72px 48px",textAlign:"center" }}>
         <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)",fontWeight:800,letterSpacing:"-2px",color:"var(--white)",marginBottom:14 }}>Ready to stop worrying?</h2>
         <p style={{ fontSize:isMobile?14:15,color:"#444",marginBottom:28 }}>Join businesses already using Almondy to collect what they're owed.</p>
         <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
-          <button onClick={() => setPage("auth")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer",fontFamily:"var(--font)" }}>Get Started Free →</button>
-          <button onClick={() => setPage("systems")} style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8 }}>Back to Systems</button>
+          <button onClick={()=>setPage("auth")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer",fontFamily:"var(--font)" }}>Get Started Free →</button>
+          <button onClick={()=>setPage("systems")} style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8 }}>Back to Systems</button>
         </div>
       </div>
 
@@ -1507,10 +1075,10 @@ const PaychaserPage = ({ setPage }) => {
 /* ════════════════════════════════════════════
    PAGE: PRICING
 ════════════════════════════════════════════ */
-const PlanCard = ({ name, price, period, desc, cta, ctaStyle, features, featured=false, badge=null, onClick }) => {
+const PlanCard = ({ name,price,period,desc,cta,ctaStyle,features,featured=false,badge=null,onClick }) => {
   const [pos,setPos] = useState({ x:50,y:50 });
   return (
-    <div onMouseMove={e=>{ const r=e.currentTarget.getBoundingClientRect(); setPos({ x:((e.clientX-r.left)/r.width*100).toFixed(1),y:((e.clientY-r.top)/r.height*100).toFixed(1) }); }} style={{ position:"relative",border:`1px solid ${featured?"rgba(255,255,255,0.15)":"var(--border)"}`,borderRadius:16,padding:"28px 24px 24px",display:"flex",flexDirection:"column",background:featured?"#0f0f0f":"#0c0c0c",boxShadow:featured?"0 0 0 1px rgba(255,255,255,0.06), 0 32px 64px rgba(0,0,0,0.5)":"none",overflow:"hidden" }}>
+    <div onMouseMove={e=>{const r=e.currentTarget.getBoundingClientRect();setPos({x:((e.clientX-r.left)/r.width*100).toFixed(1),y:((e.clientY-r.top)/r.height*100).toFixed(1)});}} style={{ position:"relative",border:`1px solid ${featured?"rgba(255,255,255,0.15)":"var(--border)"}`,borderRadius:16,padding:"28px 24px 24px",display:"flex",flexDirection:"column",background:featured?"#0f0f0f":"#0c0c0c",boxShadow:featured?"0 0 0 1px rgba(255,255,255,0.06), 0 32px 64px rgba(0,0,0,0.5)":"none",overflow:"hidden" }}>
       <div style={{ position:"absolute",inset:0,background:`radial-gradient(circle at ${pos.x}% ${pos.y}%, rgba(255,255,255,0.025) 0%, transparent 65%)`,pointerEvents:"none" }} />
       <div style={{ position:"relative",zIndex:1,display:"flex",flexDirection:"column",height:"100%" }}>
         {badge&&<div style={{ display:"inline-flex",alignItems:"center",gap:6,fontSize:10.5,fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:featured?"var(--green)":"var(--white)",background:featured?"var(--green-dim)":"rgba(255,255,255,0.07)",border:`1px solid ${featured?"rgba(34,197,94,0.25)":"rgba(255,255,255,0.12)"}`,borderRadius:999,padding:"4px 12px",marginBottom:18,width:"fit-content" }}>{badge}</div>}
@@ -1563,9 +1131,7 @@ const PricingPage = ({ setPage }) => {
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:22,fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> PayChaser Pricing
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,52px)":"clamp(38px,5.5vw,72px)",fontWeight:800,letterSpacing:"-2.5px",lineHeight:1.03,color:"var(--white)",marginBottom:14 }}>
-            Simple pricing.<br />No surprises.
-          </h1>
+          <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,52px)":"clamp(38px,5.5vw,72px)",fontWeight:800,letterSpacing:"-2.5px",lineHeight:1.03,color:"var(--white)",marginBottom:14 }}>Simple pricing.<br />No surprises.</h1>
           <p style={{ fontSize:isMobile?14:15.5,color:"#858585",lineHeight:1.8,maxWidth:440,margin:"0 auto 28px" }}>Start free, scale when you're ready. Cancel any time.</p>
           <div style={{ display:"inline-flex",alignItems:"center",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:999,padding:"4px 5px" }}>
             {["monthly","annual"].map(m=>(
@@ -1586,31 +1152,6 @@ const PricingPage = ({ setPage }) => {
         </div>
       </div>
 
-      {/* Compare Table */}
-      <div style={{ maxWidth:860,margin:"0 auto",padding:isMobile?"0 20px 60px":"0 48px 80px" }}>
-        <p style={{ fontSize:11,fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:20,textAlign:"center",fontFamily:"var(--mono)" }}>Full Comparison</p>
-        <div className="table-scroll">
-          <table style={{ width:"100%",minWidth:480,borderCollapse:"collapse",border:"1px solid var(--border)",borderRadius:12,overflow:"hidden" }}>
-            <thead>
-              <tr>{["Feature","Basic","Pro","Max"].map((h,i)=>(
-                <th key={h} style={{ padding:"14px 16px",textAlign:i===0?"left":"center",fontSize:11,fontWeight:700,letterSpacing:"1.5px",textTransform:"uppercase",color:"var(--muted)",background:"#0a0a0a",borderBottom:"1px solid var(--border)",fontFamily:"var(--mono)",width:i===0?"40%":undefined }}>{h}</th>
-              ))}</tr>
-            </thead>
-            <tbody>
-              {[["Active invoices","5","Unlimited","Unlimited"],["Email reminders","✓","✓","✓"],["SMS reminders","—","✓","✓"],["Automated sequences","—","✓","✓"],["White-label branding","—","—","✓"],["API access","—","—","✓"],["Support","Community","Priority","Dedicated"]].map(([feat,...vals])=>(
-                <tr key={feat} style={{ borderBottom:"1px solid rgba(255,255,255,0.04)" }}>
-                  <td style={{ padding:"12px 16px",fontSize:12.5,color:"#666",textAlign:"left",whiteSpace:"nowrap" }}>{feat}</td>
-                  {vals.map((v,i)=>(
-                    <td key={i} style={{ padding:"12px 16px",textAlign:"center",fontSize:v==="✓"?15:v==="—"?15:12,color:v==="✓"?"var(--green)":v==="—"?"#222":"#777",fontWeight:v!=="✓"&&v!=="—"?600:undefined }}>{v}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* FAQ */}
       <div style={{ maxWidth:660,margin:"0 auto",padding:isMobile?"0 20px 80px":"0 48px 100px" }}>
         <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:36 }}>Questions? Answered.</h2>
         {FAQS_PRICING.map(([q,a],i)=>(
@@ -1624,12 +1165,6 @@ const PricingPage = ({ setPage }) => {
         ))}
       </div>
 
-
-
-
-
-
-      
       <Footer setPage={setPage} />
     </div>
   );
@@ -1656,8 +1191,7 @@ const AuthPage = ({ setPage, setUser }) => {
   return (
     <div style={{ minHeight:"100vh",background:"var(--black)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,position:"relative",overflow:"hidden" }}>
       <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
-      <div style={{ position:"absolute",inset:0,background:"radial-gradient(ellipse 60% 50% at 50% 40%, rgba(40,40,40,0.5) 0%, transparent 70%)",pointerEvents:"none" }} />
-      <button onClick={() => setPage("home")} style={{ position:"absolute",top:24,left:20,display:"flex",alignItems:"center",gap:9,background:"none",border:"none" }}>
+      <button onClick={()=>setPage("home")} style={{ position:"absolute",top:24,left:20,display:"flex",alignItems:"center",gap:9,background:"none",border:"none" }}>
         <WordmarkSVG height={18} />
       </button>
       <div style={{ position:"relative",zIndex:1,width:"100%",maxWidth:400,animation:"fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
@@ -1669,10 +1203,7 @@ const AuthPage = ({ setPage, setUser }) => {
               <p style={{ fontSize:14,color:"#858585",lineHeight:1.6 }}>Enter your email and we'll send you a magic link. No password needed.</p>
             </div>
             <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
-              <div>
-                <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Email address</label>
-                <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSend()} placeholder="yourname@domain.com" autoFocus style={{ width:"100%",padding:"13px 16px",background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,fontSize:15,color:"var(--white)",outline:"none",fontFamily:"var(--font)" }} />
-              </div>
+              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSend()} placeholder="yourname@domain.com" autoFocus style={{ width:"100%",padding:"13px 16px",background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,fontSize:15,color:"var(--white)",outline:"none",fontFamily:"var(--font)" }} />
               <button onClick={handleSend} disabled={!email.includes("@")||loading} style={{ width:"100%",padding:14,background:loading?"rgba(255,255,255,0.5)":"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:15,fontWeight:700,opacity:!email.includes("@")?0.4:1 }}>
                 {loading?"Sending...":"Send magic link →"}
               </button>
@@ -1686,11 +1217,10 @@ const AuthPage = ({ setPage, setUser }) => {
               <h1 style={{ fontSize:24,fontWeight:800,letterSpacing:"-1px",color:"var(--white)",marginBottom:8 }}>Check your inbox</h1>
               <p style={{ fontSize:14,color:"#858585",lineHeight:1.7 }}>We sent a sign-in link to<br /><strong style={{ color:"var(--white)" }}>{email}</strong></p>
             </div>
-            <div style={{ background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.09)",borderRadius:12,padding:18,marginBottom:18,display:"flex",alignItems:"flex-start",gap:12 }}>
-              <div style={{ fontSize:18,marginTop:2 }}>📧</div>
-              <div style={{ fontSize:12,color:"#444",lineHeight:1.7 }}>Check your inbox and click the link to sign in. It expires in 15 minutes. Check your spam if you don't see it.</div>
+            <div style={{ background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.09)",borderRadius:12,padding:18,marginBottom:18 }}>
+              <div style={{ fontSize:12,color:"#444",lineHeight:1.7 }}>Check your inbox and click the link. It expires in 15 minutes. Check spam if you don't see it.</div>
             </div>
-            <button onClick={() => setStep("email")} style={{ width:"100%",padding:12,background:"transparent",color:"#555",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,fontSize:13,fontWeight:600 }}>← Use a different email</button>
+            <button onClick={()=>setStep("email")} style={{ width:"100%",padding:12,background:"transparent",color:"#555",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,fontSize:13,fontWeight:600 }}>← Use a different email</button>
           </>
         )}
       </div>
@@ -1707,7 +1237,7 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
   const handleContinue = () => {
     if (!bizName.trim()) return;
     setLoading(true);
-    setTimeout(() => { setUser(u=>({ ...u,bizName:bizName.trim(),plan:"free" })); setPage("dashboard"); }, 800);
+    setTimeout(()=>{ setUser(u=>({ ...u,bizName:bizName.trim(),plan:"free" })); setPage("dashboard"); },800);
   };
   return (
     <div style={{ minHeight:"100vh",background:"var(--black)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,position:"relative",overflow:"hidden" }}>
@@ -1715,7 +1245,7 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
       <div style={{ position:"absolute",top:0,left:0,right:0,height:3,background:"rgba(255,255,255,0.05)" }}>
         <div style={{ width:"100%",height:"100%",background:"var(--green)",borderRadius:"0 2px 2px 0" }} />
       </div>
-      <button onClick={() => setPage("home")} style={{ position:"absolute",top:24,left:20,display:"flex",alignItems:"center",background:"none",border:"none" }}>
+      <button onClick={()=>setPage("home")} style={{ position:"absolute",top:24,left:20,display:"flex",alignItems:"center",background:"none",border:"none" }}>
         <WordmarkSVG height={18} />
       </button>
       <div style={{ position:"relative",zIndex:1,width:"100%",maxWidth:480,animation:"fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
@@ -1740,20 +1270,20 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
    DASHBOARD
 ════════════════════════════════════════════ */
 const MOCK_INVOICES = [
-  { id:"INV-001",client:"Buildco Pty Ltd",     amount:4200,due:"2 days ago",  status:"overdue" },
-  { id:"INV-002",client:"Riverside Constructions",amount:1850,due:"Today",    status:"due" },
-  { id:"INV-003",client:"Peak Plumbing Co.",   amount:680, due:"In 3 days",   status:"sent" },
-  { id:"INV-004",client:"Jayco Developments",  amount:9300,due:"Paid 4d ago", status:"paid" },
-  { id:"INV-005",client:"M. Henderson",        amount:320, due:"Paid today",  status:"paid" },
+  { id:"INV-001",client:"Buildco Pty Ltd",amount:4200,due:"2 days ago",status:"overdue" },
+  { id:"INV-002",client:"Riverside Constructions",amount:1850,due:"Today",status:"due" },
+  { id:"INV-003",client:"Peak Plumbing Co.",amount:680,due:"In 3 days",status:"sent" },
+  { id:"INV-004",client:"Jayco Developments",amount:9300,due:"Paid 4d ago",status:"paid" },
+  { id:"INV-005",client:"M. Henderson",amount:320,due:"Paid today",status:"paid" },
 ];
 const STATUS_CONFIG = {
-  overdue:{ label:"Overdue",       bg:"rgba(239,68,68,0.1)",  color:"#f87171",border:"rgba(239,68,68,0.2)",  dot:"#ef4444" },
-  due:    { label:"Due Today",     bg:"rgba(245,158,11,0.1)", color:"#f59e0b",border:"rgba(245,158,11,0.2)", dot:"#f59e0b" },
-  sent:   { label:"Reminder Sent", bg:"rgba(99,102,241,0.1)", color:"#818cf8",border:"rgba(99,102,241,0.2)", dot:"#6366f1" },
-  paid:   { label:"Paid",          bg:"rgba(34,197,94,0.1)",  color:"#22c55e",border:"rgba(34,197,94,0.2)",  dot:"#22c55e" },
+  overdue:{ label:"Overdue",bg:"rgba(239,68,68,0.1)",color:"#f87171",border:"rgba(239,68,68,0.2)",dot:"#ef4444" },
+  due:{ label:"Due Today",bg:"rgba(245,158,11,0.1)",color:"#f59e0b",border:"rgba(245,158,11,0.2)",dot:"#f59e0b" },
+  sent:{ label:"Reminder Sent",bg:"rgba(99,102,241,0.1)",color:"#818cf8",border:"rgba(99,102,241,0.2)",dot:"#6366f1" },
+  paid:{ label:"Paid",bg:"rgba(34,197,94,0.1)",color:"#22c55e",border:"rgba(34,197,94,0.2)",dot:"#22c55e" },
 };
 
-const AppNav = ({ user, setPage }) => {
+const AppNav = ({ user,setPage }) => {
   const isMobile = useIsMobile();
   return (
     <div style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,height:58,background:"rgba(8,8,8,0.95)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(255,255,255,0.07)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"0 16px":"0 28px" }}>
@@ -1762,7 +1292,7 @@ const AppNav = ({ user, setPage }) => {
         {user?.plan==="free"&&<div style={{ display:"inline-flex",alignItems:"center",background:"rgba(245,158,11,0.1)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:999,padding:"2px 8px",fontSize:9.5,fontWeight:700,color:"#f59e0b",letterSpacing:"0.5px" }}>FREE</div>}
       </div>
       <div style={{ display:"flex",alignItems:"center",gap:10 }}>
-        {user?.plan==="free"&&<button onClick={() => setPage("paywall")} style={{ padding:isMobile?"6px 12px":"7px 16px",background:"var(--green)",color:"var(--black)",border:"none",borderRadius:7,fontSize:isMobile?11.5:12.5,fontWeight:700 }}>Upgrade</button>}
+        {user?.plan==="free"&&<button onClick={()=>setPage("paywall")} style={{ padding:isMobile?"6px 12px":"7px 16px",background:"var(--green)",color:"var(--black)",border:"none",borderRadius:7,fontSize:isMobile?11.5:12.5,fontWeight:700 }}>Upgrade</button>}
         <div style={{ width:32,height:32,borderRadius:"50%",background:"linear-gradient(135deg, #6366f1, #8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"#fff" }}>
           {user?.bizName?.[0]??user?.email?.[0]?.toUpperCase()??"?"}
         </div>
@@ -1771,13 +1301,8 @@ const AppNav = ({ user, setPage }) => {
   );
 };
 
-const MobileTabBar = ({ activeTab, setTab }) => {
-  const items = [
-    { id:"invoices",  icon:"📄", label:"Invoices" },
-    { id:"reminders", icon:"🔔", label:"Reminders" },
-    { id:"analytics", icon:"📊", label:"Analytics" },
-    { id:"settings",  icon:"⚙️", label:"Settings" },
-  ];
+const MobileTabBar = ({ activeTab,setTab }) => {
+  const items=[{id:"invoices",icon:"📄",label:"Invoices"},{id:"reminders",icon:"🔔",label:"Reminders"},{id:"analytics",icon:"📊",label:"Analytics"},{id:"settings",icon:"⚙️",label:"Settings"}];
   return (
     <div style={{ position:"fixed",bottom:0,left:0,right:0,zIndex:100,background:"rgba(8,8,8,0.97)",borderTop:"1px solid rgba(255,255,255,0.07)",display:"flex",alignItems:"center",padding:"8px 0 calc(8px + env(safe-area-inset-bottom))" }}>
       {items.map(item=>(
@@ -1790,14 +1315,8 @@ const MobileTabBar = ({ activeTab, setTab }) => {
   );
 };
 
-const AppSidebar = ({ activeTab, setTab }) => {
-  const items = [
-    { id:"invoices",  icon:"📄",label:"Invoices" },
-    { id:"reminders", icon:"🔔",label:"Reminders" },
-    { id:"clients",   icon:"👥",label:"Clients" },
-    { id:"analytics", icon:"📊",label:"Analytics" },
-    { id:"settings",  icon:"⚙️",label:"Settings" },
-  ];
+const AppSidebar = ({ activeTab,setTab }) => {
+  const items=[{id:"invoices",icon:"📄",label:"Invoices"},{id:"reminders",icon:"🔔",label:"Reminders"},{id:"clients",icon:"👥",label:"Clients"},{id:"analytics",icon:"📊",label:"Analytics"},{id:"settings",icon:"⚙️",label:"Settings"}];
   return (
     <div style={{ width:200,flexShrink:0,background:"#080808",borderRight:"1px solid rgba(255,255,255,0.05)",display:"flex",flexDirection:"column",paddingTop:16 }}>
       {items.map(item=>(
@@ -1810,7 +1329,7 @@ const AppSidebar = ({ activeTab, setTab }) => {
   );
 };
 
-const DashboardPage = ({ setPage, user }) => {
+const DashboardPage = ({ setPage,user }) => {
   const isMobile = useIsMobile();
   const [tab,setTab] = useState("invoices");
   const [showBanner,setShowBanner] = useState(true);
@@ -1823,7 +1342,7 @@ const DashboardPage = ({ setPage, user }) => {
     <div style={{ minHeight:"100vh",background:"#060606",display:"flex",flexDirection:"column" }}>
       <AppNav user={user} setPage={setPage} />
       <div style={{ display:"flex",flex:1,paddingTop:58,paddingBottom:isMobile?64:0 }}>
-        {!isMobile && <AppSidebar activeTab={tab} setTab={setTab} />}
+        {!isMobile&&<AppSidebar activeTab={tab} setTab={setTab} />}
         <div style={{ flex:1,padding:isMobile?"20px 16px":"32px 36px",overflowY:"auto" }}>
           {user?.plan==="free"&&showBanner&&(
             <div style={{ background:"rgba(245,158,11,0.07)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:isMobile?"12px 14px":"14px 20px",display:"flex",alignItems:"center",gap:12,marginBottom:20 }}>
@@ -1832,27 +1351,25 @@ const DashboardPage = ({ setPage, user }) => {
                 <div style={{ fontSize:12.5,fontWeight:700,color:"#f59e0b",marginBottom:2 }}>Free plan — 5 invoice limit</div>
                 <div style={{ fontSize:11.5,color:"#858585" }}>Upgrade for unlimited invoices & automation.</div>
               </div>
-              <button onClick={() => setPage("paywall")} style={{ padding:"7px 12px",background:"#f59e0b",color:"#000",border:"none",borderRadius:7,fontSize:11.5,fontWeight:700,flexShrink:0,whiteSpace:"nowrap" }}>Upgrade →</button>
+              <button onClick={()=>setPage("paywall")} style={{ padding:"7px 12px",background:"#f59e0b",color:"#000",border:"none",borderRadius:7,fontSize:11.5,fontWeight:700,flexShrink:0,whiteSpace:"nowrap" }}>Upgrade →</button>
               <button onClick={()=>setShowBanner(false)} style={{ background:"none",border:"none",color:"#555",fontSize:16,lineHeight:1,flexShrink:0,padding:2 }}>✕</button>
             </div>
           )}
-
           <div style={{ display:"flex",alignItems:isMobile?"flex-start":"center",justifyContent:"space-between",marginBottom:20,flexDirection:isMobile?"column":"row",gap:isMobile?12:0 }}>
             <div>
               <h1 style={{ fontSize:isMobile?20:22,fontWeight:800,letterSpacing:"-0.8px",color:"var(--white)",marginBottom:4 }}>{user?.bizName??"My Dashboard"}</h1>
               <p style={{ fontSize:13,color:"#858585" }}>Here's what's happening with your invoices.</p>
             </div>
-            <button onClick={() => setPage("paywall")} style={{ display:"flex",alignItems:"center",gap:7,padding:"10px 16px",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",borderRadius:9,fontSize:13,fontWeight:600,flexShrink:0 }}>
+            <button onClick={()=>setPage("paywall")} style={{ display:"flex",alignItems:"center",gap:7,padding:"10px 16px",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",borderRadius:9,fontSize:13,fontWeight:600,flexShrink:0 }}>
               + Add Invoice
               {user?.plan==="free"&&<span style={{ fontSize:9.5,background:"rgba(245,158,11,0.15)",color:"#f59e0b",border:"1px solid rgba(245,158,11,0.2)",borderRadius:999,padding:"1px 6px",fontWeight:700 }}>PRO</span>}
             </button>
           </div>
-
           <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(3, 1fr)",gap:10,marginBottom:20 }}>
             {[
-              { label:"Collected",   value:`$${collected.toLocaleString()}`,   sub:`${MOCK_INVOICES.filter(i=>i.status==="paid").length} paid`,    green:true  },
-              { label:"Outstanding", value:`$${outstanding.toLocaleString()}`, sub:`${MOCK_INVOICES.filter(i=>i.status!=="paid").length} pending`,  green:false },
-              { label:"Overdue",     value:`$${overdue.toLocaleString()}`,     sub:`${MOCK_INVOICES.filter(i=>i.status==="overdue").length} flagged`,green:false },
+              { label:"Collected",value:`$${collected.toLocaleString()}`,sub:`${MOCK_INVOICES.filter(i=>i.status==="paid").length} paid`,green:true },
+              { label:"Outstanding",value:`$${outstanding.toLocaleString()}`,sub:`${MOCK_INVOICES.filter(i=>i.status!=="paid").length} pending`,green:false },
+              { label:"Overdue",value:`$${overdue.toLocaleString()}`,sub:`${MOCK_INVOICES.filter(i=>i.status==="overdue").length} flagged`,green:false },
             ].map(({ label,value,sub,green },idx)=>(
               <div key={label} style={{ background:green?"rgba(34,197,94,0.04)":"rgba(255,255,255,0.025)",border:`1px solid ${green?"rgba(34,197,94,0.18)":"rgba(255,255,255,0.06)"}`,borderRadius:12,padding:isMobile?"14px 12px":"20px 18px",gridColumn:isMobile&&idx===2?"1/-1":"auto" }}>
                 <div style={{ fontSize:9.5,color:"#383838",fontFamily:"var(--mono)",letterSpacing:"1.2px",textTransform:"uppercase",marginBottom:8,fontWeight:600 }}>{label}</div>
@@ -1862,7 +1379,7 @@ const DashboardPage = ({ setPage, user }) => {
             ))}
           </div>
 
-          {isMobile ? (
+          {isMobile?(
             <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
               {MOCK_INVOICES.map(inv=>{
                 const st=STATUS_CONFIG[inv.status];
@@ -1873,11 +1390,7 @@ const DashboardPage = ({ setPage, user }) => {
                       <div style={{ fontSize:14,fontWeight:700,color:inv.status==="paid"?"var(--green)":"var(--white)",fontFamily:"var(--mono)",flexShrink:0 }}>${inv.amount.toLocaleString()}</div>
                     </div>
                     <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between" }}>
-                      <div style={{ display:"flex",alignItems:"center",gap:8 }}>
-                        <span style={{ fontSize:10.5,color:"#444",fontFamily:"var(--mono)" }}>{inv.id}</span>
-                        <span style={{ fontSize:10,color:"#333" }}>·</span>
-                        <span style={{ fontSize:10.5,color:"#444" }}>{inv.due}</span>
-                      </div>
+                      <span style={{ fontSize:10.5,color:"#444",fontFamily:"var(--mono)" }}>{inv.id} · {inv.due}</span>
                       <div style={{ display:"inline-flex",alignItems:"center",gap:5,background:st.bg,border:`1px solid ${st.border}`,borderRadius:999,padding:"3px 8px" }}>
                         <div style={{ width:5,height:5,borderRadius:"50%",background:st.dot,flexShrink:0 }} />
                         <span style={{ fontSize:10,fontWeight:700,color:st.color }}>{st.label}</span>
@@ -1886,14 +1399,8 @@ const DashboardPage = ({ setPage, user }) => {
                   </div>
                 );
               })}
-              {user?.plan==="free"&&(
-                <div style={{ background:"rgba(245,158,11,0.03)",border:"1px solid rgba(245,158,11,0.15)",borderRadius:12,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12 }}>
-                  <span style={{ fontSize:12.5,color:"#858585" }}>🔒 <strong style={{ color:"#f59e0b" }}>5/5</strong> free invoices used</span>
-                  <button onClick={() => setPage("paywall")} style={{ padding:"7px 12px",background:"transparent",color:"#f59e0b",border:"1px solid rgba(245,158,11,0.3)",borderRadius:7,fontSize:12,fontWeight:700,flexShrink:0 }}>Upgrade →</button>
-                </div>
-              )}
             </div>
-          ) : (
+          ):(
             <div style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,overflow:"hidden" }}>
               <div style={{ display:"grid",gridTemplateColumns:"1fr 120px 120px 110px 44px",padding:"12px 20px",borderBottom:"1px solid rgba(255,255,255,0.05)",background:"#080808" }}>
                 {["Client","Invoice","Amount","Status",""].map(h=>(
@@ -1916,24 +1423,22 @@ const DashboardPage = ({ setPage, user }) => {
                       <div style={{ width:5,height:5,borderRadius:"50%",background:st.dot,flexShrink:0 }} />
                       <span style={{ fontSize:10,fontWeight:700,color:st.color }}>{st.label}</span>
                     </div>
-                    <button onClick={() => setPage("paywall")} style={{ background:"none",border:"none",color:"#2a2a2a",fontSize:16,cursor:"pointer",padding:4 }}
-                      onMouseEnter={e=>e.target.style.color="#666"}
-                      onMouseLeave={e=>e.target.style.color="#2a2a2a"}>···</button>
+                    <button onClick={()=>setPage("paywall")} style={{ background:"none",border:"none",color:"#2a2a2a",fontSize:16,cursor:"pointer",padding:4 }} onMouseEnter={e=>e.target.style.color="#666"} onMouseLeave={e=>e.target.style.color="#2a2a2a"}>···</button>
                   </div>
                 );
               })}
               {user?.plan==="free"&&(
                 <div style={{ padding:"16px 20px",borderTop:"1px solid rgba(255,255,255,0.05)",background:"rgba(245,158,11,0.03)",display:"flex",alignItems:"center",justifyContent:"space-between" }}>
                   <span style={{ fontSize:13,color:"#858585" }}>🔒 <strong style={{ color:"#f59e0b" }}>5 of 5</strong> free invoices used. Upgrade for unlimited.</span>
-                  <button onClick={() => setPage("paywall")} style={{ padding:"7px 14px",background:"transparent",color:"#f59e0b",border:"1px solid rgba(245,158,11,0.3)",borderRadius:7,fontSize:12,fontWeight:700 }}>Upgrade →</button>
+                  <button onClick={()=>setPage("paywall")} style={{ padding:"7px 14px",background:"transparent",color:"#f59e0b",border:"1px solid rgba(245,158,11,0.3)",borderRadius:7,fontSize:12,fontWeight:700 }}>Upgrade →</button>
                 </div>
               )}
             </div>
           )}
 
           <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:10,marginTop:12 }}>
-            {[{ icon:"🔔",title:"Automated Reminders",desc:"Set it and forget it. PayChaser chases for you." },{ icon:"📊",title:"Analytics & Reports",desc:"See your collection rate, avg days to pay, and more." }].map(({ icon,title,desc })=>(
-              <div key={title} onClick={() => setPage("paywall")} style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:"18px",position:"relative",overflow:"hidden",cursor:"pointer" }}>
+            {[{icon:"🔔",title:"Automated Reminders",desc:"Set it and forget it. PayChaser chases for you."},{icon:"📊",title:"Analytics & Reports",desc:"See your collection rate, avg days to pay, and more."}].map(({icon,title,desc})=>(
+              <div key={title} onClick={()=>setPage("paywall")} style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:"18px",position:"relative",overflow:"hidden",cursor:"pointer" }}>
                 {user?.plan==="free"&&<div style={{ position:"absolute",inset:0,background:"rgba(6,6,6,0.65)",backdropFilter:"blur(2px)",zIndex:1,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:7 }}>
                   <div style={{ width:34,height:34,background:"#111",border:"1px solid #2a2a2a",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",padding:7 }}><LockSVG /></div>
                   <span style={{ fontSize:10.5,fontWeight:700,color:"#f59e0b",letterSpacing:"1px" }}>PRO FEATURE</span>
@@ -1946,7 +1451,7 @@ const DashboardPage = ({ setPage, user }) => {
           </div>
         </div>
       </div>
-      {isMobile && <MobileTabBar activeTab={tab} setTab={setTab} />}
+      {isMobile&&<MobileTabBar activeTab={tab} setTab={setTab} />}
     </div>
   );
 };
@@ -1954,7 +1459,7 @@ const DashboardPage = ({ setPage, user }) => {
 /* ════════════════════════════════════════════
    PAYWALL
 ════════════════════════════════════════════ */
-const PaywallPage = ({ setPage, user, setUser }) => {
+const PaywallPage = ({ setPage,user,setUser }) => {
   const isMobile = useIsMobile();
   const [billing,setBilling] = useState("monthly");
   const [loadingPlan,setLoadingPlan] = useState(null);
@@ -1983,7 +1488,7 @@ const PaywallPage = ({ setPage, user, setUser }) => {
   return (
     <div style={{ minHeight:"100vh",background:"var(--black)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"flex-start",padding:isMobile?"60px 16px 40px":"60px 24px",position:"relative",overflow:"hidden" }}>
       <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
-      <button onClick={() => setPage("dashboard")} style={{ position:"absolute",top:20,left:isMobile?16:28,display:"flex",alignItems:"center",gap:7,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
+      <button onClick={()=>setPage("dashboard")} style={{ position:"absolute",top:20,left:isMobile?16:28,display:"flex",alignItems:"center",gap:7,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
       <div style={{ position:"relative",zIndex:1,width:"100%",maxWidth:860,animation:"fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ textAlign:"center",marginBottom:32 }}>
           <div style={{ display:"inline-flex",alignItems:"center",gap:7,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.25)",borderRadius:999,padding:"4px 14px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:16,fontFamily:"var(--mono)" }}>
@@ -2003,8 +1508,8 @@ const PaywallPage = ({ setPage, user, setUser }) => {
 
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:12,marginBottom:22 }}>
           {PLAN_DATA.map(plan=>{
-            const price = plans[billing][plan.id];
-            const isLoading = loadingPlan===plan.id;
+            const price=plans[billing][plan.id];
+            const isLoading=loadingPlan===plan.id;
             return (
               <div key={plan.id} style={{ position:"relative",background:plan.featured?"#0f0f0f":"#0c0c0c",border:`1px solid ${plan.featured?"rgba(255,255,255,0.14)":"rgba(255,255,255,0.07)"}`,borderRadius:18,padding:"24px 22px",display:"flex",flexDirection:"column",boxShadow:plan.featured?"0 24px 60px rgba(0,0,0,0.5)":"none",overflow:"hidden" }}>
                 <div style={{ display:"inline-flex",alignItems:"center",gap:5,fontSize:10,fontWeight:700,letterSpacing:"1.5px",textTransform:"uppercase",color:plan.featured?"var(--green)":"#555",background:plan.featured?"rgba(34,197,94,0.1)":"rgba(255,255,255,0.05)",border:`1px solid ${plan.featured?"rgba(34,197,94,0.22)":"rgba(255,255,255,0.09)"}`,borderRadius:999,padding:"4px 10px",marginBottom:14,width:"fit-content" }}>{plan.badge}</div>
@@ -2015,8 +1520,8 @@ const PaywallPage = ({ setPage, user, setUser }) => {
                   <span style={{ fontSize:46,fontWeight:800,letterSpacing:"-3px",color:"var(--white)",lineHeight:1 }}>{price}</span>
                   <span style={{ fontSize:13,color:"#444",marginBottom:7,marginLeft:3 }}>/mo</span>
                 </div>
-                <div style={{ fontSize:11,color:"#333",marginBottom:18,fontFamily:"var(--mono)" }}>{billing==="annual"?`AUD · billed yearly`:"AUD · billed monthly"}</div>
-                <button onClick={() => handleUpgrade(plan.id)} disabled={!!loadingPlan} style={{ width:"100%",padding:"12px 18px",background:plan.id==="pro"?"var(--white)":"rgba(255,255,255,0.08)",color:plan.id==="pro"?"var(--black)":"var(--white)",border:plan.id==="pro"?"none":"1px solid rgba(255,255,255,0.18)",borderRadius:10,fontSize:14,fontWeight:700,letterSpacing:"-0.3px",marginBottom:18,cursor:loadingPlan?"not-allowed":"pointer",opacity:loadingPlan&&!isLoading?0.4:1,fontFamily:"var(--font)" }}>
+                <div style={{ fontSize:11,color:"#333",marginBottom:18,fontFamily:"var(--mono)" }}>{billing==="annual"?"AUD · billed yearly":"AUD · billed monthly"}</div>
+                <button onClick={()=>handleUpgrade(plan.id)} disabled={!!loadingPlan} style={{ width:"100%",padding:"12px 18px",background:plan.id==="pro"?"var(--white)":"rgba(255,255,255,0.08)",color:plan.id==="pro"?"var(--black)":"var(--white)",border:plan.id==="pro"?"none":"1px solid rgba(255,255,255,0.18)",borderRadius:10,fontSize:14,fontWeight:700,letterSpacing:"-0.3px",marginBottom:18,cursor:loadingPlan?"not-allowed":"pointer",opacity:loadingPlan&&!isLoading?0.4:1,fontFamily:"var(--font)" }}>
                   {isLoading?"Redirecting...":plan.id==="pro"?"Start 3-day free trial →":"Get started →"}
                 </button>
                 <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)",marginBottom:16 }} />
@@ -2051,33 +1556,26 @@ const PaywallPage = ({ setPage, user, setUser }) => {
 const WebDevPage = ({ setPage }) => {
   const isMobile = useIsMobile();
   const [openFaq,setOpenFaq] = useState(null);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep,setActiveStep] = useState(0);
 
-  useEffect(() => {
-  const interval = setInterval(() => {
-    setActiveStep(s => (s + 1) % process.length);
-  }, 2500);
-  return () => clearInterval(interval);
-}, []);
-  
-  const services = [
-    { icon:"⚡",title:"Landing Pages",desc:"High-converting single pages built to turn visitors into customers.",price:"From $400" },
-    { icon:"◈",title:"Business Websites",desc:"Multi-page sites that represent your business properly.",price:"From $800" },
-    { icon:"⚙️",title:"Web Apps",desc:"Custom tools, dashboards, and internal systems.",price:"Custom quote" },
-    { icon:"↗",title:"Redesigns",desc:"Got an existing site that's letting you down? Full redesign.",price:"From $500" },
-  ];
   const process = [
-    { step:"01",title:"Onboarding Process",desc:"3 minutes. You fill out the onboarding form, Get a reply back within 24hrs." },
+    { step:"01",title:"Onboarding Process",desc:"3 minutes. You fill out the onboarding form, get a reply back within 24hrs." },
     { step:"02",title:"Design & build",desc:"Our team design and develop simultaneously." },
     { step:"03",title:"Review & refine",desc:"Two rounds of revisions. Most clients only need one." },
     { step:"04",title:"Launch",desc:"Site goes live. We handle deployment, hosting, domain setup." },
   ];
+
+  useEffect(() => {
+    const interval = setInterval(()=>setActiveStep(s=>(s+1)%process.length),2500);
+    return ()=>clearInterval(interval);
+  }, []);
+
   const faqs = [
     ["How long does it take?","On average most sites are completed within 1-3 days"],
     ["What do you make the websites with?","Our websites are made using high-end programming languages for the best performance, including React, HTML, CSS."],
     ["Can I get changes done on the website?","Yes, simply contact us through email/sms with the detailed request of what you want changed."],
     ["Why do you charge monthly?","We charge monthly to make it as simple as possible for our clients to make changes and maintain the site rather then the client trying to figure it out themselves."],
-    ["What do you need to get started?","Complete the onboarding by pressing *Get Your Website*, after this somebody from the team will be in contact within 24hrs."],
+    ["What do you need to get started?","Complete the onboarding by pressing Get Your Website, after this somebody from the team will be in contact within 24hrs."],
   ];
 
   return (
@@ -2088,54 +1586,40 @@ const WebDevPage = ({ setPage }) => {
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:24,fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> Taking on clients
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(34px,10vw,52px)":"clamp(42px,6vw,78px)",fontWeight:800,letterSpacing:"-3px",lineHeight:1.02,color:"var(--white)",marginBottom:18 }}>
-            Websites that work<br />as hard as you do.
-          </h1>
-          <p style={{ fontSize:isMobile?14.5:16,color:"#858585",lineHeight:1.8,maxWidth:500,margin:"0 auto 32px" }}>
-            Clean, fast, and built to convert. <strong style={{ color:"#888" }}>No templates. No bloat.</strong>
-          </p>
+          <h1 style={{ fontSize:isMobile?"clamp(34px,10vw,52px)":"clamp(42px,6vw,78px)",fontWeight:800,letterSpacing:"-3px",lineHeight:1.02,color:"var(--white)",marginBottom:18 }}>Websites that work<br />as hard as you do.</h1>
+          <p style={{ fontSize:isMobile?14.5:16,color:"#858585",lineHeight:1.8,maxWidth:500,margin:"0 auto 32px" }}>Clean, fast, and built to convert. <strong style={{ color:"#888" }}>No templates. No bloat.</strong></p>
           <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
-            <button onClick={() => setPage("webdev-onboarding")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer" }}>Get Your Website →</button>
-            <button onClick={() => setPage("contact")} style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8 }}>Contact Us</button>          </div>
+            <button onClick={()=>setPage("webdev-onboarding")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer" }}>Get Your Website →</button>
+            <button onClick={()=>setPage("contact")} style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8 }}>Contact Us</button>
+          </div>
         </div>
       </div>
 
-
-
-{/* PROCESS */}
-<div style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"0 20px 60px":"0 48px 80px" }}>
-  <div style={{ textAlign:"center",marginBottom:isMobile?36:56 }}>
-    <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:12,fontFamily:"var(--mono)" }}>The Process</p>
-    <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",lineHeight:1.05 }}>Up and running fast.</h2>
-  </div>
-
-  <div style={{ display:"flex",alignItems:"center",marginBottom:isMobile?28:40 }}>
-    {process.map((_,i) => (
-      <div key={i} style={{ display:"contents" }}>
-        <button onClick={() => setActiveStep(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<=activeStep?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i===activeStep?"var(--green)":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)",color:i===activeStep?"var(--black)":i<activeStep?"var(--green)":"#333",fontSize:isMobile?10:11,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1,boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none",transition:"all 0.35s",cursor:"pointer" }}>{i+1}</button>
-        {i < process.length-1 && (
-          <div style={{ flex:1,height:1,background:"rgba(255,255,255,0.07)",position:"relative" }}>
-            <div style={{ position:"absolute",top:0,left:0,height:"100%",width:activeStep>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} />
-          </div>
-        )}
+      <div style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"0 20px 60px":"0 48px 80px" }}>
+        <div style={{ textAlign:"center",marginBottom:isMobile?36:56 }}>
+          <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:12,fontFamily:"var(--mono)" }}>The Process</p>
+          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",lineHeight:1.05 }}>Up and running fast.</h2>
+        </div>
+        <div style={{ display:"flex",alignItems:"center",marginBottom:isMobile?28:40 }}>
+          {process.map((_,i)=>(
+            <div key={i} style={{ display:"contents" }}>
+              <button onClick={()=>setActiveStep(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<=activeStep?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i===activeStep?"var(--green)":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)",color:i===activeStep?"var(--black)":i<activeStep?"var(--green)":"#333",fontSize:isMobile?10:11,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1,boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none",transition:"all 0.35s",cursor:"pointer" }}>{i+1}</button>
+              {i<process.length-1&&<div style={{ flex:1,height:1,background:"rgba(255,255,255,0.07)",position:"relative" }}><div style={{ position:"absolute",top:0,left:0,height:"100%",width:activeStep>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} /></div>}
+            </div>
+          ))}
+        </div>
+        <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:10 }}>
+          {process.map(({step,title,desc},i)=>(
+            <div key={step} onClick={()=>setActiveStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${i===activeStep?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.06)"}`,borderRadius:14,padding:"22px 18px",position:"relative",overflow:"hidden",cursor:"pointer",transition:"all 0.3s" }}>
+              {i===activeStep&&<div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,rgba(34,197,94,0.6),transparent)" }} />}
+              <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2px",color:i===activeStep?"var(--green)":"#333",fontFamily:"var(--mono)",marginBottom:12 }}>{step}</div>
+              <div style={{ fontSize:14,fontWeight:700,color:i===activeStep?"var(--white)":"#444",marginBottom:6,letterSpacing:"-0.3px" }}>{title}</div>
+              <p style={{ fontSize:12.5,color:i===activeStep?"#858585":"#2e2e2e",lineHeight:1.7,margin:0 }}>{desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
-    ))}
-  </div>
 
-  <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:10 }}>
-    {process.map(({ step,title,desc },i) => (
-      <div key={step} onClick={() => setActiveStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${i===activeStep?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.06)"}`,borderRadius:14,padding:"22px 18px",position:"relative",overflow:"hidden",cursor:"pointer",transition:"all 0.3s" }}>
-        {i===activeStep&&<div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,rgba(34,197,94,0.6),transparent)" }} />}
-        <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2px",color:i===activeStep?"var(--green)":"#333",fontFamily:"var(--mono)",marginBottom:12 }}>{step}</div>
-        <div style={{ fontSize:14,fontWeight:700,color:i===activeStep?"var(--white)":"#444",marginBottom:6,letterSpacing:"-0.3px" }}>{title}</div>
-        <p style={{ fontSize:12.5,color:i===activeStep?"#858585":"#2e2e2e",lineHeight:1.7,margin:0 }}>{desc}</p>
-      </div>
-    ))}
-  </div>
-</div>
-
-
-      
       <div style={{ maxWidth:660,margin:"0 auto",padding:isMobile?"60px 20px":"80px 48px" }}>
         <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:36 }}>Questions? Answered.</h2>
         {faqs.map(([q,a],i)=>(
@@ -2149,81 +1633,44 @@ const WebDevPage = ({ setPage }) => {
         ))}
       </div>
 
-    
-
       <Footer setPage={setPage} />
     </div>
   );
 };
 
-
 const ContactPage = ({ setPage }) => {
   const isMobile = useIsMobile();
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ name:"", email:"", message:"" });
-  const set = (k,v) => setForm(f => ({ ...f, [k]:v }));
-
-  const inputStyle = {
-    width:"100%", padding:"12px 16px",
-    background:"#0f0f0f", border:"1px solid rgba(255,255,255,0.1)",
-    borderRadius:10, fontSize:15, color:"#fff", outline:"none",
-    fontFamily:"var(--font)", boxSizing:"border-box",
-  };
+  const [submitted,setSubmitted] = useState(false);
+  const [form,setForm] = useState({ name:"",email:"",message:"" });
+  const set = (k,v) => setForm(f=>({ ...f,[k]:v }));
+  const inputStyle = { width:"100%",padding:"12px 16px",background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,fontSize:15,color:"#fff",outline:"none",fontFamily:"var(--font)",boxSizing:"border-box" };
 
   const handleSubmit = async () => {
-    if (!form.name.trim() || !form.email.includes("@") || !form.message.trim()) return;
+    if (!form.name.trim()||!form.email.includes("@")||!form.message.trim()) return;
     try {
-      await fetch("https://formspree.io/f/mlgzbpng", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-          "👤 Name": form.name,
-          "📧 Email": form.email,
-          "💬 Message": form.message,
-        }),
-      });
+      await fetch("https://formspree.io/f/mlgzbpng",{ method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({"👤 Name":form.name,"📧 Email":form.email,"💬 Message":form.message}) });
     } catch(e) { console.error(e); }
     setSubmitted(true);
   };
 
   return (
-    <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
-      <div style={{ maxWidth:580, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px", flex:1 }}>
+    <div style={{ paddingTop:62,minHeight:"100vh",display:"flex",flexDirection:"column" }}>
+      <div style={{ maxWidth:580,margin:"0 auto",padding:isMobile?"60px 20px 80px":"100px 48px",flex:1 }}>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Get in Touch</p>
-        <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,48px)":"clamp(36px,4vw,56px)",fontWeight:800,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:12,lineHeight:1.05 }}>
-          Let's build something.
-        </h1>
-        <p style={{ fontSize:15,color:"#858585",lineHeight:1.75,marginBottom:40 }}>
-          Tell us what you need. We'll get back to you within 24 hours.
-        </p>
-
-        {submitted ? (
+        <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,48px)":"clamp(36px,4vw,56px)",fontWeight:800,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:12,lineHeight:1.05 }}>Let's build something.</h1>
+        <p style={{ fontSize:15,color:"#858585",lineHeight:1.75,marginBottom:40 }}>Tell us what you need. We'll get back to you within 24 hours.</p>
+        {submitted?(
           <div style={{ background:"#0c0c0c",border:"1px solid rgba(34,197,94,0.2)",borderRadius:16,padding:"40px 32px",textAlign:"center" }}>
             <div style={{ width:56,height:56,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,margin:"0 auto 18px" }}>✓</div>
             <h2 style={{ fontSize:22,fontWeight:800,letterSpacing:"-0.8px",color:"#fff",marginBottom:10 }}>Message sent!</h2>
             <p style={{ fontSize:14,color:"#666",lineHeight:1.75 }}>We'll get back to you at <strong style={{ color:"#999" }}>{form.email}</strong> within 24 hours.</p>
           </div>
-        ) : (
+        ):(
           <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
-            <div>
-              <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Your name</label>
-              <input style={inputStyle} placeholder="Alex Smith" value={form.name} onChange={e=>set("name",e.target.value)} />
-            </div>
-            <div>
-              <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Email address</label>
-              <input style={inputStyle} type="email" placeholder="alex@yourbusiness.com" value={form.email} onChange={e=>set("email",e.target.value)} />
-            </div>
-            <div>
-              <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Message</label>
-              <textarea style={{ ...inputStyle,resize:"vertical",minHeight:130 }} placeholder="Tell us about your project..." value={form.message} onChange={e=>set("message",e.target.value)} />
-            </div>
-            <button
-              onClick={handleSubmit}
-              disabled={!form.name.trim()||!form.email.includes("@")||!form.message.trim()}
-              style={{ padding:"13px 24px",background:"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",opacity:(!form.name.trim()||!form.email.includes("@")||!form.message.trim())?0.4:1,transition:"opacity 0.2s" }}
-            >
-              Send message →
-            </button>
+            <div><label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Your name</label><input style={inputStyle} placeholder="Alex Smith" value={form.name} onChange={e=>set("name",e.target.value)} /></div>
+            <div><label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Email address</label><input style={inputStyle} type="email" placeholder="alex@yourbusiness.com" value={form.email} onChange={e=>set("email",e.target.value)} /></div>
+            <div><label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Message</label><textarea style={{ ...inputStyle,resize:"vertical",minHeight:130 }} placeholder="Tell us about your project..." value={form.message} onChange={e=>set("message",e.target.value)} /></div>
+            <button onClick={handleSubmit} disabled={!form.name.trim()||!form.email.includes("@")||!form.message.trim()} style={{ padding:"13px 24px",background:"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",opacity:(!form.name.trim()||!form.email.includes("@")||!form.message.trim())?0.4:1,transition:"opacity 0.2s" }}>Send message →</button>
           </div>
         )}
       </div>
@@ -2232,12 +1679,11 @@ const ContactPage = ({ setPage }) => {
   );
 };
 
-
 const TestimonialsPage = ({ setPage }) => {
   const isMobile = useIsMobile();
   return (
-    <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
-      <div style={{ maxWidth:900,margin:"0 auto",padding:isMobile?"80px 20px":"140px 48px",textAlign:"center",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both", flex:1 }}>
+    <div style={{ paddingTop:62,minHeight:"100vh",display:"flex",flexDirection:"column" }}>
+      <div style={{ maxWidth:900,margin:"0 auto",padding:isMobile?"80px 20px":"140px 48px",textAlign:"center",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both",flex:1 }}>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Testimonials</p>
         <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,52px)":"clamp(40px,5vw,68px)",fontWeight:800,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:16 }}>Coming soon.</h1>
         <p style={{ fontSize:15,color:"#858585" }}>Reviews are being collected. Check back shortly.</p>
@@ -2256,90 +1702,83 @@ export default function App() {
   const [user,setUser] = useState(null);
   const [authLoading,setAuthLoading] = useState(true);
   const isMobile = useIsMobile();
-  const [showMobileWarning, setShowMobileWarning] = useState(false);
+  const [showMobileWarning,setShowMobileWarning] = useState(false);
 
-  // Show mobile warning once per session on mobile devices
   useEffect(() => {
     if (isMobile) {
       const dismissed = sessionStorage.getItem("mobileWarningDismissed");
       if (!dismissed) {
-        // Delay so it appears after splash
-        const t = setTimeout(() => setShowMobileWarning(true), 3200);
-        return () => clearTimeout(t);
+        const t = setTimeout(()=>setShowMobileWarning(true),3200);
+        return ()=>clearTimeout(t);
       }
     }
   }, [isMobile]);
 
   const handleDismissWarning = () => {
     setShowMobileWarning(false);
-    sessionStorage.setItem("mobileWarningDismissed", "1");
+    sessionStorage.setItem("mobileWarningDismissed","1");
   };
 
-useEffect(() => {
-  const handleSession = async (session, redirect) => {
-    if (!session) { setAuthLoading(false); return; }
-    const email = session.user.email;
-    const { data: profile } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
-    if (!profile) {
-      await supabase.from("profiles").insert({ id: session.user.id, email, plan: "free" });
-      setUser({ id: session.user.id, email, plan: "free" });
-    } else {
-      setUser({ id: session.user.id, email, plan: profile.plan || "free", bizName: profile.biz_name });
-    }
-    if (redirect) setPage("dashboard");
-    window.history.replaceState({}, "", window.location.pathname);
-    setAuthLoading(false);
-  };
+  useEffect(() => {
+    const handleSession = async (session, redirect) => {
+      if (!session) { setAuthLoading(false); return; }
+      const email = session.user.email;
+      const { data: profile } = await supabase.from("profiles").select("*").eq("id",session.user.id).single();
+      if (!profile) {
+        await supabase.from("profiles").insert({ id:session.user.id,email,plan:"free" });
+        setUser({ id:session.user.id,email,plan:"free" });
+      } else {
+        setUser({ id:session.user.id,email,plan:profile.plan||"free",bizName:profile.biz_name });
+      }
+      if (redirect) setPage("dashboard");
+      window.history.replaceState({},"",window.location.pathname);
+      setAuthLoading(false);
+    };
 
-  supabase.auth.getSession().then(({ data: { session } }) => handleSession(session, false));
+    supabase.auth.getSession().then(({ data:{ session } })=>handleSession(session,false));
 
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-    if (_event === "SIGNED_IN") handleSession(session, true);
-    if (_event === "SIGNED_OUT") { setUser(null); setAuthLoading(false); }
-  });
+    const { data:{ subscription } } = supabase.auth.onAuthStateChange((_event,session) => {
+      if (_event==="SIGNED_IN") handleSession(session,true);
+      if (_event==="SIGNED_OUT") { setUser(null); setAuthLoading(false); }
+    });
 
-  return () => subscription.unsubscribe();
-}, []);
+    return ()=>subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("session")==="success"&&user) {
-      supabase.from("profiles").select("*").eq("id",user.id).single().then(({ data }) => { if(data) setUser(u=>({ ...u,plan:data.plan||"pro" })); });
+      supabase.from("profiles").select("*").eq("id",user.id).single().then(({ data })=>{ if(data) setUser(u=>({ ...u,plan:data.plan||"pro" })); });
       setPage("dashboard");
       window.history.replaceState({},"",window.location.pathname);
     }
   }, [user]);
 
-const handleSetPage = (p) => {
-  setPage(p);
-  window.scrollTo(0, 0);
-  const appPages = ["auth","onboarding","dashboard","paywall"];
-  if (!appPages.includes(p)) {
-    const slug = p === "home" ? "/" : `/${p}`;
-    window.history.pushState({ page: p }, "", slug);
-  }
-};
-
-useEffect(() => {
-  const path = window.location.pathname.replace("/", "") || "home";
-  const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","testimonials","pricing","contact"];
-  if (publicPages.includes(path)) setPage(path);
-}, []);
-
-// Handle browser back/forward buttons
-useEffect(() => {
-  const onPop = (e) => {
-    const p = e.state?.page || "home";
+  const handleSetPage = (p) => {
     setPage(p);
     window.scrollTo(0,0);
+    const appPages = ["auth","onboarding","dashboard","paywall"];
+    if (!appPages.includes(p)) {
+      const slug = p==="home"?"/":"/"+p;
+      window.history.pushState({ page:p },"",slug);
+    }
   };
-  window.addEventListener("popstate", onPop);
-  return () => window.removeEventListener("popstate", onPop);
-}, []);
 
-  
-  
+  useEffect(() => {
+    const path = window.location.pathname.replace("/","") || "home";
+    const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact"];
+    if (publicPages.includes(path)) setPage(path);
+  }, []);
+
+  useEffect(() => {
+    const onPop = (e) => { const p=e.state?.page||"home"; setPage(p); window.scrollTo(0,0); };
+    window.addEventListener("popstate",onPop);
+    return ()=>window.removeEventListener("popstate",onPop);
+  }, []);
+
+  // ReviewChaser handles its own nav entirely — exclude from isAppPage logic
   const isAppPage = ["auth","onboarding","dashboard","paywall"].includes(page);
+  const isReviewChaser = page === "reviewchaser";
 
   if (authLoading) return (
     <div style={{ minHeight:"100vh",background:"#080808",display:"flex",alignItems:"center",justifyContent:"center" }}>
@@ -2350,23 +1789,28 @@ useEffect(() => {
   return (
     <>
       <GlobalStyle />
-      {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
+      {showSplash && <SplashScreen onDone={()=>setShowSplash(false)} />}
       {showMobileWarning && <MobileWarningPopup onDismiss={handleDismissWarning} />}
-      {!isAppPage && <Nav page={page} setPage={handleSetPage} />}
 
-      {page==="home"         && <HomePage         setPage={handleSetPage} />}
-      {page==="systems"      && <SystemsPage      setPage={handleSetPage} />}
-      {page==="webdev"       && <WebDevPage       setPage={handleSetPage} />}
+      {/* Only show global Nav when NOT in an app page AND NOT in ReviewChaser (it has its own nav) */}
+      {!isAppPage && !isReviewChaser && <Nav page={page} setPage={handleSetPage} />}
+
+      {page==="home"              && <HomePage              setPage={handleSetPage} />}
+      {page==="systems"           && <SystemsPage           setPage={handleSetPage} />}
+      {page==="webdev"            && <WebDevPage            setPage={handleSetPage} />}
       {page==="webdev-onboarding" && <WebDevOnboardingPage  setPage={handleSetPage} />}
-      {page==="paychaser"    && <PaychaserPage    setPage={handleSetPage} />}
-      {page==="testimonials" && <TestimonialsPage setPage={handleSetPage} />}
-      {page==="pricing"      && <PricingPage      setPage={handleSetPage} />}
-      {page==="contact"      && <ContactPage      setPage={handleSetPage} />}
+      {page==="paychaser"         && <PaychaserPage         setPage={handleSetPage} />}
+      {page==="testimonials"      && <TestimonialsPage      setPage={handleSetPage} />}
+      {page==="pricing"           && <PricingPage           setPage={handleSetPage} />}
+      {page==="contact"           && <ContactPage           setPage={handleSetPage} />}
 
-      {page==="auth"         && <AuthPage         setPage={handleSetPage} setUser={setUser} />}
-      {page==="onboarding"   && <OnboardingPage   setPage={handleSetPage} user={user} setUser={setUser} />}
-      {page==="dashboard"    && <DashboardPage    setPage={handleSetPage} user={user} />}
-      {page==="paywall"      && <PaywallPage      setPage={handleSetPage} user={user} setUser={setUser} />}
+      {/* ← ReviewChaser — ADDED */}
+      {page==="reviewchaser"      && <ReviewChaserPage      setPage={handleSetPage} user={user} setUser={setUser} />}
+
+      {page==="auth"              && <AuthPage              setPage={handleSetPage} setUser={setUser} />}
+      {page==="onboarding"        && <OnboardingPage        setPage={handleSetPage} user={user} setUser={setUser} />}
+      {page==="dashboard"         && <DashboardPage         setPage={handleSetPage} user={user} />}
+      {page==="paywall"           && <PaywallPage           setPage={handleSetPage} user={user} setUser={setUser} />}
     </>
   );
 }
