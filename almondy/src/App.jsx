@@ -2304,12 +2304,18 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
     ? settingsData.customMsg
     : activeTemplate.preview(settingsData.bizName || "Your Business", settingsData.googleLink || "your-link");
 
-  useEffect(() => { getRCSendsThisMonth(userId).then(setSendsUsed); }, [userId, sent]);
+  useEffect(() => { getRCSendsThisMonth(userId).then(setSendsUsed).catch(() => {}); }, [userId, sent]);
 
   const loadHistory = useCallback(async () => {
     setHistoryLoading(true);
-    setHistory(await getRCSendHistory(userId));
-    setHistoryLoading(false);
+    try {
+      setHistory(await getRCSendHistory(userId));
+    } catch (e) {
+      console.error("load history error:", e);
+      setHistory([]);
+    } finally {
+      setHistoryLoading(false);
+    }
   }, [userId]);
 
   useEffect(() => { if (tab === "history") loadHistory(); }, [tab, loadHistory]);
@@ -2342,15 +2348,21 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
 
   const handleSaveSettings = async () => {
     setSettingsSaving(true);
-    await supabase.from("rc_profiles").update({
-      biz_name: settingsData.bizName.trim(),
-      google_link: settingsData.googleLink.trim(),
-      template_id: settingsData.templateId,
-      custom_msg: settingsData.customMsg.trim(),
-    }).eq("id", userId);
-    setProfile(p => ({ ...p, biz_name: settingsData.bizName.trim(), google_link: settingsData.googleLink.trim() }));
-    setSettingsSaving(false); setSettingsSaved(true);
-    setTimeout(() => setSettingsSaved(false), 2500);
+    try {
+      await supabase.from("rc_profiles").update({
+        biz_name: settingsData.bizName.trim(),
+        google_link: settingsData.googleLink.trim(),
+        template_id: settingsData.templateId,
+        custom_msg: settingsData.customMsg.trim(),
+      }).eq("id", userId);
+      setProfile(p => ({ ...p, biz_name: settingsData.bizName.trim(), google_link: settingsData.googleLink.trim() }));
+      setSettingsSaved(true);
+      setTimeout(() => setSettingsSaved(false), 2500);
+    } catch (e) {
+      console.error("save settings error:", e);
+    } finally {
+      setSettingsSaving(false);
+    }
   };
 
   const handleCancelPlan = async () => {
@@ -2647,39 +2659,53 @@ function ReviewChaserPage({ setPage, user, setUser }) {
   let mounted = true;
 
   const init = async () => {
-    const { data:{ session } } = await supabase.auth.getSession();
-    if (!mounted) return;
-    if (!session) { setView("marketing"); return; }
-    const uid = session.user.id;
-    setRcUserId(uid);
-    const profile = await getOrCreateRCProfile(uid, session.user.email);
-    if (!mounted) return;
-    setRcProfile(profile);
-    setView(!profile.biz_name ? "onboarding" : profile.plan === "expired" ? "paywall" : "dashboard");
+    try {
+      const { data:{ session } } = await supabase.auth.getSession();
+      if (!mounted) return;
+      if (!session) { setView("marketing"); return; }
+      const uid = session.user.id;
+      setRcUserId(uid);
+      const profile = await getOrCreateRCProfile(uid, session.user.email);
+      if (!mounted) return;
+      setRcProfile(profile);
+      setView(!profile.biz_name ? "onboarding" : profile.plan === "expired" ? "paywall" : "dashboard");
+    } catch (e) {
+      console.error("RC init error:", e);
+      if (mounted) setView("marketing");
+    }
   };
   init();
 
   const { data:{ subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
     if (event==="SIGNED_IN"&&session) {
-      const uid = session.user.id;
-      setRcUserId(uid);
-      const profile = await getOrCreateRCProfile(uid, session.user.email);
-      setRcProfile(profile);
-      setView(!profile.biz_name ? "onboarding" : profile.plan === "expired" ? "paywall" : "dashboard");
-      window.history.replaceState({}, "", window.location.pathname);
+      try {
+        const uid = session.user.id;
+        setRcUserId(uid);
+        const profile = await getOrCreateRCProfile(uid, session.user.email);
+        setRcProfile(profile);
+        setView(!profile.biz_name ? "onboarding" : profile.plan === "expired" ? "paywall" : "dashboard");
+        window.history.replaceState({}, "", "/reviewchaser");
+      } catch (e) {
+        console.error("RC auth error:", e);
+        setView("marketing");
+      }
     }
     if (event==="SIGNED_OUT") { setRcProfile(null); setRcUserId(null); setView("marketing"); }
   });
 
   const params = new URLSearchParams(window.location.search);
   if (params.get("rc_session")==="success") {
-    window.history.replaceState({}, "", window.location.pathname);
+    window.history.replaceState({}, "", "/reviewchaser");
     setTimeout(async () => {
-      const { data:{ session } } = await supabase.auth.getSession();
-      if (session) {
-        const profile = await getOrCreateRCProfile(session.user.id, session.user.email);
-        setRcProfile(profile);
-        setView("dashboard");
+      try {
+        const { data:{ session } } = await supabase.auth.getSession();
+        if (session) {
+          const profile = await getOrCreateRCProfile(session.user.id, session.user.email);
+          setRcProfile(profile);
+          setView("dashboard");
+        }
+      } catch (e) {
+        console.error("RC session restore error:", e);
       }
     }, 1500);
   }
@@ -2689,7 +2715,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
 
   
 
-  const handleSignOut = async () => { await supabase.auth.signOut(); setView("marketing"); };
+  const handleSignOut = async () => { try { await supabase.auth.signOut(); } catch(e) {} setView("marketing"); };
 
 
   if (view==="loading") return (
@@ -2738,29 +2764,38 @@ export default function App() {
   };
 
   useEffect(() => {
-    
-const handleSession = async (session, redirect) => {
-  const currentPath = window.location.pathname.replace("/","") || "home";
-  const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact"];
-  if (publicPages.includes(currentPath)) redirect = false;
-    
-      if (!session) { setAuthLoading(false); return; }
-      const email = session.user.email;
-      const { data: profile } = await supabase.from("profiles").select("*").eq("id",session.user.id).maybeSingle();
-      if (!profile) {
-        await supabase.from("profiles").insert({ id:session.user.id,email,plan:"free" });
-        setUser({ id:session.user.id,email,plan:"free" });
-      } else {
-        setUser({ id:session.user.id,email,plan:profile.plan||"free",bizName:profile.biz_name });
+    const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact"];
+
+    const handleSession = async (session, redirect) => {
+      try {
+        const currentPath = window.location.pathname.replace("/","") || "home";
+        const pageParam = new URLSearchParams(window.location.search).get("page");
+        const effectivePage = (pageParam && publicPages.includes(pageParam)) ? pageParam : currentPath;
+        if (publicPages.includes(effectivePage)) redirect = false;
+
+        if (!session) { setAuthLoading(false); return; }
+        const email = session.user.email;
+        const { data: profile } = await supabase.from("profiles").select("*").eq("id",session.user.id).maybeSingle();
+        if (!profile) {
+          await supabase.from("profiles").upsert({ id:session.user.id,email,plan:"free" }, { onConflict:"id" });
+          setUser({ id:session.user.id,email,plan:"free" });
+        } else {
+          setUser({ id:session.user.id,email,plan:profile.plan||"free",bizName:profile.biz_name });
+        }
+        if (redirect) {
+          setPage("dashboard");
+          window.history.replaceState({},"",window.location.pathname);
+        }
+        setAuthLoading(false);
+      } catch (e) {
+        console.error("auth error:", e);
+        setAuthLoading(false);
       }
-      if (redirect) {
-        setPage("dashboard");
-        window.history.replaceState({},"",window.location.pathname);
-      }
-      setAuthLoading(false);
     };
 
-    supabase.auth.getSession().then(({ data:{ session } })=>handleSession(session,false));
+    supabase.auth.getSession()
+      .then(({ data:{ session } }) => handleSession(session, false))
+      .catch(() => setAuthLoading(false));
 
     const { data:{ subscription } } = supabase.auth.onAuthStateChange((_event,session) => {
       if (_event==="SIGNED_IN") handleSession(session,true);
@@ -2791,8 +2826,18 @@ const handleSession = async (session, redirect) => {
 
   useEffect(() => {
     const path = window.location.pathname.replace("/","") || "home";
+    const params = new URLSearchParams(window.location.search);
+    const pageParam = params.get("page");
     const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact"];
-    if (publicPages.includes(path)) setPage(path);
+    if (params.get("rc_session") === "success") {
+      setPage("reviewchaser");
+      window.history.replaceState({ page:"reviewchaser" }, "", "/reviewchaser");
+    } else if (pageParam && publicPages.includes(pageParam)) {
+      setPage(pageParam);
+      window.history.replaceState({ page:pageParam }, "", "/"+pageParam);
+    } else if (publicPages.includes(path)) {
+      setPage(path);
+    }
   }, []);
 
   useEffect(() => {
