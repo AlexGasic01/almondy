@@ -1521,7 +1521,7 @@ const PaywallPage = ({ setPage,user,setUser }) => {
                 </div>
                 <div style={{ fontSize:11,color:"#656565",marginBottom:18,fontFamily:"var(--mono)" }}>{billing==="annual"?"AUD · billed yearly":"AUD · billed monthly"}</div>
                 <button onClick={()=>handleUpgrade(plan.id)} disabled={!!loadingPlan} style={{ width:"100%",padding:"12px 18px",background:plan.id==="pro"?"var(--white)":"rgba(255,255,255,0.08)",color:plan.id==="pro"?"var(--black)":"var(--white)",border:plan.id==="pro"?"none":"1px solid rgba(255,255,255,0.18)",borderRadius:10,fontSize:14,fontWeight:700,letterSpacing:"-0.3px",marginBottom:18,cursor:loadingPlan?"not-allowed":"pointer",opacity:loadingPlan&&!isLoading?0.4:1,fontFamily:"var(--font)" }}>
-                  {isLoading?"Redirecting...":plan.id==="pro"?"Start 3-day free trial →":"Get started →"}
+                  {isLoading?"Redirecting...":plan.id==="pro"?"Start 7-day free trial →":"Get started →"}
                 </button>
                 <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)",marginBottom:16 }} />
                 <div style={{ display:"flex",flexDirection:"column",gap:9 }}>
