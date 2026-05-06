@@ -2585,7 +2585,12 @@ export default function App() {
   };
 
   useEffect(() => {
-    const handleSession = async (session, redirect) => {
+    
+const handleSession = async (session, redirect) => {
+  const currentPath = window.location.pathname.replace("/","") || "home";
+  const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact"];
+  if (publicPages.includes(currentPath)) redirect = false;
+    
       if (!session) { setAuthLoading(false); return; }
       const email = session.user.email;
       const { data: profile } = await supabase.from("profiles").select("*").eq("id",session.user.id).single();
