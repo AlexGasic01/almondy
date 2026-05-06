@@ -2217,7 +2217,7 @@ const RCPaywallScreen = ({ isMobile, profile, onClose }) => {
             <span className="rc-badge-dot" style={{ width:6,height:6 }} /> {trialExpired?"Trial Expired":"Upgrade ReviewChaser"}
           </div>
           <h2 style={{ fontSize:isMobile?"clamp(22px,6vw,28px)":"clamp(24px,3vw,32px)",fontWeight:800,letterSpacing:"-1.5px",color:"#fff",marginBottom:10 }}>
-            {trialExpired ? "Plans that grow with you." : "You've hit your send limit."}
+            {trialExpired ? "Plans that grow with you." : "Plans that grow with your company"}
           </h2>
           <p style={{ fontSize:14,color:"#555",lineHeight:1.7 }}>
           </p>
