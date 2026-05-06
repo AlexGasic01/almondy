@@ -2369,12 +2369,13 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const handleCancelPlan = async () => {
     setCancelLoading(true);
     try {
-      await fetch("https://formspree.io/f/mlgzbpng", {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not signed in");
+      const res = await fetch("/api/cancel-rc-subscription", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ "❌ Cancel request": "ReviewChaser", "📧 Email": profile?.email ?? "unknown", "📦 Plan": plan }),
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
       });
-      await supabase.from("rc_profiles").update({ plan: "expired" }).eq("id", userId);
+      if (!res.ok) throw new Error("Cancel failed");
       setProfile(p => ({ ...p, plan: "expired" }));
       setCancelStep("done");
     } catch (e) { console.error(e); }
