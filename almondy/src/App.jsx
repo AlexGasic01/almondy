@@ -1521,7 +1521,7 @@ const PaywallPage = ({ setPage,user,setUser }) => {
                 </div>
                 <div style={{ fontSize:11,color:"#656565",marginBottom:18,fontFamily:"var(--mono)" }}>{billing==="annual"?"AUD · billed yearly":"AUD · billed monthly"}</div>
                 <button onClick={()=>handleUpgrade(plan.id)} disabled={!!loadingPlan} style={{ width:"100%",padding:"12px 18px",background:plan.id==="pro"?"var(--white)":"rgba(255,255,255,0.08)",color:plan.id==="pro"?"var(--black)":"var(--white)",border:plan.id==="pro"?"none":"1px solid rgba(255,255,255,0.18)",borderRadius:10,fontSize:14,fontWeight:700,letterSpacing:"-0.3px",marginBottom:18,cursor:loadingPlan?"not-allowed":"pointer",opacity:loadingPlan&&!isLoading?0.4:1,fontFamily:"var(--font)" }}>
-                  {isLoading?"Redirecting...":plan.id==="pro"?"Start 7-day free trial →":"Get started →"}
+                  {isLoading?"Redirecting...":plan.id==="pro"?"Start 7-Day free trial →":"Get started →"}
                 </button>
                 <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)",marginBottom:16 }} />
                 <div style={{ display:"flex",flexDirection:"column",gap:9 }}>
@@ -2217,10 +2217,9 @@ const RCPaywallScreen = ({ isMobile, profile, onClose }) => {
             <span className="rc-badge-dot" style={{ width:6,height:6 }} /> {trialExpired?"Trial Expired":"Upgrade ReviewChaser"}
           </div>
           <h2 style={{ fontSize:isMobile?"clamp(22px,6vw,28px)":"clamp(24px,3vw,32px)",fontWeight:800,letterSpacing:"-1.5px",color:"#fff",marginBottom:10 }}>
-            {trialExpired ? "Your 7-day trial has ended." : "You've hit your send limit."}
+            {trialExpired ? "Plans that grow with you." : "You've hit your send limit."}
           </h2>
           <p style={{ fontSize:14,color:"#555",lineHeight:1.7 }}>
-            {trialExpired ? "Upgrade to keep sending review requests and growing your reputation." : "Upgrade to unlock more sends and keep your reviews rolling in."}
           </p>
         </div>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:10,marginBottom:20 }}>
