@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import ReviewChaserPage from "./ReviewChaserPage"; // ← ReviewChaser drop-in
 
 const supabase = createClient(
   "https://qmaqmbimnhzyspvnioeb.supabase.co",
@@ -1692,6 +1691,866 @@ const TestimonialsPage = ({ setPage }) => {
     </div>
   );
 };
+
+/* ════════════════════════════════════════════
+   REVIEW CHASER
+════════════════════════════════════════════ */
+
+// ── Stripe Price IDs ─────────────────────────────────────────────
+const STRIPE_PRICES = {
+  growth: "price_1TTu1PKVRE4IsC8ThYKGACBz",
+  crew:   "price_1TTu1pKVRE4IsC8T19RkUMWr",
+};
+
+// ── ClickSend ────────────────────────────────────────────────────
+const CLICKSEND_USER = "alex.digital200@gmail.com";
+const CLICKSEND_KEY  = "27EAF71B-5ABD-BB47-6968-264A64B2CE3C";
+const CLICKSEND_AUTH = btoa(`${CLICKSEND_USER}:${CLICKSEND_KEY}`);
+
+// ── Plan config ──────────────────────────────────────────────────
+const PLAN_CONFIG = {
+  trial:  { label:"Free Trial", sends: 20,  color:"#888" },
+  growth: { label:"Growth",     sends: 140, color:"#22c55e" },
+  crew:   { label:"Crew",       sends: 400, color:"#f59e0b" },
+};
+
+const Divider = () => (
+  <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.055)" }} />
+);
+
+const Spinner = ({ size=16, dark=false }) => (
+  <div style={{ width:size, height:size, border:`2px solid ${dark?"rgba(0,0,0,0.15)":"rgba(255,255,255,0.1)"}`, borderTop:`2px solid ${dark?"#000":"#fff"}`, borderRadius:"50%", animation:"rc-spin 0.7s linear infinite", flexShrink:0 }} />
+);
+
+// ── Supabase helpers ─────────────────────────────────────────────
+async function getOrCreateRCProfile(userId, email) {
+  const { data } = await supabase.from("rc_profiles").select("*").eq("id", userId).single();
+  if (data) return data;
+  const fresh = { id:userId, email, plan:"trial", sends_used:0, trial_started_at:new Date().toISOString(), sends_reset_at:new Date().toISOString() };
+  await supabase.from("rc_profiles").insert(fresh);
+  return fresh;
+}
+
+async function getRCSendsThisMonth(userId) {
+  const start = new Date(); start.setDate(1); start.setHours(0,0,0,0);
+  const { data } = await supabase.from("rc_sends").select("id").eq("user_id", userId).gte("sent_at", start.toISOString());
+  return data?.length ?? 0;
+}
+
+async function logRCSend(userId, mobile, messageId) {
+  await supabase.from("rc_sends").insert({ user_id:userId, mobile, status:"sent", message_id:messageId ?? null });
+}
+
+async function getRCSendHistory(userId) {
+  const { data } = await supabase.from("rc_sends").select("*").eq("user_id", userId).order("sent_at", { ascending:false }).limit(50);
+  return data ?? [];
+}
+
+// ── ClickSend SMS ─────────────────────────────────────────────────
+async function sendReviewSMS(mobile, bizName, googleLink) {
+  let num = mobile.replace(/\s/g,"").replace(/^0/,"+61");
+  if (!num.startsWith("+")) num = "+61" + num;
+  const message = `Hi! Thanks for choosing ${bizName}. If you have a moment, we'd love a Google review — it really helps! ${googleLink}`;
+  const res = await fetch("https://rest.clicksend.com/v3/sms/send", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":`Basic ${CLICKSEND_AUTH}` },
+    body:JSON.stringify({ messages:[{ source:"sdk", body:message, to:num }] }),
+  });
+  const json = await res.json();
+  const msgId  = json?.data?.messages?.[0]?.message_id ?? null;
+  const status = json?.data?.messages?.[0]?.status ?? "unknown";
+  return { ok: res.ok && status !== "INVALID", messageId: msgId };
+}
+
+// ── Stripe Checkout ───────────────────────────────────────────────
+async function startStripeCheckout(priceId, email, userId) {
+  const res = await fetch("/api/create-checkout-session", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ priceId, email, userId, successUrl:`${window.location.origin}/?rc_session=success`, cancelUrl:`${window.location.origin}/?page=reviewchaser`, metadata:{ product:"reviewchaser" } }),
+  });
+  const { url } = await res.json();
+  if (url) window.location.href = url;
+}
+
+function isTrialExpired(profile) {
+  if (profile?.plan !== "trial") return false;
+  if (!profile?.trial_started_at) return false;
+  return (new Date() - new Date(profile.trial_started_at)) / (1000*60*60*24) > 7;
+}
+
+function getSendLimit(plan) { return PLAN_CONFIG[plan]?.sends ?? 20; }
+
+// ── Styles ────────────────────────────────────────────────────────
+const RCStyles = () => (
+  <style>{`
+    @keyframes rc-spin    { to { transform: rotate(360deg); } }
+    @keyframes rc-fadeUp  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes rc-fadeIn  { from { opacity:0; } to { opacity:1; } }
+    @keyframes rc-pulse   { 0%,100% { box-shadow:0 0 0 3px rgba(34,197,94,0.2); } 50% { box-shadow:0 0 0 6px rgba(34,197,94,0.05); } }
+    @keyframes rc-starPop { 0%{transform:scale(0) rotate(-20deg);opacity:0} 60%{transform:scale(1.3) rotate(4deg);} 100%{transform:scale(1) rotate(0);opacity:1} }
+    .rc-star { display:inline-block; animation: rc-starPop 0.4s cubic-bezier(0.22,1,0.36,1) both; }
+    .rc-badge-dot { width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,0.2);animation:rc-pulse 2.2s ease infinite;flex-shrink:0;display:inline-block; }
+    .rc-hover-row:hover { background:rgba(255,255,255,0.018) !important; }
+    .rc-plan-card:hover { border-color:rgba(255,255,255,0.14) !important; }
+    .rc-input:focus { border-color:rgba(255,255,255,0.25) !important; }
+    .rc-btn-primary:hover { opacity:0.9; }
+    .rc-btn-primary:active { transform:scale(0.97); }
+  `}</style>
+);
+
+const RC_INPUT = {
+  width:"100%", padding:"13px 16px", background:"#0f0f0f",
+  border:"1px solid rgba(255,255,255,0.1)", borderRadius:10,
+  fontSize:15, color:"#fff", outline:"none", fontFamily:"var(--font)",
+  boxSizing:"border-box", transition:"border-color 0.2s",
+};
+
+// ── Plan data ─────────────────────────────────────────────────────
+const PLANS_DATA = [
+  { id:"trial",  name:"Free Trial", price:"0",     priceLabel:"Free", period:"7 days, then cancel or upgrade", sends:20,  desc:"Try ReviewChaser risk-free. No credit card required to start.", cta:"Start Free Trial →", solid:false, badge:null, features:[[true,"20 review requests"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Basic send dashboard"],[false,"Send history"],[false,"Custom SMS message"],[false,"Priority support"]] },
+  { id:"growth", name:"Growth",     price:"29.99", priceLabel:"29",   period:"per month AUD",                  sends:140, desc:"For sole operators and small businesses building their reputation.", cta:"Get Growth →", solid:true, badge:"⚡ Most Popular", features:[[true,"<strong>140 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
+  { id:"crew",   name:"Crew",       price:"59.99", priceLabel:"59",   period:"per month AUD",                  sends:400, desc:"For multi-van operators, agencies, and businesses scaling fast.", cta:"Get Crew →", solid:false, badge:"Enterprise", features:[[true,"<strong>400 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history & exports"],[true,"Advanced analytics"],[true,"Custom SMS message"],[true,"Priority support"]] },
+];
+
+const RCPlanCard = ({ plan, onSelect, loading }) => {
+  const featured = plan.id === "growth";
+  return (
+    <div className="rc-plan-card" style={{ position:"relative", border:`1px solid ${featured?"rgba(255,255,255,0.14)":"rgba(255,255,255,0.07)"}`, borderRadius:16, padding:"28px 24px 24px", display:"flex", flexDirection:"column", background:featured?"#0f0f0f":"#0c0c0c", boxShadow:featured?"0 32px 64px rgba(0,0,0,0.5)":"none", overflow:"hidden", transition:"border-color 0.2s" }}>
+      {featured && <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:120, height:2, background:"linear-gradient(90deg,transparent,rgba(34,197,94,0.6),transparent)", borderRadius:999 }} />}
+      {plan.badge && <div style={{ display:"inline-flex", alignItems:"center", gap:6, fontSize:10.5, fontWeight:700, letterSpacing:"1.2px", textTransform:"uppercase", color:featured?"#22c55e":"#777", background:featured?"rgba(34,197,94,0.1)":"rgba(255,255,255,0.05)", border:`1px solid ${featured?"rgba(34,197,94,0.25)":"rgba(255,255,255,0.1)"}`, borderRadius:999, padding:"4px 12px", marginBottom:18, width:"fit-content" }}>{plan.badge}</div>}
+      {!plan.badge && <div style={{ height:34, marginBottom:18 }} />}
+      <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", fontFamily:"var(--mono)", marginBottom:10 }}>{plan.name}</div>
+      <div style={{ display:"flex", alignItems:"flex-end", gap:2, lineHeight:1, marginBottom:4 }}>
+        {plan.price !== "0" && <span style={{ fontSize:18, fontWeight:700, color:"#444", marginBottom:8 }}>$</span>}
+        <span style={{ fontSize:50, fontWeight:800, letterSpacing:"-3px", color:"#fff", lineHeight:1 }}>{plan.priceLabel==="0"?"Free":plan.priceLabel}</span>
+        {plan.price !== "0" && <span style={{ fontSize:13, color:"#444", marginBottom:8, marginLeft:2 }}>/mo</span>}
+      </div>
+      <div style={{ fontSize:12, color:"#333", marginBottom:10 }}>{plan.period}</div>
+      <div style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.15)", borderRadius:999, padding:"3px 10px", fontSize:11, fontWeight:700, color:"rgba(34,197,94,0.7)", marginBottom:16, width:"fit-content", fontFamily:"var(--mono)" }}>{plan.sends} sends/mo</div>
+      <p style={{ fontSize:13, color:"#858585", lineHeight:1.75, marginBottom:22 }}>{plan.desc}</p>
+      <button onClick={() => onSelect(plan.id)} disabled={!!loading} className="rc-btn-primary" style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, width:"100%", padding:"12px 20px", fontSize:13, fontWeight:700, borderRadius:9, border:plan.solid?"none":"1px solid rgba(255,255,255,0.1)", background:plan.solid?"#fff":"transparent", color:plan.solid?"#000":"#666", marginBottom:22, opacity:loading&&loading!==plan.id?0.4:1, transition:"opacity 0.2s" }}>
+        {loading===plan.id ? <><Spinner size={14} dark={plan.solid} /> Redirecting…</> : plan.cta}
+      </button>
+      <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.055)", marginBottom:18 }} />
+      <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+        {plan.features.map(([on, label]) => (
+          <div key={label} style={{ display:"flex", alignItems:"flex-start", gap:9, fontSize:13, color:on?"#8a8a8a":"#383838" }}>
+            <div style={{ width:15, height:15, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1, fontSize:8, fontWeight:900, background:on?"rgba(34,197,94,0.1)":"rgba(255,255,255,0.03)", color:on?"#22c55e":"#2e2e2e", border:`1px solid ${on?"rgba(34,197,94,0.18)":"rgba(255,255,255,0.06)"}` }}>{on?"✓":"—"}</div>
+            <span dangerouslySetInnerHTML={{ __html:label }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ── Marketing Page ────────────────────────────────────────────────
+const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn }) => {
+  const [openFaq, setOpenFaq] = useState(null);
+  const [activeStep, setActiveStep] = useState(0);
+  const [loadingPlan, setLoadingPlan] = useState(null);
+  const [demoMobile, setDemoMobile] = useState("");
+  const [demoSent, setDemoSent] = useState(false);
+  const [demoSending, setDemoSending] = useState(false);
+
+  useEffect(() => {
+    const t = setInterval(() => setActiveStep(s => (s+1)%3), 2800);
+    return () => clearInterval(t);
+  }, []);
+
+  const handleDemoSend = () => {
+    if (demoMobile.replace(/\s/g,"").length < 10) return;
+    setDemoSending(true);
+    setTimeout(() => { setDemoSending(false); setDemoSent(true); }, 1200);
+    setTimeout(() => { setDemoSent(false); setDemoMobile(""); }, 4000);
+  };
+
+  const handlePlanSelect = async (planId) => {
+    if (planId === "trial") { onStartTrial(); return; }
+    setLoadingPlan(planId);
+    try {
+      const { data:{ session } } = await supabase.auth.getSession();
+      if (!session) { onStartTrial(); return; }
+      await startStripeCheckout(STRIPE_PRICES[planId], session.user.email, session.user.id);
+    } catch(e) { console.error(e); setLoadingPlan(null); }
+  };
+
+  const steps = [
+    { num:"01", title:"Enter mobile number", desc:"Type your customer's Australian mobile. No client list to build, no setup required." },
+    { num:"02", title:"We send the SMS",      desc:"A professional review request lands on their phone from a real AU number within seconds." },
+    { num:"03", title:"They leave a review",  desc:"One tap takes them straight to your Google Review page. More reviews, more jobs." },
+  ];
+
+  const faqs = [
+    ["Will it look like spam?","No. Messages come from a real Australian mobile number, not a shortcode or overseas number. It looks like a normal text from a local business."],
+    ["What does the SMS actually say?","Something like: 'Hi! Thanks for choosing [Your Business]. If you have a moment, we'd love a Google review — it really helps! [your link]' — under 160 characters, friendly, no pressure."],
+    ["Can I customise the message?","On Growth and Crew plans you can edit the message template. The free trial uses the default."],
+    ["What if I hit my send limit?","Sends stop until your next billing cycle. You're never charged overages. Upgrade any time to increase your cap."],
+    ["Is this legal in Australia?","Yes. The Spam Act 2003 permits relationship/transactional messages to existing customers. Your customer just did business with you — this qualifies."],
+    ["How is billing handled?","Via Stripe. Cancel any time from your account — no lock-in, no hidden fees."],
+  ];
+
+  return (
+    <div>
+      {/* HERO */}
+      <div style={{ position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse 70% 55% at 50% 40%, rgba(34,197,94,0.06) 0%, transparent 70%)", pointerEvents:"none" }} />
+        <div style={{ position:"relative", zIndex:1, maxWidth:860, margin:"0 auto", padding:isMobile?"64px 20px 56px":"100px 48px 90px", textAlign:"center", animation:"rc-fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"#22c55e", marginBottom:24, fontFamily:"var(--mono)" }}>
+            <span className="rc-badge-dot" /> ReviewChaser — Now Live
+          </div>
+          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(46px,6vw,84px)", fontWeight:800, letterSpacing:"-3.5px", lineHeight:1.01, color:"#fff", marginBottom:18 }}>
+            More Google reviews.<br /><span style={{ color:"#22c55e" }}>Zero awkwardness.</span>
+          </h1>
+          <p style={{ fontSize:isMobile?14.5:16.5, color:"#858585", lineHeight:1.8, maxWidth:520, margin:"0 auto 32px" }}>
+            Type a mobile number. Hit send. Your customer gets a friendly SMS with your Google Review link. <strong style={{ color:"#999" }}>Takes 5 seconds. Works every time.</strong>
+          </p>
+          <div style={{ display:"flex", justifyContent:"center", gap:5, marginBottom:32 }}>
+            {[1,2,3,4,5].map(i => <span key={i} className="rc-star" style={{ fontSize:isMobile?28:38, color:"#f59e0b", animationDelay:`${i*0.09}s` }}>★</span>)}
+          </div>
+          <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap" }}>
+            <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#fff", color:"#000", padding:"14px 28px", fontSize:15, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial →</button>
+            <button onClick={onSignIn} style={{ background:"transparent", color:"#666", border:"1px solid rgba(255,255,255,0.12)", padding:"14px 22px", fontSize:14, fontWeight:600, borderRadius:9 }}>Sign In</button>
+          </div>
+          <p style={{ fontSize:12, color:"#333", marginTop:14 }}>7 days free · 20 sends · No credit card required</p>
+        </div>
+      </div>
+      <Divider />
+      {/* STATS */}
+      <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"32px 20px":"44px 48px" }}>
+        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)", gap:isMobile?20:0 }}>
+          {[["98%","SMS open rate"],["4.7×","vs email review requests"],["<160","chars — never double-billed"],["AU","Local sending number"]].map(([val,label],i) => (
+            <div key={label} style={{ textAlign:"center", padding:isMobile?"0":"0 28px", borderRight:(!isMobile&&i<3)?"1px solid rgba(255,255,255,0.06)":"none" }}>
+              <div style={{ fontSize:isMobile?28:38, fontWeight:800, letterSpacing:"-2px", color:"#fff", lineHeight:1, marginBottom:6 }}>{val}</div>
+              <div style={{ fontSize:12.5, color:"#444", lineHeight:1.5 }}>{label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <Divider />
+      {/* HOW IT WORKS */}
+      <div id="rc-how" style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px":"100px 48px" }}>
+        <div style={{ textAlign:"center", marginBottom:isMobile?40:64 }}>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:12, fontFamily:"var(--mono)" }}>How It Works</p>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"#fff" }}>Three steps. Thirty seconds.</h2>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", marginBottom:isMobile?28:48 }}>
+          {steps.map((_, i) => (
+            <div key={i} style={{ display:"contents" }}>
+              <button onClick={() => setActiveStep(i)} style={{ width:isMobile?28:34, height:isMobile?28:34, borderRadius:"50%", border:`1px solid ${i<=activeStep?"#22c55e":"rgba(255,255,255,0.1)"}`, background:i===activeStep?"#22c55e":i<activeStep?"rgba(34,197,94,0.15)":"#080808", color:i===activeStep?"#000":i<activeStep?"#22c55e":"#333", fontSize:11, fontWeight:800, flexShrink:0, zIndex:1, boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none", transition:"all 0.35s" }}>{i+1}</button>
+              {i<2 && <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.07)", position:"relative" }}><div style={{ position:"absolute", top:0, left:0, height:"100%", width:activeStep>i?"100%":"0%", background:"#22c55e", transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} /></div>}
+            </div>
+          ))}
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:10 }}>
+          {steps.map(({ num, title, desc }, i) => (
+            <div key={num} onClick={() => setActiveStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.06)":"#0c0c0c", border:`1px solid ${i===activeStep?"rgba(34,197,94,0.3)":"rgba(255,255,255,0.06)"}`, borderRadius:14, padding:"24px 22px", cursor:"pointer", position:"relative", overflow:"hidden", transition:"all 0.3s" }}>
+              {i===activeStep && <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:"linear-gradient(90deg,rgba(34,197,94,0.7),transparent)" }} />}
+              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2px", color:i===activeStep?"#22c55e":"#333", fontFamily:"var(--mono)", marginBottom:14 }}>{num}</div>
+              <div style={{ fontSize:16, fontWeight:700, color:i===activeStep?"#fff":"#555", letterSpacing:"-0.4px", marginBottom:8 }}>{title}</div>
+              <p style={{ fontSize:13.5, color:i===activeStep?"#858585":"#2e2e2e", lineHeight:1.75, margin:0 }}>{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <Divider />
+      {/* LIVE DEMO */}
+      <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px":"100px 48px", display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:isMobile?40:80, alignItems:"center" }}>
+        <div>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:14, fontFamily:"var(--mono)" }}>The Send Screen</p>
+          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,46px)", fontWeight:800, letterSpacing:"-2px", color:"#fff", marginBottom:16 }}>Simpler than<br />sending a text.</h2>
+          <p style={{ fontSize:isMobile?14:15, color:"#666", lineHeight:1.8, marginBottom:24 }}>Open ReviewChaser after every job. Type the mobile. Hit send. <strong style={{ color:"#888" }}>No setup. No client database. No nonsense.</strong></p>
+          {["Works from your phone or desktop","Messages from a real Australian number","Customer taps link → straight to your Google page","Every send logged with timestamp"].map(f => (
+            <div key={f} style={{ display:"flex", alignItems:"center", gap:10, fontSize:14, color:"#777", marginBottom:10 }}>
+              <div style={{ width:16, height:16, borderRadius:"50%", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:900, color:"#22c55e", flexShrink:0 }}>✓</div>
+              {f}
+            </div>
+          ))}
+        </div>
+        <div style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.09)", borderRadius:16, overflow:"hidden", boxShadow:"0 40px 100px rgba(0,0,0,0.7)" }}>
+          <div style={{ background:"#090909", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"12px 16px", display:"flex", alignItems:"center", gap:6 }}>
+            {["#ff5f57","#febc2e","#28c840"].map(c => <div key={c} style={{ width:10, height:10, borderRadius:"50%", background:c }} />)}
+            <div style={{ flex:1, textAlign:"center", fontSize:11, fontWeight:600, color:"#2a2a2a", fontFamily:"var(--mono)" }}>ReviewChaser — Demo</div>
+          </div>
+          <div style={{ padding:24 }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
+              <div style={{ fontSize:11, color:"#383838", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase" }}>Sends this month</div>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <span style={{ fontSize:12, fontWeight:700, color:"#22c55e", fontFamily:"var(--mono)" }}>23 / 140</span>
+                <div style={{ width:72, height:5, background:"rgba(255,255,255,0.06)", borderRadius:999 }}><div style={{ width:"16%", height:"100%", background:"#22c55e", borderRadius:999 }} /></div>
+              </div>
+            </div>
+            {!demoSent ? (
+              <>
+                <label style={{ fontSize:11.5, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Customer mobile</label>
+                <input value={demoMobile} onChange={e=>setDemoMobile(e.target.value)} placeholder="04XX XXX XXX" maxLength={12} className="rc-input" style={{ ...RC_INPUT, fontSize:16, letterSpacing:"0.5px", marginBottom:12 }} />
+                <div style={{ background:"#080808", border:"1px solid rgba(255,255,255,0.05)", borderRadius:10, padding:"12px 14px", marginBottom:14 }}>
+                  <div style={{ fontSize:10, color:"#2a2a2a", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>SMS preview</div>
+                  <div style={{ fontSize:12.5, color:"#555", lineHeight:1.75 }}>Hi! Thanks for choosing <span style={{ color:"#777" }}>Your Business</span>. If you have a moment, we'd love a Google review! <span style={{ color:"#22c55e" }}>g.co/r/yourbusiness</span></div>
+                  <div style={{ fontSize:10, color:"#2a2a2a", marginTop:6, fontFamily:"var(--mono)" }}>152 / 160 chars ✓</div>
+                </div>
+                <button onClick={handleDemoSend} disabled={demoMobile.replace(/\s/g,"").length<10||demoSending} style={{ width:"100%", padding:"13px 20px", background:demoMobile.replace(/\s/g,"").length>=10?"#22c55e":"rgba(34,197,94,0.1)", color:demoMobile.replace(/\s/g,"").length>=10?"#000":"#1a4a2e", border:"none", borderRadius:10, fontSize:14, fontWeight:700 }}>
+                  {demoSending ? <span style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", gap:8 }}><Spinner size={14} dark /> Sending…</span> : "Send Review Request ✦"}
+                </button>
+              </>
+            ) : (
+              <div style={{ textAlign:"center", padding:"20px 0", animation:"rc-fadeIn 0.4s both" }}>
+                <div style={{ fontSize:36, marginBottom:10 }}>✅</div>
+                <div style={{ fontSize:15, fontWeight:700, color:"#fff", marginBottom:6 }}>Demo sent!</div>
+                <div style={{ fontSize:12.5, color:"#555" }}>Sign up to send real review requests.</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      <Divider />
+      {/* PRICING */}
+      <div id="rc-pricing" style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px" }}>
+        <div style={{ textAlign:"center", marginBottom:isMobile?40:64 }}>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:12, fontFamily:"var(--mono)" }}>Pricing</p>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"#fff" }}>Simple. Transparent. No surprises.</h2>
+          <p style={{ fontSize:14, color:"#555", marginTop:12 }}>All prices AUD. Cancel any time.</p>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:10 }}>
+          {PLANS_DATA.map(p => <RCPlanCard key={p.id} plan={p} onSelect={handlePlanSelect} loading={loadingPlan} />)}
+        </div>
+        <div style={{ marginTop:20, background:"rgba(245,158,11,0.04)", border:"1px solid rgba(245,158,11,0.15)", borderRadius:12, padding:isMobile?"14px 16px":"16px 22px", display:"flex", gap:12, alignItems:"flex-start" }}>
+          <span style={{ fontSize:16, flexShrink:0, marginTop:1 }}>💡</span>
+          <p style={{ fontSize:13, color:"#555", lineHeight:1.75, margin:0 }}><strong style={{ color:"#777" }}>Why send limits?</strong> A typical operator doing 4–5 jobs a week sends ~20 requests a month. Growth's 140-send cap gives you 7× headroom. If you hit the limit, sends pause — you're never charged overages.</p>
+        </div>
+      </div>
+      <Divider />
+      {/* FAQ */}
+      <div style={{ maxWidth:660, margin:"0 auto", padding:isMobile?"60px 20px 80px":"80px 48px 100px" }}>
+        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)", fontWeight:800, letterSpacing:"-1.5px", color:"#fff", textAlign:"center", marginBottom:36 }}>Questions? Answered.</h2>
+        {faqs.map(([q,a],i) => (
+          <div key={i} style={{ borderBottom:"1px solid rgba(255,255,255,0.055)" }}>
+            <button onClick={() => setOpenFaq(openFaq===i?null:i)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 0", background:"none", border:"none", fontFamily:"var(--font)", fontSize:isMobile?13.5:14, fontWeight:600, color:openFaq===i?"#fff":"#aaa", textAlign:"left", gap:16 }}>
+              {q}
+              <div style={{ width:22, height:22, borderRadius:"50%", background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:"#444", flexShrink:0, transform:openFaq===i?"rotate(45deg)":"none", transition:"transform 0.25s" }}>+</div>
+            </button>
+            <div style={{ maxHeight:openFaq===i?300:0, overflow:"hidden", transition:"max-height 0.4s cubic-bezier(0.22,1,0.36,1)", fontSize:13.5, color:"#858585", lineHeight:1.85, paddingBottom:openFaq===i?20:0 }}>{a}</div>
+          </div>
+        ))}
+      </div>
+      {/* BOTTOM CTA */}
+      <div style={{ borderTop:"1px solid rgba(255,255,255,0.07)", background:"#0a0a0a", padding:isMobile?"48px 20px":"72px 48px", textAlign:"center" }}>
+        <div style={{ display:"flex", justifyContent:"center", marginBottom:18 }}>
+          {[1,2,3,4,5].map(i => <span key={i} style={{ fontSize:22, color:"#f59e0b" }}>★</span>)}
+        </div>
+        <h2 style={{ fontSize:isMobile?"clamp(22px,7vw,34px)":"clamp(26px,3.5vw,42px)", fontWeight:800, letterSpacing:"-2px", color:"#fff", marginBottom:12 }}>Start collecting reviews today.</h2>
+        <p style={{ fontSize:isMobile?14:15, color:"#444", marginBottom:28 }}>7 days free · 20 sends · No card required</p>
+        <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#fff", color:"#000", padding:"14px 28px", fontSize:15, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial →</button>
+      </div>
+    </div>
+  );
+};
+
+// ── Auth Screen ───────────────────────────────────────────────────
+const RCAuthScreen = ({ isMobile, onBack }) => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [err, setErr] = useState("");
+
+  const handleSend = async () => {
+    if (!email.includes("@")) return;
+    setLoading(true); setErr("");
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo:`${window.location.origin}/?page=reviewchaser` } });
+      if (error) throw error;
+      setSent(true);
+    } catch(e) { setErr("Something went wrong. Try again."); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", background:"#080808", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24, position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
+      <button onClick={onBack} style={{ position:"absolute", top:24, left:20, background:"none", border:"none", color:"#555", fontSize:13, fontWeight:600, cursor:"pointer" }}>← Back</button>
+      <div style={{ position:"relative", zIndex:1, width:"100%", maxWidth:400, animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
+        {!sent ? (
+          <>
+            <div style={{ textAlign:"center", marginBottom:32 }}>
+              <div style={{ width:52, height:52, background:"#111", border:"1px solid #2a2a2a", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>✉️</div>
+              <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Sign in to ReviewChaser</h1>
+              <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>Enter your email — we'll send a magic link. No password needed.</p>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSend()} placeholder="yourname@domain.com" autoFocus className="rc-input" style={{ ...RC_INPUT, padding:"13px 16px" }} />
+              {err && <p style={{ fontSize:12, color:"#f87171", margin:0 }}>{err}</p>}
+              <button onClick={handleSend} disabled={!email.includes("@")||loading} className="rc-btn-primary" style={{ width:"100%", padding:14, background:loading?"rgba(255,255,255,0.5)":"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:!email.includes("@")?0.4:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+                {loading ? <><Spinner size={14} dark /> Sending…</> : "Send magic link →"}
+              </button>
+            </div>
+            <p style={{ textAlign:"center", fontSize:12, color:"#383838", marginTop:16 }}>By continuing you agree to our Terms &amp; Privacy Policy.</p>
+          </>
+        ) : (
+          <div style={{ textAlign:"center" }}>
+            <div style={{ width:52, height:52, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>📬</div>
+            <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:10 }}>Check your inbox</h1>
+            <p style={{ fontSize:14, color:"#666", lineHeight:1.7 }}>Magic link sent to<br /><strong style={{ color:"#fff" }}>{email}</strong></p>
+            <p style={{ fontSize:12, color:"#383838", marginTop:16 }}>Check spam if you don't see it. Link expires in 15 minutes.</p>
+            <button onClick={() => setSent(false)} style={{ marginTop:18, background:"transparent", border:"1px solid rgba(255,255,255,0.08)", color:"#555", borderRadius:9, padding:"10px 20px", fontSize:13, fontWeight:600, cursor:"pointer" }}>← Different email</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ── Onboarding Wizard ─────────────────────────────────────────────
+const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
+  const [step, setStep] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [data, setData] = useState({ bizName:"", googleLink:"" });
+  const set = (k,v) => setData(d=>({ ...d,[k]:v }));
+
+  const go = dir => { setVisible(false); setTimeout(()=>{ setStep(s=>s+dir); setVisible(true); },200); };
+  const canNext = () => { if(step===0) return data.bizName.trim().length>0; if(step===1) return data.googleLink.trim().length>10; return true; };
+
+  const handleFinish = async () => {
+    setSaving(true);
+    await supabase.from("rc_profiles").upsert({ id:userId, email, biz_name:data.bizName.trim(), google_link:data.googleLink.trim(), plan:"trial", sends_used:0, trial_started_at:new Date().toISOString() });
+    setSaving(false);
+    onComplete({ bizName:data.bizName.trim(), googleLink:data.googleLink.trim(), plan:"trial", sends_used:0 });
+  };
+
+  const stepLabels = ["Business","Google Link","Preview"];
+  const headings   = ["What's your business called?","Paste your Google Review link.","Preview your SMS."];
+  const subheadings = ["1/3","2/3","3/3"];
+
+  const stepContent = () => {
+    switch(step) {
+      case 0: return (
+        <div>
+          <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Business name</label>
+          <input autoFocus style={RC_INPUT} className="rc-input" placeholder="e.g. Smith Electrical" value={data.bizName} onChange={e=>set("bizName",e.target.value)} onKeyDown={e=>e.key==="Enter"&&canNext()&&go(1)} />
+          <p style={{ fontSize:12,color:"#383838",marginTop:10,lineHeight:1.6 }}>This appears at the start of every SMS you send to customers.</p>
+        </div>
+      );
+      case 1: return (
+        <div>
+          <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Google Review URL</label>
+          <input autoFocus style={RC_INPUT} className="rc-input" placeholder="https://g.page/r/your-business/review" value={data.googleLink} onChange={e=>set("googleLink",e.target.value)} />
+          <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.06)",borderRadius:10,padding:"14px 16px",marginTop:14 }}>
+            <div style={{ fontSize:11,fontWeight:700,color:"#383838",letterSpacing:1,textTransform:"uppercase",fontFamily:"var(--mono)",marginBottom:8 }}>How to find your link</div>
+            <ol style={{ fontSize:13,color:"#555",lineHeight:1.9,paddingLeft:18,margin:0 }}>
+              <li>Search your business on Google</li>
+              <li>Click <strong style={{ color:"#666" }}>"Ask for reviews"</strong> on your Business Profile</li>
+              <li>Copy the link and paste it above</li>
+            </ol>
+          </div>
+        </div>
+      );
+      case 2: return (
+        <div>
+          <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:12,padding:"20px 18px",marginBottom:16 }}>
+            <div style={{ fontSize:10,color:"#383838",fontFamily:"var(--mono)",letterSpacing:1,textTransform:"uppercase",marginBottom:12 }}>SMS your customers will receive</div>
+            <div style={{ background:"#080808",borderRadius:10,padding:"14px 16px",fontSize:14,color:"#bbb",lineHeight:1.8 }}>
+              Hi! Thanks for choosing <strong style={{ color:"#fff" }}>{data.bizName||"Your Business"}</strong>. If you have a moment, we'd love a Google review — it really helps! <span style={{ color:"#22c55e" }}>{data.googleLink||"your-review-link"}</span>
+            </div>
+            <div style={{ fontSize:11,color:"#2a2a2a",marginTop:10,display:"flex",justifyContent:"space-between",fontFamily:"var(--mono)" }}>
+              <span>From: AU mobile number</span>
+              <span style={{ color:"rgba(34,197,94,0.4)" }}>✓ Under 160 chars</span>
+            </div>
+          </div>
+          <p style={{ fontSize:13,color:"#555",lineHeight:1.75 }}>This is exactly what your customers receive. You can customise the message in Settings on Growth and Crew plans.</p>
+        </div>
+      );
+      default: return null;
+    }
+  };
+
+  return (
+    <div style={{ minHeight:"100vh",background:"#080808",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,position:"relative",overflow:"hidden" }}>
+      <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
+      <div style={{ position:"fixed",top:0,left:0,right:0,height:2,background:"rgba(255,255,255,0.05)",zIndex:100 }}>
+        <div style={{ height:"100%",width:`${((step+1)/3)*100}%`,background:"#22c55e",transition:"width 0.4s cubic-bezier(0.22,1,0.36,1)" }} />
+      </div>
+      <div style={{ position:"relative",zIndex:1,width:"100%",maxWidth:520,animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
+        <div style={{ display:"flex",gap:6,marginBottom:28 }}>
+          {stepLabels.map((l,i) => (
+            <div key={l} style={{ fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:999,background:i<step?"rgba(34,197,94,0.1)":i===step?"#22c55e":"rgba(255,255,255,0.04)",color:i<step?"#22c55e":i===step?"#000":"#333",border:`1px solid ${i<step?"rgba(34,197,94,0.25)":i===step?"transparent":"rgba(255,255,255,0.06)"}`,transition:"all 0.3s" }}>{l}</div>
+          ))}
+        </div>
+        <div style={{ opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(14px)",transition:"all 0.25s cubic-bezier(0.22,1,0.36,1)",marginBottom:24 }}>
+          <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2px",textTransform:"uppercase",color:"#444",fontFamily:"var(--mono)",marginBottom:8 }}>{subheadings[step]}</p>
+          <h1 style={{ fontSize:isMobile?"clamp(22px,6vw,30px)":"clamp(24px,3vw,34px)",fontWeight:800,letterSpacing:"-1.2px",color:"#fff",marginBottom:20 }}>{headings[step]}</h1>
+          {stepContent()}
+        </div>
+        <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:24,paddingTop:20,borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+          <button onClick={()=>step===0?null:go(-1)} style={{ padding:"11px 20px",fontSize:13,fontWeight:600,borderRadius:8,background:"transparent",color:"#555",border:"1px solid rgba(255,255,255,0.08)",opacity:step===0?0.2:1,cursor:step===0?"default":"pointer" }}>← Back</button>
+          <span style={{ fontSize:11,color:"#333",fontFamily:"var(--mono)" }}>{step+1} / 3</span>
+          {step<2 ? (
+            <button onClick={()=>canNext()&&go(1)} disabled={!canNext()} style={{ padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:canNext()?"#fff":"rgba(255,255,255,0.08)",color:canNext()?"#000":"#333",border:"none",cursor:canNext()?"pointer":"default" }}>Next →</button>
+          ) : (
+            <button onClick={handleFinish} disabled={saving} style={{ padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:"#22c55e",color:"#000",border:"none",display:"flex",alignItems:"center",gap:8 }}>
+              {saving ? <><Spinner size={13} dark />Saving…</> : "Go to Dashboard →"}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── Paywall Screen ────────────────────────────────────────────────
+const RCPaywallScreen = ({ isMobile, profile, onClose }) => {
+  const [loadingPlan, setLoadingPlan] = useState(null);
+  const trialExpired = isTrialExpired(profile);
+
+  const handleUpgrade = async (planId) => {
+    if (planId === "trial") return;
+    setLoadingPlan(planId);
+    try {
+      const { data:{ session } } = await supabase.auth.getSession();
+      await startStripeCheckout(STRIPE_PRICES[planId], session.user.email, session.user.id);
+    } catch(e) { console.error(e); setLoadingPlan(null); }
+  };
+
+  const paidPlans = PLANS_DATA.filter(p => p.id !== "trial");
+
+  return (
+    <div style={{ position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,0,0.8)",backdropFilter:"blur(10px)",display:"flex",alignItems:"center",justifyContent:"center",padding:isMobile?16:24 }}>
+      <div style={{ background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:20,padding:isMobile?"24px 20px":"36px 32px",maxWidth:740,width:"100%",maxHeight:"90vh",overflowY:"auto",position:"relative",boxShadow:"0 40px 100px rgba(0,0,0,0.8)",animation:"rc-fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both" }}>
+        <div style={{ position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:120,height:2,background:"linear-gradient(90deg,transparent,rgba(34,197,94,0.6),transparent)",borderRadius:999 }} />
+        {!trialExpired && <button onClick={onClose} style={{ position:"absolute",top:16,right:16,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:"50%",width:28,height:28,color:"#555",fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center" }}>✕</button>}
+        <div style={{ textAlign:"center",marginBottom:28 }}>
+          <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:999,padding:"4px 14px",fontSize:12,fontWeight:600,color:"#22c55e",marginBottom:16,fontFamily:"var(--mono)" }}>
+            <span className="rc-badge-dot" style={{ width:6,height:6 }} /> {trialExpired?"Trial Expired":"Upgrade ReviewChaser"}
+          </div>
+          <h2 style={{ fontSize:isMobile?"clamp(22px,6vw,28px)":"clamp(24px,3vw,32px)",fontWeight:800,letterSpacing:"-1.5px",color:"#fff",marginBottom:10 }}>
+            {trialExpired ? "Your 7-day trial has ended." : "You've hit your send limit."}
+          </h2>
+          <p style={{ fontSize:14,color:"#555",lineHeight:1.7 }}>
+            {trialExpired ? "Upgrade to keep sending review requests and growing your reputation." : "Upgrade to unlock more sends and keep your reviews rolling in."}
+          </p>
+        </div>
+        <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:10,marginBottom:20 }}>
+          {paidPlans.map(p => <RCPlanCard key={p.id} plan={p} onSelect={handleUpgrade} loading={loadingPlan} />)}
+        </div>
+        <div style={{ display:"flex",justifyContent:"center",gap:24,flexWrap:"wrap" }}>
+          {["Cancel any time","Instant access","Billed via Stripe"].map(t => (
+            <div key={t} style={{ display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#333" }}>
+              <span style={{ color:"#22c55e",fontSize:10 }}>✓</span> {t}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── Dashboard App ─────────────────────────────────────────────────
+const RCDashboardApp = ({ isMobile, profile:initialProfile, userId, onSignOut }) => {
+  const [profile, setProfile] = useState(initialProfile);
+  const [tab, setTab] = useState("send");
+  const [mobile, setMobile] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [sendErr, setSendErr] = useState("");
+  const [history, setHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [sendsUsed, setSendsUsed] = useState(0);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsData, setSettingsData] = useState({ bizName:initialProfile?.biz_name??"", googleLink:initialProfile?.google_link??"" });
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [settingsSaved, setSettingsSaved] = useState(false);
+
+  const plan = profile?.plan ?? "trial";
+  const sendLimit = getSendLimit(plan);
+  const trialExpired = isTrialExpired(profile);
+  const pct = Math.min(100, Math.round((sendsUsed/sendLimit)*100));
+  const atLimit = sendsUsed >= sendLimit;
+
+  useEffect(() => {
+    getRCSendsThisMonth(userId).then(setSendsUsed);
+  }, [userId, sent]);
+
+  const loadHistory = useCallback(async () => {
+    setHistoryLoading(true);
+    setHistory(await getRCSendHistory(userId));
+    setHistoryLoading(false);
+  }, [userId]);
+
+  useEffect(() => { if(tab==="history") loadHistory(); }, [tab, loadHistory]);
+  useEffect(() => { if(trialExpired||atLimit) setShowPaywall(true); }, [trialExpired, atLimit]);
+
+  const handleSend = async () => {
+    const clean = mobile.replace(/\s/g,"").replace(/^0/,"+61");
+    if(clean.length<10) return;
+    if(atLimit||trialExpired) { setShowPaywall(true); return; }
+    if(!profile?.biz_name||!profile?.google_link) { setSendErr("Please complete your profile in Settings first."); return; }
+    setSending(true); setSendErr("");
+    try {
+      const { ok, messageId } = await sendReviewSMS(mobile, profile.biz_name, profile.google_link);
+      if(!ok) throw new Error("SMS failed");
+      await logRCSend(userId, mobile, messageId);
+      setSent(true); setMobile("");
+      setTimeout(()=>setSent(false), 4000);
+    } catch(e) { setSendErr("Failed to send SMS. Check your mobile number and try again."); }
+    finally { setSending(false); }
+  };
+
+  const handleSaveSettings = async () => {
+    setSettingsSaving(true);
+    await supabase.from("rc_profiles").update({ biz_name:settingsData.bizName.trim(), google_link:settingsData.googleLink.trim() }).eq("id", userId);
+    setProfile(p=>({ ...p, biz_name:settingsData.bizName.trim(), google_link:settingsData.googleLink.trim() }));
+    setSettingsSaving(false); setSettingsSaved(true);
+    setTimeout(()=>setSettingsSaved(false), 2500);
+  };
+
+  const formatDate = iso => {
+    const d = new Date(iso); const now = new Date(); const diff = (now-d)/1000;
+    if(diff<60) return "Just now";
+    if(diff<3600) return `${Math.floor(diff/60)}m ago`;
+    if(diff<86400) return `${Math.floor(diff/3600)}h ago`;
+    return d.toLocaleDateString("en-AU",{ day:"numeric",month:"short" });
+  };
+
+  const planConfig = PLAN_CONFIG[plan] ?? PLAN_CONFIG.trial;
+
+  return (
+    <>
+      {(showPaywall||trialExpired) && <RCPaywallScreen isMobile={isMobile} profile={profile} onClose={()=>!trialExpired&&setShowPaywall(false)} />}
+      <div style={{ minHeight:"100vh",background:"#060606" }}>
+        <div style={{ position:"fixed",top:0,left:0,right:0,zIndex:100,height:58,background:"rgba(8,8,8,0.96)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(255,255,255,0.07)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"0 16px":"0 28px" }}>
+          <div style={{ display:"flex",alignItems:"center",gap:10 }}>
+            <div style={{ fontSize:15,fontWeight:800,letterSpacing:"-0.5px",color:"#fff" }}>ReviewChaser</div>
+            <div style={{ fontSize:10,fontWeight:700,color:planConfig.color,background:`${planConfig.color}18`,border:`1px solid ${planConfig.color}38`,borderRadius:999,padding:"2px 8px",fontFamily:"var(--mono)" }}>{planConfig.label.toUpperCase()}</div>
+          </div>
+          <div style={{ display:"flex",alignItems:"center",gap:10 }}>
+            {plan==="trial" && <button onClick={()=>setShowPaywall(true)} style={{ padding:isMobile?"6px 12px":"7px 16px",background:"#22c55e",color:"#000",border:"none",borderRadius:7,fontSize:isMobile?11:12.5,fontWeight:700,cursor:"pointer" }}>Upgrade</button>}
+            <div style={{ fontSize:12,color:"#333",fontFamily:"var(--mono)",display:isMobile?"none":"block" }}>{sendsUsed}/{sendLimit}</div>
+            <button onClick={()=>setShowSettings(s=>!s)} style={{ width:32,height:32,borderRadius:"50%",background:"linear-gradient(135deg,#22c55e,#16a34a)",border:"none",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#000",cursor:"pointer" }}>
+              {(profile?.biz_name||"R")[0].toUpperCase()}
+            </button>
+          </div>
+        </div>
+        <div style={{ maxWidth:900,margin:"0 auto",padding:`${isMobile?0:36}px ${isMobile?0:36}px`,paddingTop:isMobile?72:90 }}>
+          <div style={{ padding:isMobile?"0 16px":0 }}>
+            {showSettings && (
+              <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:isMobile?20:28,marginBottom:16,animation:"rc-fadeIn 0.25s both" }}>
+                <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20 }}>
+                  <h3 style={{ fontSize:16,fontWeight:700,color:"#ccc",letterSpacing:"-0.4px" }}>Account Settings</h3>
+                  <button onClick={()=>setShowSettings(false)} style={{ background:"none",border:"none",color:"#444",fontSize:18,cursor:"pointer" }}>✕</button>
+                </div>
+                <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
+                  <div>
+                    <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Business name</label>
+                    <input className="rc-input" style={RC_INPUT} value={settingsData.bizName} onChange={e=>setSettingsData(d=>({...d,bizName:e.target.value}))} placeholder="Smith Electrical" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Google Review link</label>
+                    <input className="rc-input" style={RC_INPUT} value={settingsData.googleLink} onChange={e=>setSettingsData(d=>({...d,googleLink:e.target.value}))} placeholder="https://g.page/r/..." />
+                  </div>
+                  {(plan==="growth"||plan==="crew") ? (
+                    <div>
+                      <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Custom SMS message <span style={{ color:"#22c55e" }}>✦</span></label>
+                      <textarea className="rc-input" style={{ ...RC_INPUT,minHeight:90,resize:"vertical" }} placeholder={`Hi! Thanks for choosing ${settingsData.bizName||"Your Business"}. We'd love a Google review! ${settingsData.googleLink||"your-link"}`} />
+                      <p style={{ fontSize:11.5,color:"#383838",marginTop:6 }}>Keep under 160 characters to avoid double billing.</p>
+                    </div>
+                  ) : (
+                    <div style={{ background:"rgba(245,158,11,0.04)",border:"1px solid rgba(245,158,11,0.15)",borderRadius:9,padding:"12px 14px",display:"flex",alignItems:"center",gap:8 }}>
+                      <span style={{ fontSize:14 }}>🔒</span>
+                      <p style={{ fontSize:12.5,color:"#555",margin:0 }}>Custom SMS message is available on <strong style={{ color:"#f59e0b" }}>Growth & Crew</strong> plans. <button onClick={()=>{setShowSettings(false);setShowPaywall(true);}} style={{ background:"none",border:"none",color:"#f59e0b",fontWeight:700,fontSize:12.5,cursor:"pointer",padding:0 }}>Upgrade →</button></p>
+                    </div>
+                  )}
+                  <div style={{ display:"flex",gap:10,flexWrap:"wrap" }}>
+                    <button onClick={handleSaveSettings} disabled={settingsSaving} style={{ flex:1,minWidth:140,padding:"11px 20px",background:settingsSaved?"rgba(34,197,94,0.15)":settingsSaving?"rgba(255,255,255,0.5)":"#fff",color:settingsSaved?"#22c55e":settingsSaving?"#aaa":"#000",border:settingsSaved?"1px solid rgba(34,197,94,0.3)":"none",borderRadius:9,fontSize:13,fontWeight:700,cursor:settingsSaving?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8 }}>
+                      {settingsSaving ? <><Spinner size={13} dark />Saving…</> : settingsSaved ? "✓ Saved!" : "Save changes"}
+                    </button>
+                    <button onClick={onSignOut} style={{ padding:"11px 18px",background:"transparent",border:"1px solid rgba(255,255,255,0.08)",color:"#555",borderRadius:9,fontSize:13,fontWeight:600,cursor:"pointer" }}>Sign out</button>
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* Stats */}
+            <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr 1fr":"repeat(3,1fr)",gap:10,marginBottom:16 }}>
+              {[{label:"Sent this month",val:sendsUsed,green:false},{label:"Remaining",val:Math.max(0,sendLimit-sendsUsed),green:true},{label:"Monthly cap",val:sendLimit,green:false}].map(({label,val,green}) => (
+                <div key={label} style={{ background:green?"rgba(34,197,94,0.04)":"rgba(255,255,255,0.025)",border:`1px solid ${green?"rgba(34,197,94,0.18)":"rgba(255,255,255,0.06)"}`,borderRadius:12,padding:isMobile?"12px 14px":"18px 20px" }}>
+                  <div style={{ fontSize:9.5,color:"#383838",fontFamily:"var(--mono)",letterSpacing:"1.2px",textTransform:"uppercase",marginBottom:6,fontWeight:600 }}>{label}</div>
+                  <div style={{ fontSize:isMobile?22:28,fontWeight:800,letterSpacing:"-1px",color:green?"#22c55e":"#fff",lineHeight:1 }}>{val}</div>
+                </div>
+              ))}
+            </div>
+            {/* Progress */}
+            <div style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.06)",borderRadius:10,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12 }}>
+              <div style={{ flex:1,height:5,background:"rgba(255,255,255,0.05)",borderRadius:999,overflow:"hidden" }}>
+                <div style={{ width:`${pct}%`,height:"100%",background:pct>=90?"#ef4444":pct>=75?"#f59e0b":"#22c55e",borderRadius:999,transition:"width 0.5s" }} />
+              </div>
+              <div style={{ fontSize:12,color:pct>=90?"#f87171":pct>=75?"#f59e0b":"#444",fontFamily:"var(--mono)",flexShrink:0 }}>{pct}% used</div>
+              {pct>=80 && <button onClick={()=>setShowPaywall(true)} style={{ fontSize:11,fontWeight:700,color:"#f59e0b",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:999,padding:"3px 9px",cursor:"pointer",flexShrink:0 }}>Upgrade</button>}
+            </div>
+            {plan==="trial"&&!trialExpired && (
+              <div style={{ background:"rgba(245,158,11,0.04)",border:"1px solid rgba(245,158,11,0.18)",borderRadius:10,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12 }}>
+                <div style={{ fontSize:13,color:"#858585" }}>⚡ <strong style={{ color:"#f59e0b" }}>Free trial</strong> — 7 days, 20 sends. Keep your reviews coming after trial.</div>
+                <button onClick={()=>setShowPaywall(true)} style={{ padding:"7px 14px",background:"transparent",color:"#f59e0b",border:"1px solid rgba(245,158,11,0.3)",borderRadius:7,fontSize:12,fontWeight:700,cursor:"pointer",flexShrink:0,whiteSpace:"nowrap" }}>Upgrade →</button>
+              </div>
+            )}
+            {/* Tabs */}
+            <div style={{ display:"flex",background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:10,padding:4,marginBottom:16,gap:4 }}>
+              {[["send","Send Request"],["history","Send History"]].map(([id,label]) => (
+                <button key={id} onClick={()=>setTab(id)} style={{ flex:1,padding:"10px 16px",borderRadius:8,background:tab===id?"rgba(255,255,255,0.07)":"transparent",color:tab===id?"#fff":"#444",fontSize:13,fontWeight:600,border:"none",transition:"all 0.2s" }}>{label}</button>
+              ))}
+            </div>
+            {/* Send Tab */}
+            {tab==="send" && (
+              <div style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,padding:isMobile?20:32,animation:"rc-fadeIn 0.3s both" }}>
+                <h2 style={{ fontSize:isMobile?20:24,fontWeight:800,letterSpacing:"-1px",color:"#fff",marginBottom:6 }}>Send a review request</h2>
+                <p style={{ fontSize:13.5,color:"#555",marginBottom:24 }}>Enter your customer's mobile. They'll get a friendly SMS with your Google Review link.</p>
+                {!sent ? (
+                  <>
+                    <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:10 }}>Customer mobile number</label>
+                    <input value={mobile} onChange={e=>{setMobile(e.target.value);setSendErr("");}} placeholder="04XX XXX XXX" maxLength={13} className="rc-input" style={{ ...RC_INPUT,fontSize:18,letterSpacing:"1px",marginBottom:12 }} onKeyDown={e=>e.key==="Enter"&&handleSend()} disabled={atLimit||trialExpired} />
+                    {mobile.length>3 && (
+                      <div style={{ background:"#080808",border:"1px solid rgba(255,255,255,0.05)",borderRadius:10,padding:"14px 16px",marginBottom:14,animation:"rc-fadeIn 0.3s both" }}>
+                        <div style={{ fontSize:10,color:"#2a2a2a",fontFamily:"var(--mono)",letterSpacing:1,textTransform:"uppercase",marginBottom:8 }}>What {mobile} will receive</div>
+                        <div style={{ fontSize:14,color:"#bbb",lineHeight:1.8 }}>Hi! Thanks for choosing <strong style={{ color:"#ddd" }}>{profile?.biz_name||"Your Business"}</strong>. If you have a moment, we'd love a Google review — it really helps! <span style={{ color:"#22c55e" }}>{profile?.google_link||"your-link"}</span></div>
+                        <div style={{ fontSize:11,color:"#2a2a2a",marginTop:8,display:"flex",justifyContent:"space-between",fontFamily:"var(--mono)" }}><span>From: AU mobile number</span><span style={{ color:"rgba(34,197,94,0.4)" }}>✓ Under 160 chars</span></div>
+                      </div>
+                    )}
+                    {sendErr && <p style={{ fontSize:13,color:"#f87171",marginBottom:12 }}>{sendErr}</p>}
+                    <button onClick={handleSend} disabled={mobile.replace(/\s/g,"").length<10||sending||atLimit||trialExpired} style={{ width:"100%",padding:"15px 20px",background:atLimit||trialExpired?"rgba(255,255,255,0.04)":mobile.replace(/\s/g,"").length>=10?"#22c55e":"rgba(34,197,94,0.08)",color:atLimit||trialExpired?"#333":mobile.replace(/\s/g,"").length>=10?"#000":"#1a4a2e",border:"none",borderRadius:12,fontSize:15,fontWeight:700,transition:"all 0.2s",display:"flex",alignItems:"center",justifyContent:"center",gap:10 }}>
+                      {sending ? <><Spinner size={16} dark />Sending SMS…</> : atLimit||trialExpired ? "🔒 Upgrade to Send" : "Send Review Request ✦"}
+                    </button>
+                  </>
+                ) : (
+                  <div style={{ textAlign:"center",padding:"32px 0",animation:"rc-fadeIn 0.4s both" }}>
+                    <div style={{ fontSize:52,marginBottom:14 }}>🌟</div>
+                    <div style={{ fontSize:22,fontWeight:800,letterSpacing:"-0.8px",color:"#fff",marginBottom:8 }}>Request sent!</div>
+                    <div style={{ fontSize:14,color:"#555",marginBottom:18 }}>Your customer will receive the SMS shortly.</div>
+                    <div style={{ display:"inline-flex",alignItems:"center",gap:6,background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:999,padding:"5px 14px",fontSize:12,fontWeight:600,color:"#22c55e" }}>
+                      <span className="rc-badge-dot" style={{ width:6,height:6 }} /> Delivered to AU network
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            {/* History Tab */}
+            {tab==="history" && (
+              <div style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,overflow:"hidden",animation:"rc-fadeIn 0.3s both" }}>
+                <div style={{ padding:"16px 24px",borderBottom:"1px solid rgba(255,255,255,0.05)",display:"flex",alignItems:"center",justifyContent:"space-between" }}>
+                  <div style={{ fontSize:14,fontWeight:700,color:"#777" }}>Send history</div>
+                  {historyLoading ? <Spinner size={14} /> : <div style={{ fontSize:12,color:"#333",fontFamily:"var(--mono)" }}>{history.length} records</div>}
+                </div>
+                {historyLoading ? (
+                  <div style={{ padding:"40px 24px",display:"flex",justifyContent:"center" }}><Spinner /></div>
+                ) : history.length===0 ? (
+                  <div style={{ padding:"40px 24px",textAlign:"center",color:"#333",fontSize:14 }}>No sends yet. Send your first review request!</div>
+                ) : history.map((row,i) => (
+                  <div key={row.id} className="rc-hover-row" style={{ display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"12px 16px":"14px 24px",borderBottom:i<history.length-1?"1px solid rgba(255,255,255,0.04)":"none",background:"transparent",transition:"background 0.15s" }}>
+                    <div style={{ display:"flex",alignItems:"center",gap:10 }}>
+                      <div style={{ width:7,height:7,borderRadius:"50%",background:"#22c55e",flexShrink:0 }} />
+                      <div>
+                        <div style={{ fontSize:14,fontWeight:600,color:"#aaa",fontFamily:"var(--mono)" }}>{row.mobile}</div>
+                        <div style={{ fontSize:11,color:"#2a2a2a" }}>{formatDate(row.sent_at)}</div>
+                      </div>
+                    </div>
+                    <div style={{ display:"inline-flex",alignItems:"center",gap:5,background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:999,padding:"3px 9px" }}>
+                      <span style={{ fontSize:10,fontWeight:700,color:"#22c55e" }}>Sent</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+// ── ReviewChaserPage (root) ───────────────────────────────────────
+function ReviewChaserPage({ setPage, user, setUser }) {
+  const isMobile = useIsMobile();
+  const [view, setView] = useState("loading");
+  const [rcProfile, setRcProfile] = useState(null);
+  const [rcUserId, setRcUserId] = useState(null);
+
+  useEffect(() => {
+    const init = async () => {
+      const { data:{ session } } = await supabase.auth.getSession();
+      if (!session) { setView("marketing"); return; }
+      const uid = session.user.id;
+      setRcUserId(uid);
+      const profile = await getOrCreateRCProfile(uid, session.user.email);
+      setRcProfile(profile);
+      setView(profile.biz_name ? "dashboard" : "onboarding");
+    };
+    init();
+
+    const { data:{ subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event==="SIGNED_IN"&&session) {
+        const uid = session.user.id;
+        setRcUserId(uid);
+        const profile = await getOrCreateRCProfile(uid, session.user.email);
+        setRcProfile(profile);
+        setView(profile.biz_name ? "dashboard" : "onboarding");
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+      if (event==="SIGNED_OUT") { setRcProfile(null); setRcUserId(null); setView("marketing"); }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("rc_session")==="success") {
+      window.history.replaceState({}, "", window.location.pathname);
+      setTimeout(async () => {
+        const { data:{ session } } = await supabase.auth.getSession();
+        if (session) {
+          const profile = await getOrCreateRCProfile(session.user.id, session.user.email);
+          setRcProfile(profile);
+          setView("dashboard");
+        }
+      }, 1500);
+    }
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => { await supabase.auth.signOut(); setView("marketing"); };
+
+  const MarketingNav = () => (
+    <nav style={{ position:"fixed",top:0,left:0,right:0,zIndex:200,height:62,background:"rgba(8,8,8,0.92)",backdropFilter:"blur(20px) saturate(1.4)",borderBottom:"1px solid rgba(255,255,255,0.07)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"0 18px":"0 48px" }}>
+      <div style={{ display:"flex",alignItems:"center",gap:10 }}>
+        <button onClick={()=>setView("marketing")} style={{ background:"none",border:"none",fontSize:16,fontWeight:800,letterSpacing:"-0.5px",color:"#fff",cursor:"pointer" }}>ReviewChaser</button>
+        <span style={{ fontSize:11,color:"#333",fontFamily:"var(--mono)" }}>by Almondy</span>
+      </div>
+      <div style={{ display:"flex",alignItems:"center",gap:12 }}>
+        {!isMobile && (
+          <>
+            <a href="#rc-how" style={{ fontSize:13,color:"#555",fontWeight:500,textDecoration:"none" }}>How it works</a>
+            <a href="#rc-pricing" style={{ fontSize:13,color:"#555",fontWeight:500,textDecoration:"none" }}>Pricing</a>
+          </>
+        )}
+        <button onClick={()=>setView("auth")} style={{ background:"transparent",color:"#666",border:"1px solid rgba(255,255,255,0.12)",padding:"8px 16px",fontSize:13,fontWeight:600,borderRadius:7,cursor:"pointer" }}>Sign In</button>
+        <button onClick={()=>setView("auth")} style={{ background:"#fff",color:"#000",padding:"8px 18px",fontSize:13,fontWeight:700,borderRadius:7,border:"none",cursor:"pointer" }}>Get Started →</button>
+      </div>
+    </nav>
+  );
+
+  if (view==="loading") return (
+    <>
+      <RCStyles />
+      <div style={{ minHeight:"100vh",background:"#080808",display:"flex",alignItems:"center",justifyContent:"center" }}><Spinner size={28} /></div>
+    </>
+  );
+
+  return (
+    <>
+      <RCStyles />
+      {view==="marketing" && <div style={{ paddingTop:62 }}><MarketingNav /><RCMarketingPage isMobile={isMobile} onStartTrial={()=>setView("auth")} onSignIn={()=>setView("auth")} /></div>}
+      {view==="auth" && <RCAuthScreen isMobile={isMobile} onBack={()=>setView("marketing")} />}
+      {view==="onboarding"&&rcUserId && <RCOnboardingWizard isMobile={isMobile} userId={rcUserId} email={rcProfile?.email??""} onComplete={profile=>{ setRcProfile(p=>({...p,...profile})); setView("dashboard"); }} />}
+      {view==="dashboard"&&rcUserId&&rcProfile && <RCDashboardApp isMobile={isMobile} profile={rcProfile} userId={rcUserId} onSignOut={handleSignOut} />}
+    </>
+  );
+}
 
 /* ════════════════════════════════════════════
    ROOT APP
