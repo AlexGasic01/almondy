@@ -2277,7 +2277,7 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
 };
 
 // ── Paywall Screen ────────────────────────────────────────────────
-const RCPaywallScreen = ({ isMobile, profile, onClose }) => {
+const RCPaywallScreen = ({ isMobile, profile, onClose, onBack }) => {
   const [loadingPlan, setLoadingPlan] = useState(null);
   const trialExpired = isTrialExpired(profile);
 
@@ -2296,6 +2296,7 @@ const RCPaywallScreen = ({ isMobile, profile, onClose }) => {
     <div style={{ position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,0,0.8)",backdropFilter:"blur(10px)",display:"flex",alignItems:isMobile?"flex-start":"center",justifyContent:"center",padding:isMobile?"72px 16px 24px":24,overflowY:"auto" }}>
       <div style={{ background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:20,padding:isMobile?"24px 20px":"36px 32px",maxWidth:740,width:"100%",maxHeight:"90vh",overflowY:"auto",position:"relative",boxShadow:"0 40px 100px rgba(0,0,0,0.8)",animation:"rc-fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:120,height:2,background:"linear-gradient(90deg,transparent,rgba(34,197,94,0.6),transparent)",borderRadius:999 }} />
+        {onBack && <button onClick={onBack} style={{ position:"absolute",top:16,left:16,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5 }}>← Back</button>}
         <div style={{ textAlign:"center",marginBottom:28 }}>
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:999,padding:"4px 14px",fontSize:12,fontWeight:600,color:"#22c55e",marginBottom:16,fontFamily:"var(--mono)" }}>
             <span className="rc-badge-dot" style={{ width:6,height:6 }} /> {trialExpired?"Trial Expired":"Upgrade ReviewChaser"}
@@ -2817,7 +2818,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
       {view==="marketing" && <div style={{ paddingTop:62 }}><RCMarketingPage isMobile={isMobile} onStartTrial={()=>setView("auth")} onSignIn={()=>setView("auth")} setPage={setPage} /></div>}
       {view==="auth" && <RCAuthScreen isMobile={isMobile} onBack={()=>setView("marketing")} />}
       {view==="onboarding"&&rcUserId && <RCOnboardingWizard isMobile={isMobile} userId={rcUserId} email={rcProfile?.email??""} onComplete={(profile, forcePaywall)=>{ setRcProfile(p=>({...p,...profile})); setView("paywall"); }} />}
-      {view==="paywall"&&rcUserId&&rcProfile && <RCPaywallScreen isMobile={isMobile} profile={rcProfile} onClose={null} />}
+      {view==="paywall"&&rcUserId&&rcProfile && <RCPaywallScreen isMobile={isMobile} profile={rcProfile} onClose={null} onBack={() => setView("marketing")} />}
       {view==="dashboard"&&rcUserId&&rcProfile && <RCDashboardApp isMobile={isMobile} profile={rcProfile} userId={rcUserId} onSignOut={handleSignOut} />}
     </>
   );
