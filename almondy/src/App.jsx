@@ -1768,7 +1768,7 @@ function isTrialExpired(profile) {
   if (profile?.plan === "expired") return true;
   if (profile?.plan !== "trial") return false;
   if (!profile?.trial_started_at) return false;
-  return (new Date() - new Date(profile.trial_started_at)) / (1000*60*60*24) >= 6;
+  return (new Date() - new Date(profile.trial_started_at)) / (1000*60*60*24) >= 7;
 }
 
 function getSendLimit(plan) { return PLAN_CONFIG[plan]?.sends ?? 20; }
