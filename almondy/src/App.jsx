@@ -2293,7 +2293,7 @@ const RCPaywallScreen = ({ isMobile, profile, onClose }) => {
   const paidPlans = PLANS_DATA.filter(p => p.id !== "trial");
 
   return (
-    <div style={{ position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,0,0.8)",backdropFilter:"blur(10px)",display:"flex",alignItems:"center",justifyContent:"center",padding:isMobile?16:24 }}>
+    <div style={{ position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,0,0.8)",backdropFilter:"blur(10px)",display:"flex",alignItems:isMobile?"flex-start":"center",justifyContent:"center",padding:isMobile?"72px 16px 24px":24,overflowY:"auto" }}>
       <div style={{ background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:20,padding:isMobile?"24px 20px":"36px 32px",maxWidth:740,width:"100%",maxHeight:"90vh",overflowY:"auto",position:"relative",boxShadow:"0 40px 100px rgba(0,0,0,0.8)",animation:"rc-fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:120,height:2,background:"linear-gradient(90deg,transparent,rgba(34,197,94,0.6),transparent)",borderRadius:999 }} />
         <div style={{ textAlign:"center",marginBottom:28 }}>
