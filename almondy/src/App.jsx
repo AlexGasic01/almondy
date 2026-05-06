@@ -1846,7 +1846,7 @@ const RCPlanCard = ({ plan, onSelect, loading }) => {
 };
 
 // ── Marketing Page ────────────────────────────────────────────────
-const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn }) => {
+const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
   const [openFaq, setOpenFaq] = useState(null);
   const [activeStep, setActiveStep] = useState(0);
   const [loadingPlan, setLoadingPlan] = useState(null);
@@ -2044,6 +2044,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn }) => {
         <p style={{ fontSize:isMobile?14:15, color:"#444", marginBottom:28 }}>7 days free · 20 sends · No card required</p>
         <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#fff", color:"#000", padding:"14px 28px", fontSize:15, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial →</button>
       </div>
+     <Footer setPage={setPage} />
     </div>
   );
 };
@@ -2515,24 +2516,6 @@ function ReviewChaserPage({ setPage, user, setUser }) {
 
   const handleSignOut = async () => { await supabase.auth.signOut(); setView("marketing"); };
 
-  const MarketingNav = () => (
-    <nav style={{ position:"fixed",top:0,left:0,right:0,zIndex:200,height:62,background:"rgba(8,8,8,0.92)",backdropFilter:"blur(20px) saturate(1.4)",borderBottom:"1px solid rgba(255,255,255,0.07)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"0 18px":"0 48px" }}>
-      <div style={{ display:"flex",alignItems:"center",gap:10 }}>
-        <button onClick={()=>setView("marketing")} style={{ background:"none",border:"none",fontSize:16,fontWeight:800,letterSpacing:"-0.5px",color:"#fff",cursor:"pointer" }}>ReviewChaser</button>
-        <span style={{ fontSize:11,color:"#333",fontFamily:"var(--mono)" }}>by Almondy</span>
-      </div>
-      <div style={{ display:"flex",alignItems:"center",gap:12 }}>
-        {!isMobile && (
-          <>
-            <a href="#rc-how" style={{ fontSize:13,color:"#555",fontWeight:500,textDecoration:"none" }}>How it works</a>
-            <a href="#rc-pricing" style={{ fontSize:13,color:"#555",fontWeight:500,textDecoration:"none" }}>Pricing</a>
-          </>
-        )}
-        <button onClick={()=>setView("auth")} style={{ background:"transparent",color:"#666",border:"1px solid rgba(255,255,255,0.12)",padding:"8px 16px",fontSize:13,fontWeight:600,borderRadius:7,cursor:"pointer" }}>Sign In</button>
-        <button onClick={()=>setView("auth")} style={{ background:"#fff",color:"#000",padding:"8px 18px",fontSize:13,fontWeight:700,borderRadius:7,border:"none",cursor:"pointer" }}>Get Started →</button>
-      </div>
-    </nav>
-  );
 
   if (view==="loading") return (
     <>
@@ -2544,7 +2527,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
   return (
     <>
       <RCStyles />
-      {view==="marketing" && <div style={{ paddingTop:62 }}><MarketingNav /><RCMarketingPage isMobile={isMobile} onStartTrial={()=>setView("auth")} onSignIn={()=>setView("auth")} /></div>}
+      {view==="marketing" && <div style={{ paddingTop:62 }}><RCMarketingPage isMobile={isMobile} onStartTrial={()=>setView("auth")} onSignIn={()=>setView("auth")} setPage={setPage} /></div>}
       {view==="auth" && <RCAuthScreen isMobile={isMobile} onBack={()=>setView("marketing")} />}
       {view==="onboarding"&&rcUserId && <RCOnboardingWizard isMobile={isMobile} userId={rcUserId} email={rcProfile?.email??""} onComplete={profile=>{ setRcProfile(p=>({...p,...profile})); setView("dashboard"); }} />}
       {view==="dashboard"&&rcUserId&&rcProfile && <RCDashboardApp isMobile={isMobile} profile={rcProfile} userId={rcUserId} onSignOut={handleSignOut} />}
@@ -2652,7 +2635,7 @@ export default function App() {
       {showMobileWarning && <MobileWarningPopup onDismiss={handleDismissWarning} />}
 
       {/* Only show global Nav when NOT in an app page AND NOT in ReviewChaser (it has its own nav) */}
-      {!isAppPage && !isReviewChaser && <Nav page={page} setPage={handleSetPage} />}
+      {!isAppPage && <Nav page={page} setPage={handleSetPage} />}
 
       {page==="home"              && <HomePage              setPage={handleSetPage} />}
       {page==="systems"           && <SystemsPage           setPage={handleSetPage} />}
@@ -2662,8 +2645,6 @@ export default function App() {
       {page==="testimonials"      && <TestimonialsPage      setPage={handleSetPage} />}
       {page==="pricing"           && <PricingPage           setPage={handleSetPage} />}
       {page==="contact"           && <ContactPage           setPage={handleSetPage} />}
-
-      {/* ← ReviewChaser — ADDED */}
       {page==="reviewchaser"      && <ReviewChaserPage      setPage={handleSetPage} user={user} setUser={setUser} />}
 
       {page==="auth"              && <AuthPage              setPage={handleSetPage} setUser={setUser} />}
