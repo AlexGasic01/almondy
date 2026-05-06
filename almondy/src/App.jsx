@@ -1704,9 +1704,10 @@ const STRIPE_PRICES = {
 
 // ── Plan config ──────────────────────────────────────────────────
 const PLAN_CONFIG = {
-  trial:  { label:"Free Trial", sends: 20,  color:"#888" },
-  growth: { label:"Growth",     sends: 140, color:"#22c55e" },
-  crew:   { label:"Crew",       sends: 400, color:"#f59e0b" },
+  trial:   { label:"Free Trial",  sends: 20,  color:"#888" },
+  expired: { label:"Trial Ended", sends: 0,   color:"#ef4444" },
+  growth:  { label:"Growth",      sends: 140, color:"#22c55e" },
+  crew:    { label:"Crew",        sends: 400, color:"#f59e0b" },
 };
 
 const Divider = () => (
@@ -1719,9 +1720,20 @@ const Spinner = ({ size=16, dark=false }) => (
 
 // ── Supabase helpers ─────────────────────────────────────────────
 async function getOrCreateRCProfile(userId, email) {
-  const { data, error } = await supabase.from("rc_profiles").select("*").eq("id", userId).maybeSingle();
+  const { data } = await supabase.from("rc_profiles").select("*").eq("id", userId).maybeSingle();
   if (data) return data;
-  const fresh = { id:userId, email, plan:"trial", sends_used:0, trial_started_at:new Date().toISOString(), sends_reset_at:new Date().toISOString() };
+
+  // Check if this email already burned a trial on a previous account
+  const { data: prev } = await supabase.from("rc_profiles").select("id").eq("email", email).maybeSingle();
+  const trialUsed = !!prev;
+
+  const fresh = {
+    id: userId, email,
+    plan: trialUsed ? "expired" : "trial",
+    sends_used: 0,
+    trial_started_at: trialUsed ? null : new Date().toISOString(),
+    sends_reset_at: new Date().toISOString()
+  };
   await supabase.from("rc_profiles").insert(fresh);
   return fresh;
 }
@@ -1753,9 +1765,10 @@ async function startStripeCheckout(priceId, email, userId) {
 }
 
 function isTrialExpired(profile) {
+  if (profile?.plan === "expired") return true;
   if (profile?.plan !== "trial") return false;
   if (!profile?.trial_started_at) return false;
-  return (new Date() - new Date(profile.trial_started_at)) / (1000*60*60*24) > 7;
+  return (new Date() - new Date(profile.trial_started_at)) / (1000*60*60*24) >= 6;
 }
 
 function getSendLimit(plan) { return PLAN_CONFIG[plan]?.sends ?? 20; }
@@ -2493,7 +2506,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
     const profile = await getOrCreateRCProfile(uid, session.user.email);
     if (!mounted) return;
     setRcProfile(profile);
-    setView(profile.biz_name ? "dashboard" : "onboarding");
+    setView(!profile.biz_name ? "onboarding" : (profile.plan === "trial" || profile.plan === "expired") ? "paywall" : "dashboard");
   };
   init();
 
@@ -2503,7 +2516,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
       setRcUserId(uid);
       const profile = await getOrCreateRCProfile(uid, session.user.email);
       setRcProfile(profile);
-      setView(profile.biz_name ? "dashboard" : "onboarding");
+      setView(!profile.biz_name ? "onboarding" : (profile.plan === "trial" || profile.plan === "expired") ? "paywall" : "dashboard");
       window.history.replaceState({}, "", window.location.pathname);
     }
     if (event==="SIGNED_OUT") { setRcProfile(null); setRcUserId(null); setView("marketing"); }
@@ -2543,7 +2556,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
       {view==="marketing" && <div style={{ paddingTop:62 }}><RCMarketingPage isMobile={isMobile} onStartTrial={()=>setView("auth")} onSignIn={()=>setView("auth")} setPage={setPage} /></div>}
       {view==="auth" && <RCAuthScreen isMobile={isMobile} onBack={()=>setView("marketing")} />}
       {view==="onboarding"&&rcUserId && <RCOnboardingWizard isMobile={isMobile} userId={rcUserId} email={rcProfile?.email??""} onComplete={profile=>{ setRcProfile(p=>({...p,...profile})); setView("paywall"); }} />}
-      {view==="paywall"&&rcUserId&&rcProfile && <RCPaywallScreen isMobile={isMobile} profile={rcProfile} onClose={()=>setView("dashboard")} />}
+      {view==="paywall"&&rcUserId&&rcProfile && <RCPaywallScreen isMobile={isMobile} profile={rcProfile} onClose={null} />}
       {view==="dashboard"&&rcUserId&&rcProfile && <RCDashboardApp isMobile={isMobile} profile={rcProfile} userId={rcUserId} onSignOut={handleSignOut} />}
     </>
   );
