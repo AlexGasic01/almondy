@@ -1181,15 +1181,32 @@ const AuthPage = ({ setPage, setUser }) => {
   const [loading,setLoading] = useState(false);
   const [authErr,setAuthErr] = useState("");
 
-  const handleSend = async () => {
-    if (!email.includes("@")) return;
-    setLoading(true); setAuthErr("");
-    try {
-      const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo:window.location.origin } });
-      if (error) throw error;
-      setStep("sent");
-    } catch(err) { setAuthErr("Something went wrong. Please try again."); } finally { setLoading(false); }
-  };
+const handleSend = async () => {
+  if (!email.includes("@")) return;
+  setLoading(true); setErr("");
+  try {
+    const { error } = await supabase.auth.signInWithOtp({ 
+      email, 
+      options: { 
+        shouldCreateUser: true,
+        emailRedirectTo: undefined  // don't redirect anywhere
+      } 
+    });
+    if (error) throw error;
+    setSent(true);
+    // Start polling the existing tab for session
+    const poll = setInterval(async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        clearInterval(poll);
+        // onAuthStateChange in ReviewChaserPage will handle the rest
+      }
+    }, 2000);
+    // Stop polling after 10 mins
+    setTimeout(() => clearInterval(poll), 600000);
+  } catch(e) { setErr("Something went wrong. Try again."); }
+  finally { setLoading(false); }
+};
 
   return (
     <div style={{ minHeight:"100vh",background:"var(--black)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,position:"relative",overflow:"hidden" }}>
