@@ -1754,11 +1754,11 @@ async function getRCSendHistory(userId) {
 
 
 // ── Stripe Checkout ───────────────────────────────────────────────
-async function startStripeCheckout(priceId, email, userId) {
+async function startStripeCheckout(priceId, email, userId, trial = false) {
   const res = await fetch("/api/create-checkout-session", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ priceId, email, userId, successUrl:`${window.location.origin}/?rc_session=success`, cancelUrl:`${window.location.origin}/?page=reviewchaser`, metadata:{ product:"reviewchaser" } }),
+    body:JSON.stringify({ priceId, email, userId, trial, successUrl:`${window.location.origin}/?rc_session=success`, cancelUrl:`${window.location.origin}/?page=reviewchaser`, metadata:{ product:"reviewchaser" } }),
   });
   const { url } = await res.json();
   if (url) window.location.href = url;
@@ -1801,7 +1801,7 @@ const RC_INPUT = {
 // ── Plan data ─────────────────────────────────────────────────────
 const PLANS_DATA = [
   { id:"trial",  name:"Free Trial", price:"0",     priceLabel:"Free", period:"7 days, then cancel or upgrade", sends:20,  desc:"Try ReviewChaser risk-free. No credit card required to start.", cta:"Start Free Trial →", solid:false, badge:null, features:[[true,"20 review requests"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Basic send dashboard"],[false,"Send history"],[false,"Custom SMS message"],[false,"Priority support"]] },
-  { id:"growth", name:"Growth",     price:"29.99", priceLabel:"29",   period:"per month AUD",                  sends:140, desc:"For sole operators and small businesses building their reputation.", cta:"Get Growth →", solid:true, badge:"⚡ Most Popular", features:[[true,"<strong>140 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
+  { id:"growth", name:"Growth",     price:"29.99", priceLabel:"29",   period:"per month AUD",                  sends:140, desc:"For sole operators and small businesses building their reputation.", cta:"Start 7-Day Free Trial →", solid:true, badge:"⚡ Most Popular", features:[[true,"<strong>140 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
   { id:"crew",   name:"Crew",       price:"59.99", priceLabel:"59",   period:"per month AUD",                  sends:400, desc:"For multi-van operators, agencies, and businesses scaling fast.", cta:"Get Crew →", solid:false, badge:"Enterprise", features:[[true,"<strong>400 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history & exports"],[true,"Advanced analytics"],[true,"Custom SMS message"],[true,"Priority support"]] },
 ];
 
@@ -2201,7 +2201,7 @@ const RCPaywallScreen = ({ isMobile, profile, onClose }) => {
     setLoadingPlan(planId);
     try {
       const { data:{ session } } = await supabase.auth.getSession();
-      await startStripeCheckout(STRIPE_PRICES[planId], session.user.email, session.user.id);
+      await startStripeCheckout(STRIPE_PRICES[planId], session.user.email, session.user.id, planId === "growth");
     } catch(e) { console.error(e); setLoadingPlan(null); }
   };
 
