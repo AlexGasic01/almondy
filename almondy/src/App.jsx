@@ -2369,13 +2369,17 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const handleCancelPlan = async () => {
     setCancelLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("Not signed in");
-      const res = await fetch("/api/cancel-rc-subscription", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
-      });
-      if (!res.ok) throw new Error("Cancel failed");
+      if (plan === "trial") {
+        await supabase.from("rc_profiles").update({ plan: "expired" }).eq("id", userId);
+      } else {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error("Not signed in");
+        const res = await fetch("/api/cancel-rc-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
+        });
+        if (!res.ok) throw new Error("Cancel failed");
+      }
       setProfile(p => ({ ...p, plan: "expired" }));
       setCancelStep("done");
     } catch (e) { console.error(e); }
@@ -2605,8 +2609,8 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                       <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Account actions</div>
                       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                         <button onClick={onSignOut} style={{ flex: 1, minWidth: 120, padding: "10px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", color: "#555", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Sign out</button>
-                        {plan !== "trial" && plan !== "expired" && (
-                          <button onClick={() => setCancelStep("confirm")} style={{ flex: 1, minWidth: 120, padding: "10px 16px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Cancel plan</button>
+                        {plan !== "expired" && (
+                          <button onClick={() => setCancelStep("confirm")} style={{ flex: 1, minWidth: 120, padding: "10px 16px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>{plan === "trial" ? "Cancel trial" : "Cancel plan"}</button>
                         )}
                       </div>
                     </div>
@@ -2617,8 +2621,8 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                 {cancelStep === "confirm" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                     <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)", borderRadius: 12, padding: "18px 20px" }}>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: "#f87171", marginBottom: 8 }}>Cancel your plan?</div>
-                      <p style={{ fontSize: 13, color: "#666", lineHeight: 1.7, margin: 0 }}>You're on the <strong style={{ color: "#aaa" }}>{planConfig.label}</strong> plan. Cancelling will stop your sends immediately and your account will move to expired status.</p>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#f87171", marginBottom: 8 }}>{plan === "trial" ? "Cancel your trial?" : "Cancel your plan?"}</div>
+                      <p style={{ fontSize: 13, color: "#666", lineHeight: 1.7, margin: 0 }}>{plan === "trial" ? "Cancelling your free trial will end it immediately and move your account to expired status." : <>You're on the <strong style={{ color: "#aaa" }}>{planConfig.label}</strong> plan. Cancelling will stop your sends immediately and your account will move to expired status.</>}</p>
                     </div>
                     <div style={{ display: "flex", gap: 10 }}>
                       <button onClick={() => setCancelStep(null)} style={{ flex: 1, padding: "11px 16px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Keep my plan</button>
