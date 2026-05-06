@@ -2279,7 +2279,6 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const [historyLoading, setHistoryLoading] = useState(false);
   const [sendsUsed, setSendsUsed] = useState(0);
   const [showPaywall, setShowPaywall] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [settingsData, setSettingsData] = useState({
     bizName: initialProfile?.biz_name ?? "",
     googleLink: initialProfile?.google_link ?? "",
@@ -2418,7 +2417,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {plan === "trial" && <button onClick={() => setShowPaywall(true)} style={{ padding: isMobile ? "6px 12px" : "7px 16px", background: "#22c55e", color: "#000", border: "none", borderRadius: 7, fontSize: isMobile ? 11 : 12.5, fontWeight: 700, cursor: "pointer" }}>Upgrade</button>}
             <div style={{ fontSize: 12, color: "#656565", fontFamily: "var(--mono)", display: isMobile ? "none" : "block" }}>{sendsUsed}/{sendLimit}</div>
-            <button onClick={() => { setShowSettings(s => !s); setCancelStep(null); }} style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#22c55e,#16a34a)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#000", cursor: "pointer" }}>
+            <button onClick={() => { setTab(t => t === "settings" ? "send" : "settings"); setCancelStep(null); }} style={{ width: 32, height: 32, borderRadius: "50%", background: tab === "settings" ? "rgba(34,197,94,0.15)" : "linear-gradient(135deg,#22c55e,#16a34a)", border: tab === "settings" ? "2px solid #22c55e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: tab === "settings" ? "#22c55e" : "#000", cursor: "pointer" }}>
               {(profile?.biz_name || "R")[0].toUpperCase()}
             </button>
           </div>
@@ -2426,127 +2425,6 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
 
         <div style={{ maxWidth: 900, margin: "0 auto", padding: `${isMobile ? 0 : 36}px ${isMobile ? 0 : 36}px`, paddingTop: isMobile ? 72 : 90 }}>
           <div style={{ padding: isMobile ? "0 16px" : 0 }}>
-
-            {/* ── SETTINGS PANEL ── */}
-            {showSettings && (
-              <div style={{ background: "#0c0c0c", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: isMobile ? 20 : 28, marginBottom: 16, animation: "rc-fadeIn 0.25s both" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "#ccc", letterSpacing: "-0.4px" }}>Settings</h3>
-                  <button onClick={() => setShowSettings(false)} style={{ background: "none", border: "none", color: "#444", fontSize: 18, cursor: "pointer" }}>✕</button>
-                </div>
-
-                {cancelStep === null && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-
-                    {/* Account */}
-                    <div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Account</div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                        <div>
-                          <label style={{ fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 }}>Business name</label>
-                          <input className="rc-input" style={RC_INPUT} value={settingsData.bizName} onChange={e => setSettingsData(d => ({ ...d, bizName: e.target.value }))} placeholder="Smith Electrical" />
-                        </div>
-                        <div>
-                          <label style={{ fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 }}>Google Review link</label>
-                          <input className="rc-input" style={RC_INPUT} value={settingsData.googleLink} onChange={e => setSettingsData(d => ({ ...d, googleLink: e.target.value }))} placeholder="https://g.page/r/..." />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Message template */}
-                    <div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>
-                        Message template {!canCustomise && <span style={{ color: "#f59e0b", fontSize: 10 }}>— Growth & Crew only</span>}
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-                        {RC_MESSAGE_TEMPLATES.map(t => {
-                          const locked = t.id === "custom" && !canCustomise;
-                          const active = settingsData.templateId === t.id;
-                          return (
-                            <button key={t.id} onClick={() => !locked && setSettingsData(d => ({ ...d, templateId: t.id }))} style={{ background: active ? "rgba(34,197,94,0.07)" : "#080808", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "11px 14px", cursor: locked ? "default" : "pointer", display: "flex", alignItems: "center", gap: 10, textAlign: "left", opacity: locked ? 0.4 : 1 }}>
-                              <div style={{ width: 14, height: 14, borderRadius: "50%", border: `1px solid ${active ? "rgba(34,197,94,0.5)" : "#383838"}`, background: active ? "#22c55e" : "transparent", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: "#000", fontWeight: 900 }}>{active ? "✓" : ""}</div>
-                              <span style={{ fontSize: 13, fontWeight: 600, color: active ? "#22c55e" : "#666" }}>{t.label}</span>
-                              {locked && <span style={{ fontSize: 10, color: "#f59e0b", marginLeft: "auto" }}>🔒</span>}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      {settingsData.templateId === "custom" && canCustomise && (
-                        <div>
-                          <textarea className="rc-input" style={{ ...RC_INPUT, minHeight: 80, resize: "vertical" }} placeholder={`Hi! Thanks for choosing ${settingsData.bizName || "Your Business"}...`} value={settingsData.customMsg} onChange={e => setSettingsData(d => ({ ...d, customMsg: e.target.value }))} />
-                          <p style={{ fontSize: 11, color: "#383838", marginTop: 6 }}>Keep under 160 chars to avoid double billing. {settingsData.customMsg.length}/160</p>
-                        </div>
-                      )}
-                      {settingsData.templateId !== "custom" && (
-                        <div style={{ background: "#080808", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 10, padding: "12px 14px" }}>
-                          <div style={{ fontSize: 10, color: "#2a2a2a", fontFamily: "var(--mono)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>Preview</div>
-                          <div style={{ fontSize: 13, color: "#666", lineHeight: 1.75 }}>{livePreview}</div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Save */}
-                    <button onClick={handleSaveSettings} disabled={settingsSaving} style={{ width: "100%", padding: "12px 20px", background: settingsSaved ? "rgba(34,197,94,0.15)" : settingsSaving ? "rgba(255,255,255,0.5)" : "#fff", color: settingsSaved ? "#22c55e" : settingsSaving ? "#aaa" : "#000", border: settingsSaved ? "1px solid rgba(34,197,94,0.3)" : "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: settingsSaving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                      {settingsSaving ? <><Spinner size={13} dark />Saving…</> : settingsSaved ? "✓ Saved!" : "Save changes"}
-                    </button>
-
-                    <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
-
-                    {/* Contact support */}
-                    <div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Contact support</div>
-                      {!contactSent ? (
-                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                          <textarea className="rc-input" style={{ ...RC_INPUT, minHeight: 70, resize: "vertical" }} placeholder="Describe your issue or question…" value={contactMsg} onChange={e => setContactMsg(e.target.value)} />
-                          <button onClick={handleContactSupport} disabled={!contactMsg.trim()} style={{ padding: "10px 18px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "#666", cursor: contactMsg.trim() ? "pointer" : "default", opacity: contactMsg.trim() ? 1 : 0.4 }}>Send to support →</button>
-                        </div>
-                      ) : (
-                        <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 9, padding: "12px 14px", fontSize: 13, color: "#22c55e" }}>✓ Message sent — we'll get back to you within 24h.</div>
-                      )}
-                    </div>
-
-                    <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
-
-                    {/* Danger zone */}
-                    <div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Account actions</div>
-                      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                        <button onClick={onSignOut} style={{ flex: 1, minWidth: 120, padding: "10px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", color: "#555", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Sign out</button>
-                        {plan !== "trial" && plan !== "expired" && (
-                          <button onClick={() => setCancelStep("confirm")} style={{ flex: 1, minWidth: 120, padding: "10px 16px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Cancel plan</button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* ── CANCEL CONFIRM ── */}
-                {cancelStep === "confirm" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                    <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)", borderRadius: 12, padding: "18px 20px" }}>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: "#f87171", marginBottom: 8 }}>Cancel your plan?</div>
-                      <p style={{ fontSize: 13, color: "#666", lineHeight: 1.7, margin: 0 }}>You're on the <strong style={{ color: "#aaa" }}>{planConfig.label}</strong> plan. Cancelling will stop your sends immediately and your account will move to expired status.</p>
-                    </div>
-                    <div style={{ display: "flex", gap: 10 }}>
-                      <button onClick={() => setCancelStep(null)} style={{ flex: 1, padding: "11px 16px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Keep my plan</button>
-                      <button onClick={handleCancelPlan} disabled={cancelLoading} style={{ flex: 1, padding: "11px 16px", background: "rgba(239,68,68,0.1)", color: "#f87171", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: cancelLoading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                        {cancelLoading ? <><Spinner size={13} />Cancelling…</> : "Confirm cancel"}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* ── CANCEL DONE ── */}
-                {cancelStep === "done" && (
-                  <div style={{ textAlign: "center", padding: "16px 0" }}>
-                    <div style={{ fontSize: 32, marginBottom: 12 }}>👋</div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 8 }}>Plan cancelled</div>
-                    <p style={{ fontSize: 13, color: "#555", lineHeight: 1.7, marginBottom: 18 }}>Your account has been downgraded. You can re-subscribe any time.</p>
-                    <button onClick={() => { setShowSettings(false); setCancelStep(null); }} style={{ padding: "10px 20px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Close</button>
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* ── STATS ── */}
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr 1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 16 }}>
@@ -2576,8 +2454,8 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
 
             {/* Tabs */}
             <div style={{ display: "flex", background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: 4, marginBottom: 16, gap: 4 }}>
-              {[["send", "Send Requests"], ["history", "Send History"]].map(([id, label]) => (
-                <button key={id} onClick={() => setTab(id)} style={{ flex: 1, padding: "10px 16px", borderRadius: 8, background: tab === id ? "rgba(255,255,255,0.07)" : "transparent", color: tab === id ? "#fff" : "#444", fontSize: 13, fontWeight: 600, border: "none", transition: "all 0.2s" }}>{label}</button>
+              {[["send", "Send"], ["history", "History"], ["settings", "Settings"]].map(([id, label]) => (
+                <button key={id} onClick={() => { setTab(id); if (id !== "settings") setCancelStep(null); }} style={{ flex: 1, padding: "10px 16px", borderRadius: 8, background: tab === id ? "rgba(255,255,255,0.07)" : "transparent", color: tab === id ? "#fff" : "#444", fontSize: 13, fontWeight: 600, border: "none", transition: "all 0.2s", cursor: "pointer" }}>{label}</button>
               ))}
             </div>
 
@@ -2640,6 +2518,125 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* ── SETTINGS TAB ── */}
+            {tab === "settings" && (
+              <div style={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: isMobile ? 20 : 32, animation: "rc-fadeIn 0.3s both" }}>
+
+                {cancelStep === null && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+
+                    {/* Account */}
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Account</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 }}>Business name</label>
+                          <input className="rc-input" style={RC_INPUT} value={settingsData.bizName} onChange={e => setSettingsData(d => ({ ...d, bizName: e.target.value }))} placeholder="Smith Electrical" />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 }}>Google Review link</label>
+                          <input className="rc-input" style={RC_INPUT} value={settingsData.googleLink} onChange={e => setSettingsData(d => ({ ...d, googleLink: e.target.value }))} placeholder="https://g.page/r/..." />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
+
+                    {/* Message template */}
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>
+                        Message template {!canCustomise && <span style={{ color: "#f59e0b", fontSize: 10 }}>— Growth & Crew only</span>}
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+                        {RC_MESSAGE_TEMPLATES.map(t => {
+                          const locked = t.id === "custom" && !canCustomise;
+                          const active = settingsData.templateId === t.id;
+                          return (
+                            <button key={t.id} onClick={() => !locked && setSettingsData(d => ({ ...d, templateId: t.id }))} style={{ background: active ? "rgba(34,197,94,0.07)" : "#080808", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "11px 14px", cursor: locked ? "default" : "pointer", display: "flex", alignItems: "center", gap: 10, textAlign: "left", opacity: locked ? 0.4 : 1 }}>
+                              <div style={{ width: 14, height: 14, borderRadius: "50%", border: `1px solid ${active ? "rgba(34,197,94,0.5)" : "#383838"}`, background: active ? "#22c55e" : "transparent", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: "#000", fontWeight: 900 }}>{active ? "✓" : ""}</div>
+                              <span style={{ fontSize: 13, fontWeight: 600, color: active ? "#22c55e" : "#666" }}>{t.label}</span>
+                              {locked && <span style={{ fontSize: 10, color: "#f59e0b", marginLeft: "auto" }}>🔒</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {settingsData.templateId === "custom" && canCustomise && (
+                        <div>
+                          <textarea className="rc-input" style={{ ...RC_INPUT, minHeight: 80, resize: "vertical" }} placeholder={`Hi! Thanks for choosing ${settingsData.bizName || "Your Business"}...`} value={settingsData.customMsg} onChange={e => setSettingsData(d => ({ ...d, customMsg: e.target.value }))} />
+                          <p style={{ fontSize: 11, color: "#383838", marginTop: 6 }}>Keep under 160 chars to avoid double billing. {settingsData.customMsg.length}/160</p>
+                        </div>
+                      )}
+                      {settingsData.templateId !== "custom" && (
+                        <div style={{ background: "#080808", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 10, padding: "12px 14px" }}>
+                          <div style={{ fontSize: 10, color: "#2a2a2a", fontFamily: "var(--mono)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>Preview</div>
+                          <div style={{ fontSize: 13, color: "#666", lineHeight: 1.75 }}>{livePreview}</div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Save */}
+                    <button onClick={handleSaveSettings} disabled={settingsSaving} style={{ width: "100%", padding: "12px 20px", background: settingsSaved ? "rgba(34,197,94,0.15)" : settingsSaving ? "rgba(255,255,255,0.5)" : "#fff", color: settingsSaved ? "#22c55e" : settingsSaving ? "#aaa" : "#000", border: settingsSaved ? "1px solid rgba(34,197,94,0.3)" : "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: settingsSaving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                      {settingsSaving ? <><Spinner size={13} dark />Saving…</> : settingsSaved ? "✓ Saved!" : "Save changes"}
+                    </button>
+
+                    <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
+
+                    {/* Contact support */}
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Contact support</div>
+                      {!contactSent ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                          <textarea className="rc-input" style={{ ...RC_INPUT, minHeight: 70, resize: "vertical" }} placeholder="Describe your issue or question…" value={contactMsg} onChange={e => setContactMsg(e.target.value)} />
+                          <button onClick={handleContactSupport} disabled={!contactMsg.trim()} style={{ padding: "10px 18px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "#666", cursor: contactMsg.trim() ? "pointer" : "default", opacity: contactMsg.trim() ? 1 : 0.4 }}>Send to support →</button>
+                        </div>
+                      ) : (
+                        <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 9, padding: "12px 14px", fontSize: 13, color: "#22c55e" }}>✓ Message sent — we'll get back to you within 24h.</div>
+                      )}
+                    </div>
+
+                    <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
+
+                    {/* Account actions */}
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Account actions</div>
+                      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                        <button onClick={onSignOut} style={{ flex: 1, minWidth: 120, padding: "10px 16px", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", color: "#555", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Sign out</button>
+                        {plan !== "trial" && plan !== "expired" && (
+                          <button onClick={() => setCancelStep("confirm")} style={{ flex: 1, minWidth: 120, padding: "10px 16px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Cancel plan</button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── CANCEL CONFIRM ── */}
+                {cancelStep === "confirm" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)", borderRadius: 12, padding: "18px 20px" }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#f87171", marginBottom: 8 }}>Cancel your plan?</div>
+                      <p style={{ fontSize: 13, color: "#666", lineHeight: 1.7, margin: 0 }}>You're on the <strong style={{ color: "#aaa" }}>{planConfig.label}</strong> plan. Cancelling will stop your sends immediately and your account will move to expired status.</p>
+                    </div>
+                    <div style={{ display: "flex", gap: 10 }}>
+                      <button onClick={() => setCancelStep(null)} style={{ flex: 1, padding: "11px 16px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Keep my plan</button>
+                      <button onClick={handleCancelPlan} disabled={cancelLoading} style={{ flex: 1, padding: "11px 16px", background: "rgba(239,68,68,0.1)", color: "#f87171", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: cancelLoading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                        {cancelLoading ? <><Spinner size={13} />Cancelling…</> : "Confirm cancel"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── CANCEL DONE ── */}
+                {cancelStep === "done" && (
+                  <div style={{ textAlign: "center", padding: "16px 0" }}>
+                    <div style={{ fontSize: 32, marginBottom: 12 }}>👋</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 8 }}>Plan cancelled</div>
+                    <p style={{ fontSize: 13, color: "#555", lineHeight: 1.7, marginBottom: 18 }}>Your account has been downgraded. You can re-subscribe any time.</p>
+                    <button onClick={() => { setTab("send"); setCancelStep(null); }} style={{ padding: "10px 20px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Done</button>
+                  </div>
+                )}
               </div>
             )}
 
