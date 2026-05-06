@@ -166,7 +166,7 @@ const Nav = ({ page, setPage }) => {
     <>
       <nav style={{ position:"fixed",top:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"0 18px":"0 48px",height:62,background:"rgba(8,8,8,0.92)",backdropFilter:"blur(20px) saturate(1.4)",borderBottom:"1px solid var(--border)" }}>
         <button onClick={() => go("home")} style={{ display:"flex",alignItems:"center",gap:10,background:"none",border:"none" }}>
-          <WordmarkSVG height={isMobile ? 17 : 20} />
+          <WordmarkSVG height={isMobile ? 20 : 24} />
         </button>
 
         {isMobile ? (
