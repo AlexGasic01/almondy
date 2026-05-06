@@ -1702,11 +1702,6 @@ const STRIPE_PRICES = {
   crew:   "price_1TTu1pKVRE4IsC8T19RkUMWr",
 };
 
-// ── ClickSend ────────────────────────────────────────────────────
-const CLICKSEND_USER = "alex.digital200@gmail.com";
-const CLICKSEND_KEY  = "27EAF71B-5ABD-BB47-6968-264A64B2CE3C";
-const CLICKSEND_AUTH = btoa(`${CLICKSEND_USER}:${CLICKSEND_KEY}`);
-
 // ── Plan config ──────────────────────────────────────────────────
 const PLAN_CONFIG = {
   trial:  { label:"Free Trial", sends: 20,  color:"#888" },
@@ -2282,21 +2277,49 @@ const RCDashboardApp = ({ isMobile, profile:initialProfile, userId, onSignOut })
   useEffect(() => { if(tab==="history") loadHistory(); }, [tab, loadHistory]);
   useEffect(() => { if(trialExpired||atLimit) setShowPaywall(true); }, [trialExpired, atLimit]);
 
-  const handleSend = async () => {
-    const clean = mobile.replace(/\s/g,"").replace(/^0/,"+61");
-    if(clean.length<10) return;
-    if(atLimit||trialExpired) { setShowPaywall(true); return; }
-    if(!profile?.biz_name||!profile?.google_link) { setSendErr("Please complete your profile in Settings first."); return; }
-    setSending(true); setSendErr("");
-    try {
-      const { ok, messageId } = await sendReviewSMS(mobile, profile.biz_name, profile.google_link);
-      if(!ok) throw new Error("SMS failed");
-      await logRCSend(userId, mobile, messageId);
-      setSent(true); setMobile("");
-      setTimeout(()=>setSent(false), 4000);
-    } catch(e) { setSendErr("Failed to send SMS. Check your mobile number and try again."); }
-    finally { setSending(false); }
-  };
+const handleSend = async () => {
+  const clean = mobile.replace(/\s/g, "").replace(/^0/, "+61")
+  if (clean.length < 10) return
+  if (!profile?.biz_name || !profile?.google_link) {
+    setSendErr("Please complete your profile in Settings first.")
+    return
+  }
+
+  setSending(true); setSendErr("")
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { setSendErr("Please sign in again."); return }
+
+    const res = await fetch(
+      "https://qmaqmbimnhzyspvnioeb.supabase.co/functions/v1/smooth-worker",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ mobile }),
+      }
+    )
+
+    const json = await res.json()
+
+    if (!res.ok) {
+      if (json.error === "trial_expired") { setShowPaywall(true); return }
+      if (json.error === "limit_reached") { setShowPaywall(true); return }
+      throw new Error(json.error)
+    }
+
+    setSent(true); setMobile("")
+    setTimeout(() => setSent(false), 4000)
+
+  } catch (e) {
+    setSendErr("Failed to send. Check the number and try again.")
+  } finally {
+    setSending(false)
+  }
+}
 
   const handleSaveSettings = async () => {
     setSettingsSaving(true);
