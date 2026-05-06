@@ -486,7 +486,7 @@ const HEADER_STYLES = [
           <div style={{display:"inline-block",background:"#fff",color:"#000",borderRadius:5,padding:"4px 10px",fontSize:9,fontWeight:700}}>CTA →</div>
         </div>
         <div style={{background:"#1a1a1a",borderRadius:6,height:70,display:"flex",alignItems:"center",justifyContent:"center"}}>
-          <div style={{width:28,height:28,borderRadius:"50%",background:"#2a2a2a",border:"1px solid #333"}} />
+          <div style={{width:28,height:28,borderRadius:"50%",background:"#2a2a2a",border:"1px solid #656565"}} />
         </div>
       </div>
     )
@@ -703,7 +703,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
           <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
             {PAGE_OPTIONS.map(p=>{const on=data.pages.includes(p.id);return(
               <button key={p.id} onClick={()=>toggle("pages",p.id)} style={{ background:on?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${on?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.07)"}`,borderRadius:9,padding:"11px 14px",display:"flex",alignItems:"center",gap:9,cursor:"pointer",fontSize:13,fontWeight:600,color:on?"#22c55e":"#666",textAlign:"left" }}>
-                <div style={{ width:14,height:14,borderRadius:"50%",border:`1px solid ${on?"rgba(34,197,94,0.5)":"#333"}`,background:on?"#22c55e":"transparent",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#000",fontWeight:900 }}>{on?"✓":""}</div>
+                <div style={{ width:14,height:14,borderRadius:"50%",border:`1px solid ${on?"rgba(34,197,94,0.5)":"#656565"}`,background:on?"#22c55e":"transparent",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#000",fontWeight:900 }}>{on?"✓":""}</div>
                 {p.label}
               </button>
             );})}
@@ -716,7 +716,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
           <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
             {EXTRA_OPTIONS.map(e=>{const on=data.extras.includes(e.id);return(
               <button key={e.id} onClick={()=>toggle("extras",e.id)} style={{ background:on?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${on?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.07)"}`,borderRadius:9,padding:"11px 14px",display:"flex",alignItems:"center",gap:9,cursor:"pointer",fontSize:13,fontWeight:600,color:on?"#22c55e":"#666",textAlign:"left" }}>
-                <div style={{ width:14,height:14,borderRadius:"50%",border:`1px solid ${on?"rgba(34,197,94,0.5)":"#333"}`,background:on?"#22c55e":"transparent",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#000",fontWeight:900 }}>{on?"✓":""}</div>
+                <div style={{ width:14,height:14,borderRadius:"50%",border:`1px solid ${on?"rgba(34,197,94,0.5)":"#656565"}`,background:on?"#22c55e":"transparent",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#000",fontWeight:900 }}>{on?"✓":""}</div>
                 {e.label}
               </button>
             );})}
@@ -781,7 +781,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
       <div style={{ maxWidth:640,margin:"0 auto",padding:isMobile?"40px 20px 80px":"80px 48px 100px" }}>
         <div style={{ display:"flex",gap:6,flexWrap:"wrap",marginBottom:32 }}>
           {STEPS_ONBOARDING.map((s,i)=>(
-            <div key={s} style={{ fontSize:10,fontWeight:700,letterSpacing:"0.5px",padding:"3px 10px",borderRadius:999,background:i<step?"rgba(34,197,94,0.1)":i===step?"var(--green)":"rgba(255,255,255,0.04)",color:i<step?"#22c55e":i===step?"#000":"#333",border:`1px solid ${i<step?"rgba(34,197,94,0.25)":i===step?"transparent":"rgba(255,255,255,0.06)"}`,transition:"all 0.3s" }}>{s}</div>
+            <div key={s} style={{ fontSize:10,fontWeight:700,letterSpacing:"0.5px",padding:"3px 10px",borderRadius:999,background:i<step?"rgba(34,197,94,0.1)":i===step?"var(--green)":"rgba(255,255,255,0.04)",color:i<step?"#22c55e":i===step?"#000":"#656565",border:`1px solid ${i<step?"rgba(34,197,94,0.25)":i===step?"transparent":"rgba(255,255,255,0.06)"}`,transition:"all 0.3s" }}>{s}</div>
           ))}
         </div>
         <div style={{ opacity:visible?1:0,transform:visible?"translateY(0)":`translateY(${animDir>0?14:-14}px)`,transition:"all 0.25s cubic-bezier(0.22,1,0.36,1)",marginBottom:28 }}>
@@ -793,9 +793,9 @@ const WebDevOnboardingPage = ({ setPage }) => {
         </div>
         <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:36,paddingTop:24,borderTop:"1px solid rgba(255,255,255,0.06)" }}>
           <button onClick={()=>step===0?setPage("webdev"):go(-1)} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"11px 20px",fontSize:13,fontWeight:600,borderRadius:8,background:"transparent",color:"#555",border:"1px solid rgba(255,255,255,0.08)",cursor:"pointer" }}>← {step===0?"Back":"Previous"}</button>
-          <span style={{ fontSize:11,color:"#333",fontFamily:"var(--mono)" }}>{step+1} / {STEPS_ONBOARDING.length}</span>
+          <span style={{ fontSize:11,color:"#656565",fontFamily:"var(--mono)" }}>{step+1} / {STEPS_ONBOARDING.length}</span>
           {step<STEPS_ONBOARDING.length-1?(
-            <button onClick={()=>canNext()&&go(1)} disabled={!canNext()} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:canNext()?"var(--white)":"rgba(255,255,255,0.08)",color:canNext()?"var(--black)":"#333",border:"none",cursor:canNext()?"pointer":"default",transition:"all 0.2s" }}>Next →</button>
+            <button onClick={()=>canNext()&&go(1)} disabled={!canNext()} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:canNext()?"var(--white)":"rgba(255,255,255,0.08)",color:canNext()?"var(--black)":"#656565",border:"none",cursor:canNext()?"pointer":"default",transition:"all 0.2s" }}>Next →</button>
           ):(
             <button onClick={async()=>{if(!canNext())return;try{await fetch("https://formspree.io/f/mlgzbpng",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({"🏢 Business Name":data.bizName,"📧 Client Email":data.email,"📝 Description":data.bizDesc||"—","🎨 Colour Palette":data.palette==="custom"?`Custom — Primary: ${data.paletteCustom?.split("|")[0]||"—"}, Secondary: ${data.paletteCustom?.split("|")[1]||"—"}`:PALETTE_OPTIONS.find(p=>p.id===data.palette)?.label||"—","✏️ Font Style":FONT_OPTIONS.find(f=>f.id===data.font)?.label+(data.fontCustom?` — ${data.fontCustom}`:""),"🖼️ Header Style":HEADER_STYLES.find(h=>h.id===data.headerStyle)?.label||"—","🔗 Reference URL":data.headerUrl||"—","💬 Headline":data.heroHeadline,"💬 Subheadline":data.heroSubline||"—","🎯 CTA Button":data.heroCta||"—","📄 Pages":data.pages.map(p=>PAGE_OPTIONS.find(x=>x.id===p)?.label).join(", ")||"—","⚙️ Extras":data.extras.map(e=>EXTRA_OPTIONS.find(x=>x.id===e)?.label).join(", ")||"None","📌 Notes":data.otherNotes||"—"})});}catch(e){console.error(e);}setSubmitted(true);}} disabled={!canNext()} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:canNext()?"var(--green)":"rgba(34,197,94,0.15)",color:canNext()?"#000":"#1a4a2e",border:"none",cursor:canNext()?"pointer":"default" }}>Submit →</button>
           )}
@@ -958,7 +958,7 @@ const PaychaserPage = ({ setPage }) => {
             <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.09)",borderRadius:16,overflow:"hidden",boxShadow:"0 40px 100px rgba(0,0,0,0.8)" }}>
               <div style={{ background:"#090909",borderBottom:"1px solid rgba(255,255,255,0.05)",padding:"14px 18px",display:"flex",alignItems:"center",gap:7 }}>
                 {[["#ff5f57"],["#febc2e"],["#28c840"]].map(([c])=><div key={c} style={{ width:11,height:11,borderRadius:"50%",background:c }} />)}
-                <div style={{ flex:1,textAlign:"center",fontSize:12,fontWeight:600,color:"#333",fontFamily:"var(--mono)",marginLeft:-55 }}>Almondy — Dashboard</div>
+                <div style={{ flex:1,textAlign:"center",fontSize:12,fontWeight:600,color:"#656565",fontFamily:"var(--mono)",marginLeft:-55 }}>Almondy — Dashboard</div>
               </div>
               <div style={{ display:"grid",gridTemplateColumns:"200px 1fr",minHeight:420 }}>
                 <div style={{ background:"#0a0a0a",borderRight:"1px solid rgba(255,255,255,0.05)",padding:"20px 0",display:"flex",flexDirection:"column",gap:2 }}>
@@ -966,7 +966,7 @@ const PaychaserPage = ({ setPage }) => {
                     const items=[null,"◈ Dashboard","📄 Invoices","🔔 Reminders","","📊 Analytics","💳 Payments","","⚙️ Settings"];
                     if(sec)return<div key={i} style={{ fontSize:9,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"#222",padding:"14px 18px 6px",fontFamily:"var(--mono)" }}>{sec}</div>;
                     if(!items[i])return null;
-                    return<div key={i} style={{ display:"flex",alignItems:"center",gap:10,padding:"9px 18px",fontSize:12,fontWeight:500,color:i===1?"#aaa":"#333",background:i===1?"rgba(255,255,255,0.04)":"transparent" }}>{items[i]}</div>;
+                    return<div key={i} style={{ display:"flex",alignItems:"center",gap:10,padding:"9px 18px",fontSize:12,fontWeight:500,color:i===1?"#aaa":"#656565",background:i===1?"rgba(255,255,255,0.04)":"transparent" }}>{items[i]}</div>;
                   })}
                 </div>
                 <div style={{ padding:28,display:"flex",flexDirection:"column",gap:20 }}>
@@ -1003,7 +1003,7 @@ const PaychaserPage = ({ setPage }) => {
           <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.09)",borderRadius:14,overflow:"hidden" }}>
             <div style={{ background:"#090909",borderBottom:"1px solid rgba(255,255,255,0.05)",padding:"12px 16px",display:"flex",alignItems:"center",gap:6 }}>
               {[["#ff5f57"],["#febc2e"],["#28c840"]].map(([c])=><div key={c} style={{ width:9,height:9,borderRadius:"50%",background:c }} />)}
-              <div style={{ flex:1,textAlign:"center",fontSize:11,fontWeight:600,color:"#333",fontFamily:"var(--mono)" }}>Dashboard</div>
+              <div style={{ flex:1,textAlign:"center",fontSize:11,fontWeight:600,color:"#656565",fontFamily:"var(--mono)" }}>Dashboard</div>
             </div>
             <div style={{ padding:16,display:"flex",flexDirection:"column",gap:12 }}>
               <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
@@ -1029,7 +1029,7 @@ const PaychaserPage = ({ setPage }) => {
         <div style={{ display:"flex",alignItems:"center",marginBottom:isMobile?36:56 }}>
           {STEPS.map((_,i)=>(
             <div key={i} style={{ display:"contents" }}>
-              <button onClick={()=>goTo(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<step?"rgba(34,197,94,0.4)":i===step?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i<step?"rgba(34,197,94,0.15)":i===step?"var(--green)":"var(--black)",color:i<step?"var(--green)":i===step?"var(--black)":"#333",fontSize:isMobile?10:11,fontWeight:800,boxShadow:i===step?"0 0 0 4px rgba(34,197,94,0.15)":"none",flexShrink:0,zIndex:1,transition:"all 0.35s" }}>{i+1}</button>
+              <button onClick={()=>goTo(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<step?"rgba(34,197,94,0.4)":i===step?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i<step?"rgba(34,197,94,0.15)":i===step?"var(--green)":"var(--black)",color:i<step?"var(--green)":i===step?"var(--black)":"#656565",fontSize:isMobile?10:11,fontWeight:800,boxShadow:i===step?"0 0 0 4px rgba(34,197,94,0.15)":"none",flexShrink:0,zIndex:1,transition:"all 0.35s" }}>{i+1}</button>
               {i<STEPS.length-1&&<div style={{ flex:1,height:1,background:"rgba(255,255,255,0.07)",position:"relative" }}><div style={{ position:"absolute",top:0,left:0,height:"100%",width:step>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s" }} /></div>}
             </div>
           ))}
@@ -1050,7 +1050,7 @@ const PaychaserPage = ({ setPage }) => {
         </div>
         <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:40,paddingTop:28,borderTop:"1px solid rgba(255,255,255,0.06)" }}>
           <button onClick={()=>goTo(step-1)} disabled={step===0} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:isMobile?"10px 16px":"11px 22px",fontSize:13,fontWeight:600,borderRadius:8,background:"transparent",color:"#858585",border:"1px solid rgba(255,255,255,0.08)",opacity:step===0?0.2:1,cursor:step===0?"default":"pointer" }}>← {isMobile?"":"Previous"}</button>
-          <span style={{ fontSize:12,color:"#333",fontFamily:"var(--mono)" }}>{step+1}/4</span>
+          <span style={{ fontSize:12,color:"#656565",fontFamily:"var(--mono)" }}>{step+1}/4</span>
           <button onClick={()=>step<STEPS.length-1?goTo(step+1):setPage("auth")} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:isMobile?"10px 16px":"11px 22px",fontSize:13,fontWeight:600,borderRadius:8,background:step===STEPS.length-1?"var(--green)":"var(--white)",color:"var(--black)",border:"none" }}>
             {step===STEPS.length-1?"Get Started →":"Next →"}
           </button>
@@ -1255,7 +1255,7 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
         </div>
         <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
           <input type="text" value={bizName} onChange={e=>setBizName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleContinue()} placeholder="e.g. Smith Electrical" autoFocus style={{ width:"100%",padding:"15px 18px",background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.12)",borderRadius:12,fontSize:17,color:"var(--white)",outline:"none",fontFamily:"var(--font)" }} />
-          <button onClick={handleContinue} disabled={!bizName.trim()||loading} style={{ width:"100%",padding:15,background:bizName.trim()?"var(--white)":"rgba(255,255,255,0.08)",color:bizName.trim()?"var(--black)":"#333",border:"none",borderRadius:12,fontSize:16,fontWeight:700,transition:"all 0.2s" }}>
+          <button onClick={handleContinue} disabled={!bizName.trim()||loading} style={{ width:"100%",padding:15,background:bizName.trim()?"var(--white)":"rgba(255,255,255,0.08)",color:bizName.trim()?"var(--black)":"#656565",border:"none",borderRadius:12,fontSize:16,fontWeight:700,transition:"all 0.2s" }}>
             {loading?"Setting up your account...":"Take me to my dashboard →"}
           </button>
         </div>
@@ -1403,7 +1403,7 @@ const DashboardPage = ({ setPage,user }) => {
             <div style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,overflow:"hidden" }}>
               <div style={{ display:"grid",gridTemplateColumns:"1fr 120px 120px 110px 44px",padding:"12px 20px",borderBottom:"1px solid rgba(255,255,255,0.05)",background:"#080808" }}>
                 {["Client","Invoice","Amount","Status",""].map(h=>(
-                  <div key={h} style={{ fontSize:10.5,fontWeight:700,color:"#333",letterSpacing:"1.2px",textTransform:"uppercase",fontFamily:"var(--mono)" }}>{h}</div>
+                  <div key={h} style={{ fontSize:10.5,fontWeight:700,color:"#656565",letterSpacing:"1.2px",textTransform:"uppercase",fontFamily:"var(--mono)" }}>{h}</div>
                 ))}
               </div>
               {MOCK_INVOICES.map((inv,i)=>{
@@ -1519,7 +1519,7 @@ const PaywallPage = ({ setPage,user,setUser }) => {
                   <span style={{ fontSize:46,fontWeight:800,letterSpacing:"-3px",color:"var(--white)",lineHeight:1 }}>{price}</span>
                   <span style={{ fontSize:13,color:"#444",marginBottom:7,marginLeft:3 }}>/mo</span>
                 </div>
-                <div style={{ fontSize:11,color:"#333",marginBottom:18,fontFamily:"var(--mono)" }}>{billing==="annual"?"AUD · billed yearly":"AUD · billed monthly"}</div>
+                <div style={{ fontSize:11,color:"#656565",marginBottom:18,fontFamily:"var(--mono)" }}>{billing==="annual"?"AUD · billed yearly":"AUD · billed monthly"}</div>
                 <button onClick={()=>handleUpgrade(plan.id)} disabled={!!loadingPlan} style={{ width:"100%",padding:"12px 18px",background:plan.id==="pro"?"var(--white)":"rgba(255,255,255,0.08)",color:plan.id==="pro"?"var(--black)":"var(--white)",border:plan.id==="pro"?"none":"1px solid rgba(255,255,255,0.18)",borderRadius:10,fontSize:14,fontWeight:700,letterSpacing:"-0.3px",marginBottom:18,cursor:loadingPlan?"not-allowed":"pointer",opacity:loadingPlan&&!isLoading?0.4:1,fontFamily:"var(--font)" }}>
                   {isLoading?"Redirecting...":plan.id==="pro"?"Start 3-day free trial →":"Get started →"}
                 </button>
@@ -1602,7 +1602,7 @@ const WebDevPage = ({ setPage }) => {
         <div style={{ display:"flex",alignItems:"center",marginBottom:isMobile?28:40 }}>
           {process.map((_,i)=>(
             <div key={i} style={{ display:"contents" }}>
-              <button onClick={()=>setActiveStep(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<=activeStep?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i===activeStep?"var(--green)":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)",color:i===activeStep?"var(--black)":i<activeStep?"var(--green)":"#333",fontSize:isMobile?10:11,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1,boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none",transition:"all 0.35s",cursor:"pointer" }}>{i+1}</button>
+              <button onClick={()=>setActiveStep(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<=activeStep?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i===activeStep?"var(--green)":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)",color:i===activeStep?"var(--black)":i<activeStep?"var(--green)":"#656565",fontSize:isMobile?10:11,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1,boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none",transition:"all 0.35s",cursor:"pointer" }}>{i+1}</button>
               {i<process.length-1&&<div style={{ flex:1,height:1,background:"rgba(255,255,255,0.07)",position:"relative" }}><div style={{ position:"absolute",top:0,left:0,height:"100%",width:activeStep>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} /></div>}
             </div>
           ))}
@@ -1611,7 +1611,7 @@ const WebDevPage = ({ setPage }) => {
           {process.map(({step,title,desc},i)=>(
             <div key={step} onClick={()=>setActiveStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${i===activeStep?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.06)"}`,borderRadius:14,padding:"22px 18px",position:"relative",overflow:"hidden",cursor:"pointer",transition:"all 0.3s" }}>
               {i===activeStep&&<div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,rgba(34,197,94,0.6),transparent)" }} />}
-              <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2px",color:i===activeStep?"var(--green)":"#333",fontFamily:"var(--mono)",marginBottom:12 }}>{step}</div>
+              <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2px",color:i===activeStep?"var(--green)":"#656565",fontFamily:"var(--mono)",marginBottom:12 }}>{step}</div>
               <div style={{ fontSize:14,fontWeight:700,color:i===activeStep?"var(--white)":"#444",marginBottom:6,letterSpacing:"-0.3px" }}>{title}</div>
               <p style={{ fontSize:12.5,color:i===activeStep?"#858585":"#2e2e2e",lineHeight:1.7,margin:0 }}>{desc}</p>
             </div>
@@ -1826,7 +1826,7 @@ const RCPlanCard = ({ plan, onSelect, loading }) => {
         <span style={{ fontSize:50, fontWeight:800, letterSpacing:"-3px", color:"#fff", lineHeight:1 }}>{plan.priceLabel==="0"?"Free":plan.priceLabel}</span>
         {plan.price !== "0" && <span style={{ fontSize:13, color:"#444", marginBottom:8, marginLeft:2 }}>/mo</span>}
       </div>
-      <div style={{ fontSize:12, color:"#333", marginBottom:10 }}>{plan.period}</div>
+      <div style={{ fontSize:12, color:"#656565", marginBottom:10 }}>{plan.period}</div>
       <div style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.15)", borderRadius:999, padding:"3px 10px", fontSize:11, fontWeight:700, color:"rgba(34,197,94,0.7)", marginBottom:16, width:"fit-content", fontFamily:"var(--mono)" }}>{plan.sends} sends/mo</div>
       <p style={{ fontSize:13, color:"#858585", lineHeight:1.75, marginBottom:22 }}>{plan.desc}</p>
       <button onClick={() => onSelect(plan.id)} disabled={!!loading} className="rc-btn-primary" style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, width:"100%", padding:"12px 20px", fontSize:13, fontWeight:700, borderRadius:9, border:plan.solid?"none":"1px solid rgba(255,255,255,0.1)", background:plan.solid?"#fff":"transparent", color:plan.solid?"#000":"#666", marginBottom:22, opacity:loading&&loading!==plan.id?0.4:1, transition:"opacity 0.2s" }}>
@@ -1914,7 +1914,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
             <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#fff", color:"#000", padding:"14px 28px", fontSize:15, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial →</button>
             <button onClick={onSignIn} style={{ background:"transparent", color:"#666", border:"1px solid rgba(255,255,255,0.12)", padding:"14px 22px", fontSize:14, fontWeight:600, borderRadius:9 }}>Sign In</button>
           </div>
-          <p style={{ fontSize:12, color:"#333", marginTop:14 }}>7 days free · 20 sends · No credit card required</p>
+          <p style={{ fontSize:12, color:"#656565", marginTop:14 }}>7 days free · 20 sends · No credit card required</p>
         </div>
       </div>
       <Divider />
@@ -1939,7 +1939,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
         <div style={{ display:"flex", alignItems:"center", marginBottom:isMobile?28:48 }}>
           {steps.map((_, i) => (
             <div key={i} style={{ display:"contents" }}>
-              <button onClick={() => setActiveStep(i)} style={{ width:isMobile?28:34, height:isMobile?28:34, borderRadius:"50%", border:`1px solid ${i<=activeStep?"#22c55e":"rgba(255,255,255,0.1)"}`, background:i===activeStep?"#22c55e":i<activeStep?"rgba(34,197,94,0.15)":"#080808", color:i===activeStep?"#000":i<activeStep?"#22c55e":"#333", fontSize:11, fontWeight:800, flexShrink:0, zIndex:1, boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none", transition:"all 0.35s" }}>{i+1}</button>
+              <button onClick={() => setActiveStep(i)} style={{ width:isMobile?28:34, height:isMobile?28:34, borderRadius:"50%", border:`1px solid ${i<=activeStep?"#22c55e":"rgba(255,255,255,0.1)"}`, background:i===activeStep?"#22c55e":i<activeStep?"rgba(34,197,94,0.15)":"#080808", color:i===activeStep?"#000":i<activeStep?"#22c55e":"#656565", fontSize:11, fontWeight:800, flexShrink:0, zIndex:1, boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none", transition:"all 0.35s" }}>{i+1}</button>
               {i<2 && <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.07)", position:"relative" }}><div style={{ position:"absolute", top:0, left:0, height:"100%", width:activeStep>i?"100%":"0%", background:"#22c55e", transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} /></div>}
             </div>
           ))}
@@ -1948,7 +1948,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
           {steps.map(({ num, title, desc }, i) => (
             <div key={num} onClick={() => setActiveStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.06)":"#0c0c0c", border:`1px solid ${i===activeStep?"rgba(34,197,94,0.3)":"rgba(255,255,255,0.06)"}`, borderRadius:14, padding:"24px 22px", cursor:"pointer", position:"relative", overflow:"hidden", transition:"all 0.3s" }}>
               {i===activeStep && <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:"linear-gradient(90deg,rgba(34,197,94,0.7),transparent)" }} />}
-              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2px", color:i===activeStep?"#22c55e":"#333", fontFamily:"var(--mono)", marginBottom:14 }}>{num}</div>
+              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2px", color:i===activeStep?"#22c55e":"#656565", fontFamily:"var(--mono)", marginBottom:14 }}>{num}</div>
               <div style={{ fontSize:16, fontWeight:700, color:i===activeStep?"#fff":"#555", letterSpacing:"-0.4px", marginBottom:8 }}>{title}</div>
               <p style={{ fontSize:13.5, color:i===activeStep?"#858585":"#2e2e2e", lineHeight:1.75, margin:0 }}>{desc}</p>
             </div>
@@ -2175,7 +2175,7 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
       <div style={{ position:"relative",zIndex:1,width:"100%",maxWidth:520,animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ display:"flex",gap:6,marginBottom:28 }}>
           {stepLabels.map((l,i) => (
-            <div key={l} style={{ fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:999,background:i<step?"rgba(34,197,94,0.1)":i===step?"#22c55e":"rgba(255,255,255,0.04)",color:i<step?"#22c55e":i===step?"#000":"#333",border:`1px solid ${i<step?"rgba(34,197,94,0.25)":i===step?"transparent":"rgba(255,255,255,0.06)"}`,transition:"all 0.3s" }}>{l}</div>
+            <div key={l} style={{ fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:999,background:i<step?"rgba(34,197,94,0.1)":i===step?"#22c55e":"rgba(255,255,255,0.04)",color:i<step?"#22c55e":i===step?"#000":"#656565",border:`1px solid ${i<step?"rgba(34,197,94,0.25)":i===step?"transparent":"rgba(255,255,255,0.06)"}`,transition:"all 0.3s" }}>{l}</div>
           ))}
         </div>
         <div style={{ opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(14px)",transition:"all 0.25s cubic-bezier(0.22,1,0.36,1)",marginBottom:24 }}>
@@ -2185,9 +2185,9 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
         </div>
         <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:24,paddingTop:20,borderTop:"1px solid rgba(255,255,255,0.06)" }}>
           <button onClick={()=>step===0?null:go(-1)} style={{ padding:"11px 20px",fontSize:13,fontWeight:600,borderRadius:8,background:"transparent",color:"#555",border:"1px solid rgba(255,255,255,0.08)",opacity:step===0?0.2:1,cursor:step===0?"default":"pointer" }}>← Back</button>
-          <span style={{ fontSize:11,color:"#333",fontFamily:"var(--mono)" }}>{step+1} / 3</span>
+          <span style={{ fontSize:11,color:"#656565",fontFamily:"var(--mono)" }}>{step+1} / 3</span>
           {step<2 ? (
-            <button onClick={()=>canNext()&&go(1)} disabled={!canNext()} style={{ padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:canNext()?"#fff":"rgba(255,255,255,0.08)",color:canNext()?"#000":"#333",border:"none",cursor:canNext()?"pointer":"default" }}>Next →</button>
+            <button onClick={()=>canNext()&&go(1)} disabled={!canNext()} style={{ padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:canNext()?"#fff":"rgba(255,255,255,0.08)",color:canNext()?"#000":"#656565",border:"none",cursor:canNext()?"pointer":"default" }}>Next →</button>
           ) : (
             <button onClick={handleFinish} disabled={saving} style={{ padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:"#22c55e",color:"#000",border:"none",display:"flex",alignItems:"center",gap:8 }}>
               {saving ? <><Spinner size={13} dark />Saving…</> : "Go to Dashboard →"}
@@ -2236,7 +2236,7 @@ const RCPaywallScreen = ({ isMobile, profile, onClose }) => {
         </div>
         <div style={{ display:"flex",justifyContent:"center",gap:24,flexWrap:"wrap" }}>
           {["Cancel any time","Instant access","Billed via Stripe"].map(t => (
-            <div key={t} style={{ display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#333" }}>
+            <div key={t} style={{ display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#656565" }}>
               <span style={{ color:"#22c55e",fontSize:10 }}>✓</span> {t}
             </div>
           ))}
@@ -2327,7 +2327,7 @@ const RCDashboardApp = ({ isMobile, profile:initialProfile, userId, onSignOut })
           </div>
           <div style={{ display:"flex",alignItems:"center",gap:10 }}>
             {plan==="trial" && <button onClick={()=>setShowPaywall(true)} style={{ padding:isMobile?"6px 12px":"7px 16px",background:"#22c55e",color:"#000",border:"none",borderRadius:7,fontSize:isMobile?11:12.5,fontWeight:700,cursor:"pointer" }}>Upgrade</button>}
-            <div style={{ fontSize:12,color:"#333",fontFamily:"var(--mono)",display:isMobile?"none":"block" }}>{sendsUsed}/{sendLimit}</div>
+            <div style={{ fontSize:12,color:"#656565",fontFamily:"var(--mono)",display:isMobile?"none":"block" }}>{sendsUsed}/{sendLimit}</div>
             <button onClick={()=>setShowSettings(s=>!s)} style={{ width:32,height:32,borderRadius:"50%",background:"linear-gradient(135deg,#22c55e,#16a34a)",border:"none",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#000",cursor:"pointer" }}>
               {(profile?.biz_name||"R")[0].toUpperCase()}
             </button>
@@ -2417,7 +2417,7 @@ const RCDashboardApp = ({ isMobile, profile:initialProfile, userId, onSignOut })
                       </div>
                     )}
                     {sendErr && <p style={{ fontSize:13,color:"#f87171",marginBottom:12 }}>{sendErr}</p>}
-                    <button onClick={handleSend} disabled={mobile.replace(/\s/g,"").length<10||sending||atLimit||trialExpired} style={{ width:"100%",padding:"15px 20px",background:atLimit||trialExpired?"rgba(255,255,255,0.04)":mobile.replace(/\s/g,"").length>=10?"#22c55e":"rgba(34,197,94,0.08)",color:atLimit||trialExpired?"#333":mobile.replace(/\s/g,"").length>=10?"#000":"#1a4a2e",border:"none",borderRadius:12,fontSize:15,fontWeight:700,transition:"all 0.2s",display:"flex",alignItems:"center",justifyContent:"center",gap:10 }}>
+                    <button onClick={handleSend} disabled={mobile.replace(/\s/g,"").length<10||sending||atLimit||trialExpired} style={{ width:"100%",padding:"15px 20px",background:atLimit||trialExpired?"rgba(255,255,255,0.04)":mobile.replace(/\s/g,"").length>=10?"#22c55e":"rgba(34,197,94,0.08)",color:atLimit||trialExpired?"#656565":mobile.replace(/\s/g,"").length>=10?"#000":"#1a4a2e",border:"none",borderRadius:12,fontSize:15,fontWeight:700,transition:"all 0.2s",display:"flex",alignItems:"center",justifyContent:"center",gap:10 }}>
                       {sending ? <><Spinner size={16} dark />Sending SMS…</> : atLimit||trialExpired ? "🔒 Upgrade to Send" : "Send Review Request ✦"}
                     </button>
                   </>
@@ -2438,12 +2438,12 @@ const RCDashboardApp = ({ isMobile, profile:initialProfile, userId, onSignOut })
               <div style={{ background:"#0a0a0a",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,overflow:"hidden",animation:"rc-fadeIn 0.3s both" }}>
                 <div style={{ padding:"16px 24px",borderBottom:"1px solid rgba(255,255,255,0.05)",display:"flex",alignItems:"center",justifyContent:"space-between" }}>
                   <div style={{ fontSize:14,fontWeight:700,color:"#777" }}>Send history</div>
-                  {historyLoading ? <Spinner size={14} /> : <div style={{ fontSize:12,color:"#333",fontFamily:"var(--mono)" }}>{history.length} records</div>}
+                  {historyLoading ? <Spinner size={14} /> : <div style={{ fontSize:12,color:"#656565",fontFamily:"var(--mono)" }}>{history.length} records</div>}
                 </div>
                 {historyLoading ? (
                   <div style={{ padding:"40px 24px",display:"flex",justifyContent:"center" }}><Spinner /></div>
                 ) : history.length===0 ? (
-                  <div style={{ padding:"40px 24px",textAlign:"center",color:"#333",fontSize:14 }}>No sends yet. Send your first review request!</div>
+                  <div style={{ padding:"40px 24px",textAlign:"center",color:"#656565",fontSize:14 }}>No sends yet. Send your first review request!</div>
                 ) : history.map((row,i) => (
                   <div key={row.id} className="rc-hover-row" style={{ display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"12px 16px":"14px 24px",borderBottom:i<history.length-1?"1px solid rgba(255,255,255,0.04)":"none",background:"transparent",transition:"background 0.15s" }}>
                     <div style={{ display:"flex",alignItems:"center",gap:10 }}>
