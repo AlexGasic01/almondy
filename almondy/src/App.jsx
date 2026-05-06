@@ -1176,15 +1176,16 @@ const AuthPage = ({ setPage, setUser }) => {
   const [step,setStep] = useState("email");
   const [email,setEmail] = useState("");
   const [loading,setLoading] = useState(false);
+  const [authErr,setAuthErr] = useState("");
 
   const handleSend = async () => {
     if (!email.includes("@")) return;
-    setLoading(true);
+    setLoading(true); setAuthErr("");
     try {
       const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo:window.location.origin } });
       if (error) throw error;
       setStep("sent");
-    } catch(err) { setStep("sent"); } finally { setLoading(false); }
+    } catch(err) { setAuthErr("Something went wrong. Please try again."); } finally { setLoading(false); }
   };
 
   return (
@@ -1202,7 +1203,8 @@ const AuthPage = ({ setPage, setUser }) => {
               <p style={{ fontSize:14,color:"#858585",lineHeight:1.6 }}>Enter your email and we'll send you a magic link. No password needed.</p>
             </div>
             <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSend()} placeholder="yourname@domain.com" autoFocus style={{ width:"100%",padding:"13px 16px",background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,fontSize:15,color:"var(--white)",outline:"none",fontFamily:"var(--font)" }} />
+              <input type="email" value={email} onChange={e=>{ setEmail(e.target.value); setAuthErr(""); }} onKeyDown={e=>e.key==="Enter"&&handleSend()} placeholder="yourname@domain.com" autoFocus style={{ width:"100%",padding:"13px 16px",background:"#0f0f0f",border:`1px solid ${authErr?"rgba(239,68,68,0.5)":"rgba(255,255,255,0.1)"}`,borderRadius:10,fontSize:15,color:"var(--white)",outline:"none",fontFamily:"var(--font)" }} />
+              {authErr && <p style={{ fontSize:13,color:"#f87171",margin:0 }}>{authErr}</p>}
               <button onClick={handleSend} disabled={!email.includes("@")||loading} style={{ width:"100%",padding:14,background:loading?"rgba(255,255,255,0.5)":"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:15,fontWeight:700,opacity:!email.includes("@")?0.4:1 }}>
                 {loading?"Sending...":"Send magic link →"}
               </button>
@@ -2741,7 +2743,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
    ROOT APP
 ════════════════════════════════════════════ */
 export default function App() {
-  const [showSplash,setShowSplash] = useState(true);
+  const [showSplash,setShowSplash] = useState(() => !sessionStorage.getItem("splashSeen"));
   const [page,setPage] = useState("home");
   const [user,setUser] = useState(null);
   const [authLoading,setAuthLoading] = useState(true);
@@ -2858,7 +2860,7 @@ export default function App() {
   return (
     <>
       <GlobalStyle />
-      {showSplash && <SplashScreen onDone={()=>setShowSplash(false)} />}
+      {showSplash && <SplashScreen onDone={()=>{ sessionStorage.setItem("splashSeen","1"); setShowSplash(false); }} />}
       {showMobileWarning && <MobileWarningPopup onDismiss={handleDismissWarning} />}
 
       {/* Only show global Nav when NOT in an app page AND NOT in ReviewChaser (it has its own nav) */}
