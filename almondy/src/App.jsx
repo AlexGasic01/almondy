@@ -1732,9 +1732,6 @@ async function getRCSendsThisMonth(userId) {
   return data?.length ?? 0;
 }
 
-async function logRCSend(userId, mobile, messageId) {
-  await supabase.from("rc_sends").insert({ user_id:userId, mobile, status:"sent", message_id:messageId ?? null });
-}
 
 async function getRCSendHistory(userId) {
   const { data } = await supabase.from("rc_sends").select("*").eq("user_id", userId).order("sent_at", { ascending:false }).limit(50);
@@ -1742,20 +1739,7 @@ async function getRCSendHistory(userId) {
 }
 
 // ── ClickSend SMS ─────────────────────────────────────────────────
-async function sendReviewSMS(mobile, bizName, googleLink) {
-  let num = mobile.replace(/\s/g,"").replace(/^0/,"+61");
-  if (!num.startsWith("+")) num = "+61" + num;
-  const message = `Hi! Thanks for choosing ${bizName}. If you have a moment, we'd love a Google review — it really helps! ${googleLink}`;
-  const res = await fetch("https://rest.clicksend.com/v3/sms/send", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json", "Authorization":`Basic ${CLICKSEND_AUTH}` },
-    body:JSON.stringify({ messages:[{ source:"sdk", body:message, to:num }] }),
-  });
-  const json = await res.json();
-  const msgId  = json?.data?.messages?.[0]?.message_id ?? null;
-  const status = json?.data?.messages?.[0]?.status ?? "unknown";
-  return { ok: res.ok && status !== "INVALID", messageId: msgId };
-}
+
 
 // ── Stripe Checkout ───────────────────────────────────────────────
 async function startStripeCheckout(priceId, email, userId) {
@@ -2497,45 +2481,51 @@ function ReviewChaserPage({ setPage, user, setUser }) {
   const [rcProfile, setRcProfile] = useState(null);
   const [rcUserId, setRcUserId] = useState(null);
 
-  useEffect(() => {
-    const init = async () => {
-      const { data:{ session } } = await supabase.auth.getSession();
-      if (!session) { setView("marketing"); return; }
+ useEffect(() => {
+  let mounted = true;
+
+  const init = async () => {
+    const { data:{ session } } = await supabase.auth.getSession();
+    if (!mounted) return;
+    if (!session) { setView("marketing"); return; }
+    const uid = session.user.id;
+    setRcUserId(uid);
+    const profile = await getOrCreateRCProfile(uid, session.user.email);
+    if (!mounted) return;
+    setRcProfile(profile);
+    setView(profile.biz_name ? "dashboard" : "onboarding");
+  };
+  init();
+
+  const { data:{ subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event==="SIGNED_IN"&&session) {
       const uid = session.user.id;
       setRcUserId(uid);
       const profile = await getOrCreateRCProfile(uid, session.user.email);
       setRcProfile(profile);
       setView(profile.biz_name ? "dashboard" : "onboarding");
-    };
-    init();
-
-    const { data:{ subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event==="SIGNED_IN"&&session) {
-        const uid = session.user.id;
-        setRcUserId(uid);
-        const profile = await getOrCreateRCProfile(uid, session.user.email);
-        setRcProfile(profile);
-        setView(profile.biz_name ? "dashboard" : "onboarding");
-        window.history.replaceState({}, "", window.location.pathname);
-      }
-      if (event==="SIGNED_OUT") { setRcProfile(null); setRcUserId(null); setView("marketing"); }
-    });
-
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("rc_session")==="success") {
       window.history.replaceState({}, "", window.location.pathname);
-      setTimeout(async () => {
-        const { data:{ session } } = await supabase.auth.getSession();
-        if (session) {
-          const profile = await getOrCreateRCProfile(session.user.id, session.user.email);
-          setRcProfile(profile);
-          setView("dashboard");
-        }
-      }, 1500);
     }
+    if (event==="SIGNED_OUT") { setRcProfile(null); setRcUserId(null); setView("marketing"); }
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("rc_session")==="success") {
+    window.history.replaceState({}, "", window.location.pathname);
+    setTimeout(async () => {
+      const { data:{ session } } = await supabase.auth.getSession();
+      if (session) {
+        const profile = await getOrCreateRCProfile(session.user.id, session.user.email);
+        setRcProfile(profile);
+        setView("dashboard");
+      }
+    }, 1500);
+  }
 
   return () => { mounted = false; subscription.unsubscribe(); };
 }, []);
+
+  
 
   const handleSignOut = async () => { await supabase.auth.signOut(); setView("marketing"); };
 
