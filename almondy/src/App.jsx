@@ -1908,7 +1908,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
             <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#fff", color:"#000", padding:"14px 28px", fontSize:15, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial →</button>
             <button onClick={onSignIn} style={{ background:"transparent", color:"#666", border:"1px solid rgba(255,255,255,0.12)", padding:"14px 22px", fontSize:14, fontWeight:600, borderRadius:9 }}>Sign In</button>
           </div>
-          <p style={{ fontSize:12, color:"#656565", marginTop:14 }}>7 days free · 20 sends · No credit card required</p>
+          <p style={{ fontSize:12, color:"#656565", marginTop:14 }}>7 Days Free · 20 sends · No credit card required</p>
         </div>
       </div>
       <Divider />
@@ -2035,7 +2035,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
           {[1,2,3,4,5].map(i => <span key={i} style={{ fontSize:22, color:"#f59e0b" }}>★</span>)}
         </div>
         <h2 style={{ fontSize:isMobile?"clamp(22px,7vw,34px)":"clamp(26px,3.5vw,42px)", fontWeight:800, letterSpacing:"-2px", color:"#fff", marginBottom:12 }}>Start collecting reviews today.</h2>
-        <p style={{ fontSize:isMobile?14:15, color:"#444", marginBottom:28 }}>7 days free · 20 sends · No card required</p>
+        <p style={{ fontSize:isMobile?14:15, color:"#444", marginBottom:28 }}>7 Days Free · 20 sends · No card required</p>
         <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#fff", color:"#000", padding:"14px 28px", fontSize:15, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial →</button>
       </div>
      <Footer setPage={setPage} />
