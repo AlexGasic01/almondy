@@ -3232,10 +3232,20 @@ function ReviewChaserPage({ setPage, user, setUser }) {
         const isPostCheckout = sessionStorage.getItem("rc_post_checkout") === "1";
         if (isPostCheckout) sessionStorage.removeItem("rc_post_checkout");
         if (isPostCheckout && (profile.plan === "trial" || profile.plan === "expired")) {
+          const { data: { session: sess } } = await supabase.auth.getSession();
           for (let i = 0; i < 10 && mounted; i++) {
             await new Promise(r => setTimeout(r, 1000));
-            const { data } = await supabase.from("rc_profiles").select("*").eq("id", uid).maybeSingle();
-            if (data && data.plan !== "trial" && data.plan !== "expired") { profile = data; break; }
+            try {
+              const r = await fetch("/api/sync-rc-plan", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${sess?.access_token}` },
+              });
+              const json = await r.json();
+              if (json.plan && json.plan !== "trial" && json.plan !== "expired") {
+                profile = { ...profile, plan: json.plan };
+                break;
+              }
+            } catch {}
           }
         }
 
