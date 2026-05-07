@@ -2279,6 +2279,126 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   );
 };
 
+// ── Usage Toast ───────────────────────────────────────────────────
+const TOAST_THRESHOLDS = [30, 50, 90, 100];
+
+const TOAST_STYLES = {
+  30:  { color: "#60a5fa", bg: "rgba(96,165,250,0.06)",  border: "rgba(96,165,250,0.2)"  },
+  50:  { color: "#f59e0b", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)"  },
+  90:  { color: "#f59e0b", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)"  },
+  100: { color: "#f87171", bg: "rgba(239,68,68,0.06)",  border: "rgba(239,68,68,0.2)"   },
+};
+
+const TOAST_COPY = {
+  30:  { msg: "You've used 30% of your monthly sends." },
+  50:  { msg: "You've used 50% of your monthly sends." },
+  90:  { msg: "You've used 90% of your monthly sends.", btnText: "Upgrade Plan" },
+  100: { msg: "You've hit your monthly limit. Upgrade to keep sending review requests and never miss a job.", btnText: "Upgrade Now — Don't Miss Out" },
+};
+
+const RCUsageToast = ({ threshold, onDismiss, onUpgrade }) => {
+  const s = TOAST_STYLES[threshold];
+  const c = TOAST_COPY[threshold];
+  if (!s || !c) return null;
+  return (
+    <div style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 10, padding: "12px 14px", marginBottom: 14, display: "flex", alignItems: "flex-start", gap: 10, animation: "rc-fadeIn 0.3s both" }}>
+      <div style={{ flex: 1, fontSize: 13, color: s.color, lineHeight: 1.6 }}>{c.msg}</div>
+      {c.btnText && (
+        <button onClick={onUpgrade} style={{ padding: "7px 13px", background: threshold === 100 ? "#ef4444" : "transparent", color: threshold === 100 ? "#fff" : s.color, border: `1px solid ${s.border}`, borderRadius: 7, fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>
+          {c.btnText}
+        </button>
+      )}
+      <button onClick={onDismiss} style={{ background: "none", border: "none", color: "#383838", fontSize: 16, cursor: "pointer", flexShrink: 0, lineHeight: 1, padding: 0 }}>✕</button>
+    </div>
+  );
+};
+
+// ── Upgrade Modal (for active subscribers) ────────────────────────
+const RCUpgradeModal = ({ isMobile, profile, onClose, onPlanChanged }) => {
+  const [switching, setSwitching] = useState(null);
+  const [switchError, setSwitchError] = useState("");
+  const currentPlan = profile?.plan;
+  const paidPlans = PLANS_DATA.filter(p => p.id !== "trial");
+
+  const handleSwitch = async (planId) => {
+    if (planId === currentPlan || switching) return;
+    setSwitching(planId);
+    setSwitchError("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not signed in");
+      const res = await fetch("/api/switch-rc-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ newPlan: planId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Failed to switch plan");
+      onPlanChanged(planId);
+      onClose();
+    } catch (e) {
+      setSwitchError(e.message || "Something went wrong. Please try again.");
+    } finally {
+      setSwitching(null);
+    }
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)", display: "flex", alignItems: isMobile ? "flex-start" : "center", justifyContent: "center", padding: isMobile ? "72px 16px 24px" : 24, overflowY: "auto" }}>
+      <div style={{ background: "#0f0f0f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: isMobile ? "28px 20px" : "36px 32px", maxWidth: 820, width: "100%", position: "relative", boxShadow: "0 40px 100px rgba(0,0,0,0.8)", animation: "rc-fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both" }}>
+        <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 120, height: 2, background: "linear-gradient(90deg,transparent,rgba(34,197,94,0.6),transparent)", borderRadius: 999 }} />
+        <button onClick={onClose} style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "50%", width: 28, height: 28, color: "#555", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "2.5px", textTransform: "uppercase", color: "#444", fontFamily: "var(--mono)", marginBottom: 10 }}>Manage Plan</div>
+          <h2 style={{ fontSize: isMobile ? "clamp(20px,5vw,26px)" : "28px", fontWeight: 800, letterSpacing: "-1.5px", color: "#fff", marginBottom: 8 }}>Your Plan</h2>
+          <p style={{ fontSize: 13, color: "#555" }}>Switch plans instantly. Changes take effect immediately.</p>
+        </div>
+        {switchError && <p style={{ fontSize: 13, color: "#f87171", textAlign: "center", marginBottom: 16 }}>{switchError}</p>}
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
+          {paidPlans.map(p => {
+            const isCurrent = p.id === currentPlan;
+            const featured = p.id === "growth";
+            return (
+              <div key={p.id} style={{ position: "relative", border: `1px solid ${isCurrent ? "rgba(34,197,94,0.4)" : featured ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.07)"}`, borderRadius: 16, padding: "24px 20px", display: "flex", flexDirection: "column", background: isCurrent ? "rgba(34,197,94,0.04)" : featured ? "#0f0f0f" : "#0c0c0c", overflow: "hidden" }}>
+                {featured && !isCurrent && <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 80, height: 2, background: "linear-gradient(90deg,transparent,rgba(34,197,94,0.5),transparent)", borderRadius: 999 }} />}
+                {isCurrent ? (
+                  <div style={{ display: "inline-flex", alignItems: "center", gap:6, fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "#22c55e", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 999, padding: "4px 12px", marginBottom: 16, width: "fit-content" }}>✓ Current Plan</div>
+                ) : p.badge ? (
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 10, fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: featured ? "#22c55e" : "#777", background: featured ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.05)", border: `1px solid ${featured ? "rgba(34,197,94,0.25)" : "rgba(255,255,255,0.1)"}`, borderRadius: 999, padding: "4px 12px", marginBottom: 16, width: "fit-content" }}>{p.badge}</div>
+                ) : (
+                  <div style={{ height: 30, marginBottom: 16 }} />
+                )}
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "2.5px", textTransform: "uppercase", color: "#444", fontFamily: "var(--mono)", marginBottom: 8 }}>{p.name}</div>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 2, marginBottom: 4 }}>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: "#444", marginBottom: 6 }}>$</span>
+                  <span style={{ fontSize: 42, fontWeight: 800, letterSpacing: "-2px", color: "#fff", lineHeight: 1 }}>{p.priceLabel}</span>
+                  <span style={{ fontSize: 12, color: "#444", marginBottom: 6, marginLeft: 2 }}>/mo</span>
+                </div>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: 999, padding: "3px 10px", fontSize: 11, fontWeight: 700, color: "rgba(34,197,94,0.7)", marginBottom: 14, width: "fit-content", fontFamily: "var(--mono)" }}>{p.sends} sends/mo</div>
+                <p style={{ fontSize: 13, color: "#858585", lineHeight: 1.75, marginBottom: 20, flex: 1 }}>{p.desc}</p>
+                {isCurrent ? (
+                  <div style={{ textAlign: "center", fontSize: 12, color: "#2a2a2a", padding: "10px", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 9 }}>Your current plan</div>
+                ) : (
+                  <button onClick={() => handleSwitch(p.id)} disabled={!!switching} style={{ padding: "11px 16px", background: featured ? "#fff" : "transparent", color: featured ? "#000" : "#666", border: featured ? "none" : "1px solid rgba(255,255,255,0.1)", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: switching ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: switching && switching !== p.id ? 0.4 : 1 }}>
+                    {switching === p.id ? <><Spinner size={13} dark={featured} />Switching…</> : `Switch to ${p.name}`}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
+          {["Pro-rated billing", "Instant access", "Cancel any time"].map(t => (
+            <div key={t} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#656565" }}>
+              <span style={{ color: "#22c55e", fontSize: 10 }}>✓</span> {t}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ── Paywall Screen ────────────────────────────────────────────────
 const RCPaywallScreen = ({ isMobile, profile, onClose, onBack }) => {
   const [loadingPlan, setLoadingPlan] = useState(null);
@@ -2365,6 +2485,14 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const [historyLoading, setHistoryLoading] = useState(false);
   const [sendsUsed, setSendsUsed] = useState(0);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [activeToast, setActiveToast] = useState(null);
+  const [shownToasts, setShownToasts] = useState(() => {
+    try {
+      const key = `rc_toasts_${userId}_${new Date().toISOString().slice(0, 7)}`;
+      return new Set(JSON.parse(localStorage.getItem(key) || "[]"));
+    } catch { return new Set(); }
+  });
   const [settingsData, setSettingsData] = useState({
     bizName: initialProfile?.biz_name ?? "",
     googleLink: initialProfile?.google_link ?? "",
@@ -2407,6 +2535,37 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
 
   useEffect(() => { if (tab === "history") loadHistory(); }, [tab, loadHistory]);
   useEffect(() => { if (trialExpired || atLimit) setShowPaywall(true); }, [trialExpired, atLimit]);
+
+  // Usage threshold notifications
+  useEffect(() => {
+    const isPaid = plan === "starter" || plan === "growth" || plan === "crew";
+    if (!isPaid || !sendLimit) return;
+    const crossed = TOAST_THRESHOLDS.filter(t => pct >= t && !shownToasts.has(t));
+    if (!crossed.length) return;
+    const highest = crossed[crossed.length - 1];
+    setActiveToast(highest);
+    setShownToasts(prev => {
+      const next = new Set([...prev, ...crossed]);
+      try {
+        const key = `rc_toasts_${userId}_${new Date().toISOString().slice(0, 7)}`;
+        localStorage.setItem(key, JSON.stringify([...next]));
+      } catch {}
+      return next;
+    });
+    // Fire-and-forget email notification (server deduplicates per month)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) return;
+      fetch("/api/notify-rc-usage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ threshold: highest }),
+      }).catch(() => {});
+    }).catch(() => {});
+  }, [pct]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSwitchPlan = (newPlan) => {
+    setProfile(p => ({ ...p, plan: newPlan }));
+  };
 
   const handleSend = async () => {
     const clean = mobile.replace(/\s/g, "").replace(/^0/, "+61");
@@ -2498,6 +2657,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   return (
     <>
       {(showPaywall || trialExpired) && <RCPaywallScreen isMobile={isMobile} profile={profile} onClose={() => !trialExpired && setShowPaywall(false)} />}
+      {showUpgradeModal && <RCUpgradeModal isMobile={isMobile} profile={profile} onClose={() => setShowUpgradeModal(false)} onPlanChanged={handleSwitchPlan} />}
       <div style={{ minHeight: "100vh", background: "#060606" }}>
         {/* ── TOPBAR ── */}
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: 62, background: "rgba(8,8,8,0.96)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "0 16px" : "0 48px" }}>
@@ -2507,6 +2667,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {plan === "trial" && <button onClick={() => setShowPaywall(true)} style={{ padding: isMobile ? "6px 12px" : "7px 16px", background: "#22c55e", color: "#000", border: "none", borderRadius: 7, fontSize: isMobile ? 11 : 12.5, fontWeight: 700, cursor: "pointer" }}>Upgrade</button>}
+            {(plan === "starter" || plan === "growth" || plan === "crew") && <button onClick={() => setShowUpgradeModal(true)} style={{ padding: isMobile ? "6px 12px" : "7px 16px", background: "transparent", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 7, fontSize: isMobile ? 11 : 12.5, fontWeight: 700, cursor: "pointer" }}>Upgrade Plan</button>}
             <div style={{ fontSize: 12, color: "#656565", fontFamily: "var(--mono)", display: isMobile ? "none" : "block" }}>{sendsUsed}/{sendLimit}</div>
             <button onClick={() => { setTab(t => t === "settings" ? "send" : "settings"); setCancelStep(null); }} style={{ width: 32, height: 32, borderRadius: "50%", background: tab === "settings" ? "rgba(34,197,94,0.15)" : "linear-gradient(135deg,#22c55e,#16a34a)", border: tab === "settings" ? "2px solid #22c55e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: tab === "settings" ? "#22c55e" : "#000", cursor: "pointer" }}>
               {(profile?.biz_name || "R")[0].toUpperCase()}
@@ -2535,6 +2696,14 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
               <div style={{ fontSize: 12, color: pct >= 90 ? "#f87171" : pct >= 75 ? "#f59e0b" : "#444", fontFamily: "var(--mono)", flexShrink: 0 }}>{pct}% used</div>
               {pct >= 80 && <button onClick={() => setShowPaywall(true)} style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 999, padding: "3px 9px", cursor: "pointer", flexShrink: 0 }}>Upgrade</button>}
             </div>
+
+            {activeToast && (
+              <RCUsageToast
+                threshold={activeToast}
+                onDismiss={() => setActiveToast(null)}
+                onUpgrade={() => { setActiveToast(null); setShowUpgradeModal(true); }}
+              />
+            )}
 
             {plan === "trial" && !trialExpired && (
               <div style={{ background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.18)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
@@ -2672,6 +2841,25 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                     <button onClick={handleSaveSettings} disabled={settingsSaving} style={{ width: "100%", padding: "12px 20px", background: settingsSaved ? "rgba(34,197,94,0.15)" : settingsSaving ? "rgba(255,255,255,0.5)" : "#fff", color: settingsSaved ? "#22c55e" : settingsSaving ? "#aaa" : "#000", border: settingsSaved ? "1px solid rgba(34,197,94,0.3)" : "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: settingsSaving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
                       {settingsSaving ? <><Spinner size={13} dark />Saving…</> : settingsSaved ? "✓ Saved!" : "Save changes"}
                     </button>
+
+                    <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
+
+                    {/* Your Plan */}
+                    {plan !== "trial" && plan !== "expired" && (
+                      <div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>Your Plan</div>
+                        <div style={{ background: "#080808", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                          <div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{planConfig.label}</span>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: planConfig.color, background: `${planConfig.color}18`, border: `1px solid ${planConfig.color}38`, borderRadius: 999, padding: "2px 8px", fontFamily: "var(--mono)" }}>{planConfig.label.toUpperCase()}</span>
+                            </div>
+                            <div style={{ fontSize: 12, color: "#555", fontFamily: "var(--mono)" }}>{sendsUsed} / {sendLimit} sends used this month</div>
+                          </div>
+                          <button onClick={() => setShowUpgradeModal(true)} style={{ padding: "9px 16px", background: "#22c55e", color: "#000", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>Upgrade Plan</button>
+                        </div>
+                      </div>
+                    )}
 
                     <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.055)" }} />
 
