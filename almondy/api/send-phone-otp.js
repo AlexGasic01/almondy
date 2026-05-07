@@ -41,7 +41,6 @@ async function sendViaCLickSend(phone, code) {
         {
           to: phone,
           body: `Your ReviewChaser code is ${code}. Valid for 10 minutes. Do not share this code.`,
-          from: "ReviewChaser",
         },
       ],
     }),
