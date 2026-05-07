@@ -27,7 +27,7 @@ function isValidE164(phone) {
 
 async function sendViaCLickSend(phone, code) {
   const credentials = Buffer.from(
-    `${process.env.CLICKSEND_USERNAME}:${process.env.CLICKSEND_API_KEY}`
+    `alex.digital200@gmail.com:${process.env.CLICKSEND_KEY}`
   ).toString("base64");
 
   const res = await fetch("https://rest.clicksend.com/v3/sms/send", {
