@@ -276,7 +276,7 @@ const LockedCard = ({ style }) => {
         <div className={shaking?"shaking":""} style={{ width:44,height:44,background:"#111",border:"1px solid #2e2e2e",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",padding:8,boxShadow:"0 4px 20px rgba(0,0,0,0.6)" }}>
           <LockSVG />
         </div>
-        <p style={{ fontSize:10,fontWeight:700,letterSpacing:"2.5px",color:"#383838",textTransform:"uppercase" }}>In Progress</p>
+        <p style={{ fontSize:10,fontWeight:700,letterSpacing:"2.5px",color:"#555",textTransform:"uppercase" }}>In Progress</p>
       </div>
     </div>
   );
@@ -416,13 +416,13 @@ const HeroProductMockup = () => {
       {/* Title bar */}
       <div style={{ background:"#090909", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"12px 16px", display:"flex", alignItems:"center", gap:6 }}>
         {["#ff5f57","#febc2e","#28c840"].map(c => <div key={c} style={{ width:10, height:10, borderRadius:"50%", background:c }} />)}
-        <div style={{ flex:1, textAlign:"center", fontSize:11, fontWeight:600, color:"#2a2a2a", fontFamily:"var(--mono)" }}>ReviewChaser</div>
+        <div style={{ flex:1, textAlign:"center", fontSize:11, fontWeight:600, color:"#4a4a4a", fontFamily:"var(--mono)" }}>ReviewChaser</div>
       </div>
 
       <div style={{ padding:24 }}>
         {/* Sends counter */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
-          <div style={{ fontSize:11, color:"#383838", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase" }}>Sends this month</div>
+          <div style={{ fontSize:11, color:"#555", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase" }}>Sends this month</div>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <span style={{ fontSize:12, fontWeight:700, color:"#22c55e", fontFamily:"var(--mono)" }}>23 / 140</span>
             <div style={{ width:72, height:5, background:"rgba(255,255,255,0.06)", borderRadius:999 }}>
@@ -444,11 +444,11 @@ const HeroProductMockup = () => {
             />
             {/* SMS preview */}
             <div style={{ background:"#080808", border:"1px solid rgba(255,255,255,0.05)", borderRadius:10, padding:"12px 14px", marginBottom:14 }}>
-              <div style={{ fontSize:10, color:"#2a2a2a", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>SMS preview</div>
+              <div style={{ fontSize:10, color:"#4a4a4a", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>SMS preview</div>
               <div style={{ fontSize:12.5, color:"#555", lineHeight:1.75 }}>
                 Hi! Thanks for choosing <span style={{ color:"#777" }}>Your Business</span>. If you have a moment, we'd love a Google review! <span style={{ color:"#22c55e" }}>g.co/r/yourbusiness</span>
               </div>
-              <div style={{ fontSize:10, color:"#2a2a2a", marginTop:6, fontFamily:"var(--mono)" }}>152 / 160 chars ✓</div>
+              <div style={{ fontSize:10, color:"#4a4a4a", marginTop:6, fontFamily:"var(--mono)" }}>152 / 160 chars ✓</div>
             </div>
             <button
               onClick={handleDemoSend}
@@ -1220,7 +1220,7 @@ function VisInvoiceImport() {
           <div key={label} style={{ background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.055)",borderRadius:8,padding:12,flex:1 }}>
             <div style={{ fontSize:9,color:"#222",fontFamily:"var(--mono)",letterSpacing:1,textTransform:"uppercase",marginBottom:6 }}>{label}</div>
             <div style={{ fontSize:18,fontWeight:800,letterSpacing:"-0.8px",color:"var(--green)" }}>{val}</div>
-            <div style={{ fontSize:9.5,color:"#2a2a2a",marginTop:3 }}>{sub}</div>
+            <div style={{ fontSize:9.5,color:"#4a4a4a",marginTop:3 }}>{sub}</div>
           </div>
         ))}
       </div>
@@ -1229,7 +1229,7 @@ function VisInvoiceImport() {
           <div style={{ width:6,height:6,borderRadius:"50%",background:"#22c55e",flexShrink:0 }} />
           <div style={{ flex:1,fontSize:11,fontWeight:600,color:"#444",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{name}</div>
           <div style={{ fontSize:9,fontWeight:700,padding:"2px 6px",borderRadius:999,background:"rgba(34,197,94,0.1)",color:"var(--green)",border:"1px solid rgba(34,197,94,0.2)",flexShrink:0 }}>Imported</div>
-          <div style={{ fontSize:11,fontWeight:700,color:"#383838",fontFamily:"var(--mono)",flexShrink:0 }}>{amt}</div>
+          <div style={{ fontSize:11,fontWeight:700,color:"#555",fontFamily:"var(--mono)",flexShrink:0 }}>{amt}</div>
         </div>
       ))}
     </div>
@@ -1254,7 +1254,7 @@ function VisSchedule() {
           </div>
           <div>
             <div style={{ fontSize:11,fontWeight:600,color:"#858585" }}>{title}</div>
-            <div style={{ fontSize:10,color:"#2a2a2a",fontFamily:"var(--mono)",marginTop:1 }}>{sub}</div>
+            <div style={{ fontSize:10,color:"#4a4a4a",fontFamily:"var(--mono)",marginTop:1 }}>{sub}</div>
           </div>
         </div>
       ))}
@@ -1278,7 +1278,7 @@ function VisTrack() {
           <div style={{ width:6,height:6,borderRadius:"50%",background:dot,flexShrink:0 }} />
           <div style={{ flex:1,fontSize:11,fontWeight:600,color:"#444",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{name}</div>
           <div style={{ fontSize:9,fontWeight:700,padding:"2px 6px",borderRadius:999,flexShrink:0,...(cls==="paid"?{background:"rgba(34,197,94,0.1)",color:"var(--green)",border:"1px solid rgba(34,197,94,0.2)"}:cls==="late"?{background:"rgba(239,68,68,0.1)",color:"#f87171",border:"1px solid rgba(239,68,68,0.2)"}:{background:"rgba(245,158,11,0.1)",color:"#f59e0b",border:"1px solid rgba(245,158,11,0.2)"}) }}>{badge}</div>
-          <div style={{ fontSize:11,fontWeight:700,color:"#383838",fontFamily:"var(--mono)",flexShrink:0 }}>{amt}</div>
+          <div style={{ fontSize:11,fontWeight:700,color:"#555",fontFamily:"var(--mono)",flexShrink:0 }}>{amt}</div>
         </div>
       ))}
     </div>
@@ -1370,7 +1370,7 @@ const PaychaserPage = ({ setPage }) => {
                 <div style={{ padding:28,display:"flex",flexDirection:"column",gap:20 }}>
                   <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between" }}>
                     <div style={{ fontSize:15,fontWeight:700,color:"#ccc",letterSpacing:"-0.5px" }}>November Overview</div>
-                    <div style={{ fontSize:11,color:"#2a2a2a",fontFamily:"var(--mono)" }}>Last updated just now</div>
+                    <div style={{ fontSize:11,color:"#4a4a4a",fontFamily:"var(--mono)" }}>Last updated just now</div>
                   </div>
                   <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10 }}>
                     {[["Collected","$124k","↑ 18% vs last month",true],["Outstanding","$48k","12 invoices pending",false],["Overdue","$9.8k","3 clients flagged",false]].map(([label,val,sub,green])=>(
@@ -1382,7 +1382,7 @@ const PaychaserPage = ({ setPage }) => {
                     ))}
                   </div>
                   <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:10,padding:18 }}>
-                    <div style={{ fontSize:10,color:"#2a2a2a",fontFamily:"var(--mono)",marginBottom:14,letterSpacing:1,textTransform:"uppercase" }}>Collections: Last 8 months</div>
+                    <div style={{ fontSize:10,color:"#4a4a4a",fontFamily:"var(--mono)",marginBottom:14,letterSpacing:1,textTransform:"uppercase" }}>Collections: Last 8 months</div>
                     <div style={{ display:"flex",alignItems:"flex-end",gap:6,height:80 }}>
                       {[38,52,44,68,55,72,83,100].map((h,i)=>(
                         <div key={i} style={{ flex:1,borderRadius:"3px 3px 0 0",height:`${h}%`,background:i===7?"rgba(34,197,94,0.4)":"rgba(255,255,255,0.06)" }} />
@@ -1441,7 +1441,7 @@ const PaychaserPage = ({ setPage }) => {
           <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,overflow:"hidden",opacity:visible?1:0,transform:visible?"translateX(0)":"translateX(20px)",transition:"all 0.45s 0.1s" }}>
             <div style={{ background:"#090909",borderBottom:"1px solid rgba(255,255,255,0.05)",padding:"10px 14px",display:"flex",alignItems:"center",gap:5 }}>
               {[["#ff5f57"],["#febc2e"],["#28c840"]].map(([c])=><div key={c} style={{ width:8,height:8,borderRadius:"50%",background:c }} />)}
-              <div style={{ flex:1,textAlign:"center",fontSize:10,fontWeight:600,color:"#2a2a2a",fontFamily:"var(--mono)" }}>{s.visLabel}</div>
+              <div style={{ flex:1,textAlign:"center",fontSize:10,fontWeight:600,color:"#4a4a4a",fontFamily:"var(--mono)" }}>{s.visLabel}</div>
             </div>
             <div style={{ padding:isMobile?16:22 }}>{s.vis}</div>
           </div>
@@ -1677,7 +1677,7 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
             {loading?"Setting up your account...":"Take me to my dashboard →"}
           </button>
         </div>
-        <p style={{ textAlign:"center",fontSize:12,color:"#383838",marginTop:18 }}>You can change this any time in Settings</p>
+        <p style={{ textAlign:"center",fontSize:12,color:"#555",marginTop:18 }}>You can change this any time in Settings</p>
       </div>
     </div>
   );
@@ -1789,7 +1789,7 @@ const DashboardPage = ({ setPage,user }) => {
               { label:"Overdue",value:`$${overdue.toLocaleString()}`,sub:`${MOCK_INVOICES.filter(i=>i.status==="overdue").length} flagged`,green:false },
             ].map(({ label,value,sub,green },idx)=>(
               <div key={label} style={{ background:green?"rgba(34,197,94,0.04)":"rgba(255,255,255,0.025)",border:`1px solid ${green?"rgba(34,197,94,0.18)":"rgba(255,255,255,0.06)"}`,borderRadius:12,padding:isMobile?"14px 12px":"20px 18px",gridColumn:isMobile&&idx===2?"1/-1":"auto" }}>
-                <div style={{ fontSize:9.5,color:"#383838",fontFamily:"var(--mono)",letterSpacing:"1.2px",textTransform:"uppercase",marginBottom:8,fontWeight:600 }}>{label}</div>
+                <div style={{ fontSize:9.5,color:"#555",fontFamily:"var(--mono)",letterSpacing:"1.2px",textTransform:"uppercase",marginBottom:8,fontWeight:600 }}>{label}</div>
                 <div style={{ fontSize:isMobile?22:28,fontWeight:800,letterSpacing:"-1px",color:green?"var(--green)":"var(--white)",lineHeight:1,marginBottom:4 }}>{value}</div>
                 <div style={{ fontSize:11,color:green?"rgba(34,197,94,0.5)":"#383838" }}>{sub}</div>
               </div>
@@ -1832,7 +1832,7 @@ const DashboardPage = ({ setPage,user }) => {
                     onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                     <div>
                       <div style={{ fontSize:13.5,fontWeight:600,color:"#ccc",marginBottom:2 }}>{inv.client}</div>
-                      <div style={{ fontSize:11,color:"#383838",fontFamily:"var(--mono)" }}>{inv.due}</div>
+                      <div style={{ fontSize:11,color:"#555",fontFamily:"var(--mono)" }}>{inv.due}</div>
                     </div>
                     <div style={{ fontSize:12,color:"#444",fontFamily:"var(--mono)" }}>{inv.id}</div>
                     <div style={{ fontSize:14,fontWeight:700,color:inv.status==="paid"?"var(--green)":"var(--white)",fontFamily:"var(--mono)" }}>${inv.amount.toLocaleString()}</div>
@@ -1840,7 +1840,7 @@ const DashboardPage = ({ setPage,user }) => {
                       <div style={{ width:5,height:5,borderRadius:"50%",background:st.dot,flexShrink:0 }} />
                       <span style={{ fontSize:10,fontWeight:700,color:st.color }}>{st.label}</span>
                     </div>
-                    <button onClick={()=>setPage("paywall")} style={{ background:"none",border:"none",color:"#2a2a2a",fontSize:16,cursor:"pointer",padding:4 }} onMouseEnter={e=>e.target.style.color="#666"} onMouseLeave={e=>e.target.style.color="#2a2a2a"}>···</button>
+                    <button onClick={()=>setPage("paywall")} style={{ background:"none",border:"none",color:"#4a4a4a",fontSize:16,cursor:"pointer",padding:4 }} onMouseEnter={e=>e.target.style.color="#666"} onMouseLeave={e=>e.target.style.color="#2a2a2a"}>···</button>
                   </div>
                 );
               })}
@@ -1957,7 +1957,7 @@ const PaywallPage = ({ setPage,user,setUser }) => {
 
         <div style={{ display:"flex",justifyContent:"center",gap:isMobile?16:28,flexWrap:"wrap" }}>
           {["No credit card required","Cancel any time","Instant access"].map(t=>(
-            <div key={t} style={{ display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#383838" }}>
+            <div key={t} style={{ display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#555" }}>
               <span style={{ color:"var(--green)",fontSize:10 }}>✓</span> {t}
             </div>
           ))}
@@ -2397,11 +2397,11 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
         <div style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.09)", borderRadius:16, overflow:"hidden", boxShadow:"0 40px 100px rgba(0,0,0,0.7)" }}>
           <div style={{ background:"#090909", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"12px 16px", display:"flex", alignItems:"center", gap:6 }}>
             {["#ff5f57","#febc2e","#28c840"].map(c => <div key={c} style={{ width:10, height:10, borderRadius:"50%", background:c }} />)}
-            <div style={{ flex:1, textAlign:"center", fontSize:11, fontWeight:600, color:"#2a2a2a", fontFamily:"var(--mono)" }}>ReviewChaser Demo</div>
+            <div style={{ flex:1, textAlign:"center", fontSize:11, fontWeight:600, color:"#4a4a4a", fontFamily:"var(--mono)" }}>ReviewChaser Demo</div>
           </div>
           <div style={{ padding:24 }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
-              <div style={{ fontSize:11, color:"#383838", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase" }}>Sends this month</div>
+              <div style={{ fontSize:11, color:"#555", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase" }}>Sends this month</div>
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                 <span style={{ fontSize:12, fontWeight:700, color:"#22c55e", fontFamily:"var(--mono)" }}>23 / 140</span>
                 <div style={{ width:72, height:5, background:"rgba(255,255,255,0.06)", borderRadius:999 }}><div style={{ width:"16%", height:"100%", background:"#22c55e", borderRadius:999 }} /></div>
@@ -2412,9 +2412,9 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
                 <label style={{ fontSize:11.5, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Customer mobile</label>
                 <input value={demoMobile} onChange={e=>setDemoMobile(e.target.value)} placeholder="04XX XXX XXX" maxLength={12} className="rc-input" style={{ ...RC_INPUT, fontSize:16, letterSpacing:"0.5px", marginBottom:12 }} />
                 <div style={{ background:"#080808", border:"1px solid rgba(255,255,255,0.05)", borderRadius:10, padding:"12px 14px", marginBottom:14 }}>
-                  <div style={{ fontSize:10, color:"#2a2a2a", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>SMS preview</div>
+                  <div style={{ fontSize:10, color:"#4a4a4a", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>SMS preview</div>
                   <div style={{ fontSize:12.5, color:"#555", lineHeight:1.75 }}>Hi! Thanks for choosing <span style={{ color:"#777" }}>Your Business</span>. If you have a moment, we'd love a Google review! <span style={{ color:"#22c55e" }}>g.co/r/yourbusiness</span></div>
-                  <div style={{ fontSize:10, color:"#2a2a2a", marginTop:6, fontFamily:"var(--mono)" }}>152 / 160 chars ✓</div>
+                  <div style={{ fontSize:10, color:"#4a4a4a", marginTop:6, fontFamily:"var(--mono)" }}>152 / 160 chars ✓</div>
                 </div>
                 <button onClick={handleDemoSend} disabled={demoMobile.replace(/\s/g,"").length<10||demoSending} style={{ width:"100%", padding:"13px 20px", background:demoMobile.replace(/\s/g,"").length>=10?"#22c55e":"rgba(34,197,94,0.1)", color:demoMobile.replace(/\s/g,"").length>=10?"#000":"#1a4a2e", border:"none", borderRadius:10, fontSize:14, fontWeight:700 }}>
                   {demoSending ? <span style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", gap:8 }}><Spinner size={14} dark /> Sending…</span> : "Send Review Request ✦"}
@@ -2464,7 +2464,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
         </div>
         <div style={{ textAlign:"center" }}>
           <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#22c55e", color:"#000", padding:"14px 32px", fontSize:14, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial, 7 Days →</button>
-          <p style={{ fontSize:12, color:"#383838", marginTop:12 }}>20 sends included · Cancel any time</p>
+          <p style={{ fontSize:12, color:"#555", marginTop:12 }}>20 sends included · Cancel any time</p>
         </div>
       </div>
       <Divider />
@@ -2646,7 +2646,7 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
             {sending ? <><Spinner size={14} dark />Sending code…</> : "Send code →"}
           </button>
         </div>
-        <p style={{ textAlign:"center", fontSize:12, color:"#383838", marginTop:16 }}>By continuing you agree to our Terms &amp; Privacy Policy.</p>
+        <p style={{ textAlign:"center", fontSize:12, color:"#555", marginTop:16 }}>By continuing you agree to our Terms &amp; Privacy Policy.</p>
       </div>
     </div>
   );
@@ -2698,7 +2698,7 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
                 Request a new code
               </button>
             ) : resendTimer > 0 ? (
-              <span style={{ fontSize:12, color:"#383838" }}>Resend code in {resendTimer}s</span>
+              <span style={{ fontSize:12, color:"#555" }}>Resend code in {resendTimer}s</span>
             ) : (
               <button onClick={handleResend} disabled={resending} style={{ fontSize:13, color:"#22c55e", background:"none", border:"none", cursor:resending?"default":"pointer", fontWeight:600 }}>
                 {resending ? "Sending…" : "Resend code"}
@@ -2984,7 +2984,7 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
               <input autoFocus style={RC_INPUT} className="rc-input" placeholder="e.g. Smith Electrical" value={data.bizName} onChange={e => set("bizName", e.target.value)} />
               <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8, marginTop:16 }}>Google Review URL</label>
               <input style={RC_INPUT} className="rc-input" placeholder="https://search.google.com/local/writereview?placeid=..." value={data.googleLink} onChange={e => set("googleLink", e.target.value)} />
-              <p style={{ fontSize:12, color:"#383838", marginTop:8, lineHeight:1.6 }}>
+              <p style={{ fontSize:12, color:"#555", marginTop:8, lineHeight:1.6 }}>
                 Find it: search your business on Google → click "Ask for reviews" → copy the link.
               </p>
               <button onClick={() => setManualMode(false)} style={{ background:"none", border:"none", color:"#444", fontSize:12, cursor:"pointer", marginTop:10, textDecoration:"underline", padding:0 }}>
@@ -3008,11 +3008,11 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
       case 2: return (
         <div>
           <div style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"20px 18px", marginBottom:16 }}>
-            <div style={{ fontSize:10, color:"#383838", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>SMS your customers will receive</div>
+            <div style={{ fontSize:10, color:"#555", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>SMS your customers will receive</div>
             <div style={{ background:"#080808", borderRadius:10, padding:"14px 16px", fontSize:14, color:"#bbb", lineHeight:1.8 }}>
               Hi! Thanks for choosing <strong style={{ color:"#fff" }}>{data.bizName||"Your Business"}</strong>. If you have a moment, we'd love a Google review, it really helps! <span style={{ color:"#22c55e" }}>{shortLink(data.googleLink)}</span>
             </div>
-            <div style={{ fontSize:11, color:"#2a2a2a", marginTop:10, display:"flex", justifyContent:"space-between", fontFamily:"var(--mono)" }}>
+            <div style={{ fontSize:11, color:"#4a4a4a", marginTop:10, display:"flex", justifyContent:"space-between", fontFamily:"var(--mono)" }}>
               <span>From: AU mobile number</span>
               <span style={{ color:"rgba(34,197,94,0.4)" }}>✓ Under 160 chars</span>
             </div>
