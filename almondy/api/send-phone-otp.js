@@ -48,8 +48,13 @@ async function sendViaCLickSend(phone, code) {
   });
 
   const json = await res.json();
+  console.log("ClickSend response:", JSON.stringify(json));
   if (!res.ok || json.http_code !== 200) {
     throw new Error(json.response_msg || "SMS delivery failed");
+  }
+  const msgStatus = json?.data?.messages?.[0]?.status;
+  if (msgStatus && msgStatus !== "SUCCESS") {
+    throw new Error(`SMS not delivered: ${msgStatus}`);
   }
 }
 
