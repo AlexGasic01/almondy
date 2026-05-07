@@ -153,6 +153,14 @@ const GlobalStyle = () => (
 );
 
 /* ─── NAV ─── */
+const NAV_LINKS = [
+  { id: "home",         label: "Home" },
+  { id: "systems",      label: "Systems" },
+  { id: "webdev",       label: "Web Development" },
+  { id: "reviewchaser", label: "ReviewChaser" },
+  { id: "testimonials", label: "Testimonials" },
+];
+
 const Nav = ({ page, setPage }) => {
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -172,14 +180,6 @@ const Nav = ({ page, setPage }) => {
     }
   };
 
-  const links = [
-    { id: "home",         label: "Home" },
-    { id: "systems",      label: "Systems" },
-    { id: "webdev",       label: "Web Development" },
-    { id: "reviewchaser", label: "ReviewChaser" },
-    { id: "testimonials", label: "Testimonials" },
-  ];
-
   const go = (id) => { setPage(id); setMenuOpen(false); };
 
   return (
@@ -197,7 +197,7 @@ const Nav = ({ page, setPage }) => {
         ) : (
           <>
             <ul style={{ display:"flex",gap:28,listStyle:"none" }}>
-              {links.map(l => (
+              {NAV_LINKS.map(l => (
                 <li key={l.id}>
                   <button onClick={() => go(l.id)} style={{ background:"none",border:"none",color:page===l.id?"var(--white)":"var(--gray)",fontSize:13,fontWeight:500,letterSpacing:"-0.1px",transition:"color 0.15s" }}>{l.label}</button>
                 </li>
@@ -664,6 +664,77 @@ const STEPS_ONBOARDING = [
   "Technical","Inspiration","Timeline","Review",
 ];
 
+// ── WebDev onboarding shared styles (module-level to prevent per-render recreation) ──
+const WD_INPUT_STYLE = {
+  width:"100%", padding:"12px 16px", background:"#0f0f0f",
+  border:"1px solid rgba(255,255,255,0.1)", borderRadius:10,
+  fontSize:15, color:"#fff", outline:"none", fontFamily:"var(--font)", boxSizing:"border-box",
+};
+const WD_TEXTAREA_STYLE = { ...WD_INPUT_STYLE, resize:"vertical", minHeight:90 };
+const WD_LABEL_STYLE = { fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 };
+const WD_OPT_STYLE = (active) => ({
+  background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c",
+  border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`,
+  borderRadius:9, padding:"11px 14px", cursor:"pointer",
+  display:"flex", alignItems:"flex-start", gap:9,
+  fontSize:13, fontWeight:600, color: active ? "#22c55e" : "#666", textAlign:"left",
+});
+
+// ── Sub-components defined at module level (prevents remount on parent re-render) ──
+const WDTick = ({ active, round }) => (
+  <div style={{
+    width:14, height:14, borderRadius: round ? "50%" : 3, flexShrink:0, marginTop:1,
+    border:`1px solid ${active ? "rgba(34,197,94,0.5)" : "#656565"}`,
+    background: active ? "#22c55e" : "transparent",
+    display:"flex", alignItems:"center", justifyContent:"center",
+    fontSize:8, color:"#000", fontWeight:900,
+  }}>{active ? "✓" : ""}</div>
+);
+
+const WDToggleGrid = ({ options, value, onChange, multi = true, cols = 2 }) => (
+  <div style={{ display:"grid", gridTemplateColumns:`repeat(${cols}, 1fr)`, gap:8 }}>
+    {options.map(opt => {
+      const active = multi ? (Array.isArray(value) && value.includes(opt.id)) : value === opt.id;
+      return (
+        <button key={opt.id}
+          onClick={() => multi
+            ? onChange(active ? value.filter(x => x !== opt.id) : [...(value || []), opt.id])
+            : onChange(opt.id)}
+          style={WD_OPT_STYLE(active)}>
+          <WDTick active={active} round={!multi} />
+          <div>
+            <div>{opt.label}</div>
+            {opt.desc && <div style={{ fontSize:10, color:"#444", fontWeight:400, marginTop:2 }}>{opt.desc}</div>}
+          </div>
+        </button>
+      );
+    })}
+  </div>
+);
+
+const WDYesNo = ({ value, onChange, label }) => (
+  <div>
+    {label && <label style={WD_LABEL_STYLE}>{label}</label>}
+    <div style={{ display:"flex", gap:8 }}>
+      {["yes","no"].map(v => {
+        const active = value === v;
+        const isYes = v === "yes";
+        return (
+          <button key={v} onClick={() => onChange(v)} style={{
+            flex:1, padding:"11px",
+            background: active ? (isYes ? "rgba(34,197,94,0.07)" : "rgba(239,68,68,0.07)") : "#0c0c0c",
+            border:`1px solid ${active ? (isYes ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)") : "rgba(255,255,255,0.07)"}`,
+            borderRadius:9, cursor:"pointer", fontSize:13, fontWeight:600,
+            color: active ? (isYes ? "#22c55e" : "#f87171") : "#666",
+          }}>{isYes ? "Yes" : "No"}</button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+const WDConditionalInput = ({ condition, children }) => condition ? children : null;
+
 const WebDevOnboardingPage = ({ setPage }) => {
   const isMobile = useIsMobile();
   const [step, setStep] = useState(0);
@@ -716,101 +787,36 @@ const WebDevOnboardingPage = ({ setPage }) => {
     return true;
   };
 
-  const inputStyle = {
-    width: "100%", padding: "12px 16px", background: "#0f0f0f",
-    border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10,
-    fontSize: 15, color: "#fff", outline: "none", fontFamily: "var(--font)", boxSizing: "border-box",
-  };
-  const textareaStyle = { ...inputStyle, resize: "vertical", minHeight: 90 };
-  const labelStyle = { fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 };
-  const optStyle = (active) => ({
-    background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c",
-    border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`,
-    borderRadius: 9, padding: "11px 14px", cursor: "pointer",
-    display: "flex", alignItems: "flex-start", gap: 9,
-    fontSize: 13, fontWeight: 600, color: active ? "#22c55e" : "#666", textAlign: "left",
-  });
-
-  const Tick = ({ active, round }) => (
-    <div style={{
-      width: 14, height: 14, borderRadius: round ? "50%" : 3, flexShrink: 0, marginTop: 1,
-      border: `1px solid ${active ? "rgba(34,197,94,0.5)" : "#656565"}`,
-      background: active ? "#22c55e" : "transparent",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: 8, color: "#000", fontWeight: 900,
-    }}>{active ? "✓" : ""}</div>
-  );
-
-  const ToggleGrid = ({ options, field, multi = true, cols = 2 }) => (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 8 }}>
-      {options.map(opt => {
-        const active = multi ? data[field].includes(opt.id) : data[field] === opt.id;
-        return (
-          <button key={opt.id} onClick={() => multi ? toggle(field, opt.id) : set(field, opt.id)} style={optStyle(active)}>
-            <Tick active={active} round={!multi} />
-            <div>
-              <div>{opt.label}</div>
-              {opt.desc && <div style={{ fontSize: 10, color: "#444", fontWeight: 400, marginTop: 2 }}>{opt.desc}</div>}
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-
-  const YesNo = ({ field, label }) => (
-    <div>
-      {label && <label style={labelStyle}>{label}</label>}
-      <div style={{ display: "flex", gap: 8 }}>
-        {["yes", "no"].map(v => {
-          const active = data[field] === v;
-          const isYes = v === "yes";
-          return (
-            <button key={v} onClick={() => set(field, v)} style={{
-              flex: 1, padding: "11px",
-              background: active ? (isYes ? "rgba(34,197,94,0.07)" : "rgba(239,68,68,0.07)") : "#0c0c0c",
-              border: `1px solid ${active ? (isYes ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)") : "rgba(255,255,255,0.07)"}`,
-              borderRadius: 9, cursor: "pointer", fontSize: 13, fontWeight: 600,
-              color: active ? (isYes ? "#22c55e" : "#f87171") : "#666",
-            }}>{isYes ? "Yes" : "No"}</button>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  const ConditionalInput = ({ condition, children }) => condition ? children : null;
-
   const stepContent = () => {
     switch (step) {
       case 0: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <label style={labelStyle}>Business / project name</label>
-            <input autoFocus style={inputStyle} placeholder="e.g. Smith Electrical" value={data.bizName}
+            <label style={WD_LABEL_STYLE}>Business / project name</label>
+            <input autoFocus style={WD_INPUT_STYLE} placeholder="e.g. Smith Electrical" value={data.bizName}
               onChange={e => set("bizName", e.target.value)}
               onKeyDown={e => e.key === "Enter" && data.bizDesc.trim() && go(1)} />
           </div>
           <div>
-            <label style={labelStyle}>What do you do? <span style={{ color: "#383838", fontWeight: 400 }}>(brief)</span></label>
-            <textarea style={textareaStyle} placeholder="e.g. We install solar panels for residential homes in Brisbane." value={data.bizDesc} onChange={e => set("bizDesc", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>What do you do? <span style={{ color: "#383838", fontWeight: 400 }}>(brief)</span></label>
+            <textarea style={WD_TEXTAREA_STYLE} placeholder="e.g. We install solar panels for residential homes in Brisbane." value={data.bizDesc} onChange={e => set("bizDesc", e.target.value)} />
           </div>
           <div>
-            <label style={labelStyle}>Location <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <input style={inputStyle} placeholder="e.g. Brisbane, QLD" value={data.bizLocation} onChange={e => set("bizLocation", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Location <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={WD_INPUT_STYLE} placeholder="e.g. Brisbane, QLD" value={data.bizLocation} onChange={e => set("bizLocation", e.target.value)} />
           </div>
           <div>
-            <label style={labelStyle}>Who is your ideal customer? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <input style={inputStyle} placeholder="e.g. Homeowners aged 35-60 in Brisbane suburbs" value={data.idealCustomer} onChange={e => set("idealCustomer", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Who is your ideal customer? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={WD_INPUT_STYLE} placeholder="e.g. Homeowners aged 35-60 in Brisbane suburbs" value={data.idealCustomer} onChange={e => set("idealCustomer", e.target.value)} />
           </div>
         </div>
       );
       case 1: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <ToggleGrid options={VIBE_OPTIONS} field="vibe" multi={false} cols={2} />
+          <WDToggleGrid options={VIBE_OPTIONS} value={data.vibe} onChange={v => set("vibe", v)} multi={false} cols={2} />
           <div>
-            <label style={labelStyle}>Any sites you love? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <textarea style={{ ...textareaStyle, minHeight: 76 }} placeholder="Paste URLs or describe what you like about them..." value={data.vibeInspo} onChange={e => set("vibeInspo", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Any sites you love? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 76 }} placeholder="Paste URLs or describe what you like about them..." value={data.vibeInspo} onChange={e => set("vibeInspo", e.target.value)} />
           </div>
         </div>
       );
@@ -849,8 +855,8 @@ const WebDevOnboardingPage = ({ setPage }) => {
             </div>
           )}
           <div>
-            <label style={labelStyle}>Colour notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <input style={inputStyle} placeholder='e.g. "Must use our brand red #E63946"' value={data.colourNotes} onChange={e => set("colourNotes", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Colour notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={WD_INPUT_STYLE} placeholder='e.g. "Must use our brand red #E63946"' value={data.colourNotes} onChange={e => set("colourNotes", e.target.value)} />
           </div>
         </div>
       );
@@ -865,18 +871,18 @@ const WebDevOnboardingPage = ({ setPage }) => {
               </button>
             );
           })}
-          {data.font === "custom" && <input autoFocus style={inputStyle} placeholder="Font name e.g. 'Raleway'" value={data.fontCustom} onChange={e => set("fontCustom", e.target.value)} />}
+          {data.font === "custom" && <input autoFocus style={WD_INPUT_STYLE} placeholder="Font name e.g. 'Raleway'" value={data.fontCustom} onChange={e => set("fontCustom", e.target.value)} />}
         </div>
       );
       case 4: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <YesNo field="hasLogo"     label="Do you have a logo?" />
-          <YesNo field="hasPhotos"   label="Do you have professional photos?" />
-          <YesNo field="hasHeadshot" label="Do you have a headshot / team photo?" />
-          <YesNo field="needsLogo"   label="Do you need a logo designed?" />
+          <WDYesNo value={data.hasLogo}     onChange={v => set("hasLogo", v)}     label="Do you have a logo?" />
+          <WDYesNo value={data.hasPhotos}   onChange={v => set("hasPhotos", v)}   label="Do you have professional photos?" />
+          <WDYesNo value={data.hasHeadshot} onChange={v => set("hasHeadshot", v)} label="Do you have a headshot / team photo?" />
+          <WDYesNo value={data.needsLogo}   onChange={v => set("needsLogo", v)}   label="Do you need a logo designed?" />
           <div>
-            <label style={labelStyle}>Asset notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="e.g. Logo is in .AI format, photos coming next week..." value={data.assetNotes} onChange={e => set("assetNotes", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Asset notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="e.g. Logo is in .AI format, photos coming next week..." value={data.assetNotes} onChange={e => set("assetNotes", e.target.value)} />
           </div>
         </div>
       );
@@ -903,7 +909,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
                 <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) set("heroUploadName", f.name); }} />
                 {data.heroUploadName ? `✓ ${data.heroUploadName}` : "Upload image reference"}
               </label>
-              <input style={{ ...inputStyle, flex: 1, minWidth: 140 }} placeholder="or paste a URL" value={data.heroRefUrl} onChange={e => set("heroRefUrl", e.target.value)} />
+              <input style={{ ...WD_INPUT_STYLE, flex: 1, minWidth: 140 }} placeholder="or paste a URL" value={data.heroRefUrl} onChange={e => set("heroRefUrl", e.target.value)} />
             </div>
           </div>
         </div>
@@ -911,19 +917,19 @@ const WebDevOnboardingPage = ({ setPage }) => {
       case 6: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
-            <label style={labelStyle}>Main headline</label>
-            <input autoFocus style={inputStyle} placeholder='"Solar done right. Every time."' value={data.heroHeadline} onChange={e => set("heroHeadline", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Main headline</label>
+            <input autoFocus style={WD_INPUT_STYLE} placeholder='"Solar done right. Every time."' value={data.heroHeadline} onChange={e => set("heroHeadline", e.target.value)} />
           </div>
           <div>
-            <label style={labelStyle}>Subheadline <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <textarea style={textareaStyle} placeholder="A short supporting line." value={data.heroSubline} onChange={e => set("heroSubline", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Subheadline <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={WD_TEXTAREA_STYLE} placeholder="A short supporting line." value={data.heroSubline} onChange={e => set("heroSubline", e.target.value)} />
           </div>
           <div>
-            <label style={labelStyle}>CTA button text <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <input style={inputStyle} placeholder='"Get a free quote"' value={data.heroCta} onChange={e => set("heroCta", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>CTA button text <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={WD_INPUT_STYLE} placeholder='"Get a free quote"' value={data.heroCta} onChange={e => set("heroCta", e.target.value)} />
           </div>
           <div>
-            <label style={labelStyle}>Hero background style</label>
+            <label style={WD_LABEL_STYLE}>Hero background style</label>
             <div style={{ display: "flex", gap: 8 }}>
               {["solid", "photo", "gradient", "video"].map(bg => {
                 const active = data.heroBackground === bg;
@@ -947,83 +953,83 @@ const WebDevOnboardingPage = ({ setPage }) => {
       );
       case 7: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <ToggleGrid options={SOCIAL_PROOF_OPTIONS} field="socialProof" multi={true} cols={2} />
+          <WDToggleGrid options={SOCIAL_PROOF_OPTIONS} value={data.socialProof} onChange={v => set("socialProof", v)} multi={true} cols={2} />
           <div>
-            <label style={labelStyle}>Notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="e.g. We have 80+ Google reviews, 4.9 stars..." value={data.socialProofNotes} onChange={e => set("socialProofNotes", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="e.g. We have 80+ Google reviews, 4.9 stars..." value={data.socialProofNotes} onChange={e => set("socialProofNotes", e.target.value)} />
           </div>
         </div>
       );
       case 8: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <ToggleGrid options={LEAD_OPTIONS} field="leadMethod" multi={true} cols={2} />
+          <WDToggleGrid options={LEAD_OPTIONS} value={data.leadMethod} onChange={v => set("leadMethod", v)} multi={true} cols={2} />
           <div>
-            <label style={labelStyle}>What info do you need from leads? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="e.g. Name, phone, address, type of job, preferred time..." value={data.formFields} onChange={e => set("formFields", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>What info do you need from leads? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="e.g. Name, phone, address, type of job, preferred time..." value={data.formFields} onChange={e => set("formFields", e.target.value)} />
           </div>
         </div>
       );
       case 9: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <p style={{ fontSize: 13, color: "#666", marginBottom: 4 }}>Select all pages you need:</p>
-          <ToggleGrid options={PAGE_OPTIONS} field="pages" multi={true} cols={2} />
+          <WDToggleGrid options={PAGE_OPTIONS} value={data.pages} onChange={v => set("pages", v)} multi={true} cols={2} />
         </div>
       );
       case 10: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <p style={{ fontSize: 13, color: "#666", marginBottom: 4 }}>Select any features you need: <span style={{ color: "#383838" }}>(all optional)</span></p>
-          <ToggleGrid options={FEATURE_OPTIONS} field="features" multi={true} cols={2} />
+          <WDToggleGrid options={FEATURE_OPTIONS} value={data.features} onChange={v => set("features", v)} multi={true} cols={2} />
         </div>
       );
       case 11: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <YesNo field="hasDomain" label="Do you have a domain name?" />
-          <ConditionalInput condition={data.hasDomain === "yes"}>
-            <input style={inputStyle} placeholder="e.g. smithelectrical.com.au" value={data.domainName} onChange={e => set("domainName", e.target.value)} />
-          </ConditionalInput>
-          <YesNo field="hasHosting" label="Do you have existing hosting?" />
+          <WDYesNo value={data.hasDomain} onChange={v => set("hasDomain", v)} label="Do you have a domain name?" />
+          <WDConditionalInput condition={data.hasDomain === "yes"}>
+            <input style={WD_INPUT_STYLE} placeholder="e.g. smithelectrical.com.au" value={data.domainName} onChange={e => set("domainName", e.target.value)} />
+          </WDConditionalInput>
+          <WDYesNo value={data.hasHosting} onChange={v => set("hasHosting", v)} label="Do you have existing hosting?" />
           <div>
-            <label style={labelStyle}>Current website URL <span style={{ color: "#383838", fontWeight: 400 }}>(if you have one)</span></label>
-            <input style={inputStyle} placeholder="https://..." value={data.existingSite} onChange={e => set("existingSite", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Current website URL <span style={{ color: "#383838", fontWeight: 400 }}>(if you have one)</span></label>
+            <input style={WD_INPUT_STYLE} placeholder="https://..." value={data.existingSite} onChange={e => set("existingSite", e.target.value)} />
           </div>
-          <YesNo field="needsCms" label="Do you want to be able to edit the site yourself?" />
+          <WDYesNo value={data.needsCms} onChange={v => set("needsCms", v)} label="Do you want to be able to edit the site yourself?" />
         </div>
       );
       case 12: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <label style={labelStyle}>Top 2-3 local competitor URLs <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder={"e.g. https://smithelectrical.com.au\nhttps://brisbaneelectrics.com.au"} value={data.competitors} onChange={e => set("competitors", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Top 2-3 local competitor URLs <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder={"e.g. https://smithelectrical.com.au\nhttps://brisbaneelectrics.com.au"} value={data.competitors} onChange={e => set("competitors", e.target.value)} />
           </div>
           <div>
-            <label style={labelStyle}>Sites you love — any industry <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="Paste URLs or describe what you like..." value={data.inspiration} onChange={e => set("inspiration", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Sites you love — any industry <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="Paste URLs or describe what you like..." value={data.inspiration} onChange={e => set("inspiration", e.target.value)} />
           </div>
           <div>
-            <label style={labelStyle}>Anything you hate the look of? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="Styles, colours, trends you want to avoid..." value={data.antiInspo} onChange={e => set("antiInspo", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Anything you hate the look of? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="Styles, colours, trends you want to avoid..." value={data.antiInspo} onChange={e => set("antiInspo", e.target.value)} />
           </div>
           <div>
-            <label style={labelStyle}>One word to describe how you want the site to feel <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <input style={inputStyle} placeholder='"trustworthy" / "premium" / "energetic"' value={data.oneFeelingWord} onChange={e => set("oneFeelingWord", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>One word to describe how you want the site to feel <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={WD_INPUT_STYLE} placeholder='"trustworthy" / "premium" / "energetic"' value={data.oneFeelingWord} onChange={e => set("oneFeelingWord", e.target.value)} />
           </div>
         </div>
       );
       case 13: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <label style={labelStyle}>When do you need it live? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <input style={inputStyle} placeholder="e.g. End of July, or ASAP" value={data.deadline} onChange={e => set("deadline", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>When do you need it live? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={WD_INPUT_STYLE} placeholder="e.g. End of July, or ASAP" value={data.deadline} onChange={e => set("deadline", e.target.value)} />
           </div>
-          <YesNo field="hardDeadline" label="Is this a hard deadline?" />
+          <WDYesNo value={data.hardDeadline} onChange={v => set("hardDeadline", v)} label="Is this a hard deadline?" />
           <div>
-            <label style={labelStyle}>Budget range</label>
+            <label style={WD_LABEL_STYLE}>Budget range</label>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {["Under $500/month", "$500-$1000/month", "$1000+/month", "Not sure"].map(b => {
                 const active = data.budget === b;
                 return (
                   <button key={b} onClick={() => set("budget", b)} style={{ padding: "11px 14px", background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 9, cursor: "pointer", fontSize: 13, fontWeight: 600, color: active ? "#22c55e" : "#666", textAlign: "left", display: "flex", alignItems: "center", gap: 9 }}>
-                    <Tick active={active} round={true} />
+                    <WDTick active={active} round={true} />
                     {b}
                   </button>
                 );
@@ -1031,8 +1037,8 @@ const WebDevOnboardingPage = ({ setPage }) => {
             </div>
           </div>
           <div>
-            <label style={labelStyle}>Any concerns or questions? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
-            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="Anything on your mind..." value={data.concerns} onChange={e => set("concerns", e.target.value)} />
+            <label style={WD_LABEL_STYLE}>Any concerns or questions? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="Anything on your mind..." value={data.concerns} onChange={e => set("concerns", e.target.value)} />
           </div>
         </div>
       );
@@ -1073,8 +1079,8 @@ const WebDevOnboardingPage = ({ setPage }) => {
             ))}
           </div>
           <div>
-            <label style={{ ...labelStyle, color: "#666" }}>Your email <span style={{ color: "#22c55e" }}>*</span></label>
-            <input autoFocus style={inputStyle} type="email" placeholder="yourname@domain.com" value={data.email} onChange={e => set("email", e.target.value)} />
+            <label style={{ ...WD_LABEL_STYLE, color: "#666" }}>Your email <span style={{ color: "#22c55e" }}>*</span></label>
+            <input autoFocus style={WD_INPUT_STYLE} type="email" placeholder="yourname@domain.com" value={data.email} onChange={e => set("email", e.target.value)} />
             <p style={{ fontSize: 11.5, color: "#383838", marginTop: 8 }}>We'll get back to you within 24 hours with a quote.</p>
           </div>
         </div>
@@ -1576,33 +1582,28 @@ const AuthPage = ({ setPage, setUser }) => {
   const [email,setEmail] = useState("");
   const [loading,setLoading] = useState(false);
   const [authErr,setAuthErr] = useState("");
+  const pollRef = useRef(null);
 
-const handleSend = async () => {
-  if (!email.includes("@")) return;
-  setLoading(true); setErr("");
-  try {
-    const { error } = await supabase.auth.signInWithOtp({ 
-      email, 
-      options: { 
-        shouldCreateUser: true,
-        emailRedirectTo: undefined  // don't redirect anywhere
-      } 
-    });
-    if (error) throw error;
-    setSent(true);
-    // Start polling the existing tab for session
-    const poll = setInterval(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        clearInterval(poll);
-        // onAuthStateChange in ReviewChaserPage will handle the rest
-      }
-    }, 2000);
-    // Stop polling after 10 mins
-    setTimeout(() => clearInterval(poll), 600000);
-  } catch(e) { setErr("Something went wrong. Try again."); }
-  finally { setLoading(false); }
-};
+  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
+
+  const handleSend = async () => {
+    if (!email.includes("@")) return;
+    setLoading(true); setAuthErr("");
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: true, emailRedirectTo: undefined },
+      });
+      if (error) throw error;
+      setStep("sent");
+      pollRef.current = setInterval(async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) { clearInterval(pollRef.current); pollRef.current = null; }
+      }, 2000);
+      setTimeout(() => { clearInterval(pollRef.current); pollRef.current = null; }, 600000);
+    } catch(e) { setAuthErr("Something went wrong. Try again."); }
+    finally { setLoading(false); }
+  };
 
   return (
     <div style={{ minHeight:"100vh",background:"var(--black)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,position:"relative",overflow:"hidden" }}>
@@ -1746,14 +1747,18 @@ const AppSidebar = ({ activeTab,setTab }) => {
   );
 };
 
+const MOCK_COLLECTED   = MOCK_INVOICES.filter(i=>i.status==="paid").reduce((s,i)=>s+i.amount,0);
+const MOCK_OUTSTANDING = MOCK_INVOICES.filter(i=>i.status!=="paid").reduce((s,i)=>s+i.amount,0);
+const MOCK_OVERDUE     = MOCK_INVOICES.filter(i=>i.status==="overdue").reduce((s,i)=>s+i.amount,0);
+
 const DashboardPage = ({ setPage,user }) => {
   const isMobile = useIsMobile();
   const [tab,setTab] = useState("invoices");
   const [showBanner,setShowBanner] = useState(true);
 
-  const collected = MOCK_INVOICES.filter(i=>i.status==="paid").reduce((s,i)=>s+i.amount,0);
-  const outstanding = MOCK_INVOICES.filter(i=>i.status!=="paid").reduce((s,i)=>s+i.amount,0);
-  const overdue = MOCK_INVOICES.filter(i=>i.status==="overdue").reduce((s,i)=>s+i.amount,0);
+  const collected = MOCK_COLLECTED;
+  const outstanding = MOCK_OUTSTANDING;
+  const overdue = MOCK_OVERDUE;
 
   return (
     <div style={{ minHeight:"100vh",background:"#060606",display:"flex",flexDirection:"column" }}>
@@ -2777,6 +2782,14 @@ const RCEmailCollectScreen = ({ isMobile, userId, onComplete }) => {
 };
 
 // ── Onboarding Wizard ─────────────────────────────────────────────
+const RC_COUNTRIES = [
+  { code:"au", flag:"🇦🇺", label:"Australia" },
+  { code:"nz", flag:"🇳🇿", label:"New Zealand" },
+  { code:"us", flag:"🇺🇸", label:"United States" },
+  { code:"gb", flag:"🇬🇧", label:"United Kingdom" },
+  { code:"ca", flag:"🇨🇦", label:"Canada" },
+  { code:"sg", flag:"🇸🇬", label:"Singapore" },
+];
 const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   const savedKey = `rc_onboarding_${userId}`;
   const saved = (() => { try { return JSON.parse(localStorage.getItem(savedKey) || "{}"); } catch { return {}; } })();
@@ -2806,14 +2819,6 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const COUNTRIES = [
-    { code:"au", flag:"🇦🇺", label:"Australia" },
-    { code:"nz", flag:"🇳🇿", label:"New Zealand" },
-    { code:"us", flag:"🇺🇸", label:"United States" },
-    { code:"gb", flag:"🇬🇧", label:"United Kingdom" },
-    { code:"ca", flag:"🇨🇦", label:"Canada" },
-    { code:"sg", flag:"🇸🇬", label:"Singapore" },
-  ];
 
   const set = (k, v) => setData(d => {
     const next = { ...d, [k]: v };
@@ -2909,13 +2914,13 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
                     onMouseEnter={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.25)"}
                     onMouseLeave={e => e.currentTarget.style.borderColor=countryOpen?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.1)"}
                   >
-                    <span style={{ fontSize:18, lineHeight:1 }}>{COUNTRIES.find(c => c.code === searchCountry)?.flag}</span>
-                    <span style={{ fontSize:12, color:"#888", fontWeight:600 }}>{COUNTRIES.find(c => c.code === searchCountry)?.code.toUpperCase()}</span>
+                    <span style={{ fontSize:18, lineHeight:1 }}>{RC_COUNTRIES.find(c => c.code === searchCountry)?.flag}</span>
+                    <span style={{ fontSize:12, color:"#888", fontWeight:600 }}>{RC_COUNTRIES.find(c => c.code === searchCountry)?.code.toUpperCase()}</span>
                     <span style={{ fontSize:9, color:"#444", marginLeft:2 }}>▼</span>
                   </button>
                   {countryOpen && (
                     <div style={{ position:"absolute", top:"calc(100% + 6px)", left:0, background:"#111", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, overflow:"hidden", zIndex:50, minWidth:180, boxShadow:"0 8px 24px rgba(0,0,0,0.6)" }}>
-                      {COUNTRIES.map(c => (
+                      {RC_COUNTRIES.map(c => (
                         <button
                           key={c.code}
                           type="button"
@@ -3332,7 +3337,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
       } catch {}
       return next;
     });
-  }, [pct]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pct, plan, sendLimit, userId, shownToasts]);
 
   const handleSwitchPlan = (newPlan) => {
     setProfile(p => ({ ...p, plan: newPlan }));
