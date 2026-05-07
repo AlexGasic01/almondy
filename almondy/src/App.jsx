@@ -110,8 +110,13 @@ const GlobalStyle = () => (
       --green: #22c55e; --green-dim: rgba(34,197,94,0.12);
       --font: 'Inter', sans-serif; --mono: 'Inter', sans-serif;
     }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scrollbar-gutter: stable; }
     body { background: var(--black); color: var(--white); font-family: var(--font); line-height: 1.6; overflow-x: hidden; }
+    * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
     a { text-decoration: none; }
     button { cursor: pointer; font-family: var(--font); -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
     button:active { opacity: 0.7; transform: scale(0.97); transition: opacity 0.1s, transform 0.1s; }
