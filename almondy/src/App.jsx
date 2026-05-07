@@ -3225,7 +3225,19 @@ function ReviewChaserPage({ setPage, user, setUser }) {
         const uid = session.user.id;
         const phone = session.user.user_metadata?.phone ?? null;
         setRcUserId(uid);
-        const profile = await getOrCreateRCProfile(uid, session.user.email, phone);
+        let profile = await getOrCreateRCProfile(uid, session.user.email, phone);
+
+        // After a successful checkout Stripe's webhook may not have updated the plan yet.
+        // Poll until the plan changes or we time out (10s).
+        const isPostCheckout = new URLSearchParams(window.location.search).get("rc_session") === "success";
+        if (isPostCheckout && (profile.plan === "trial" || profile.plan === "expired")) {
+          for (let i = 0; i < 10 && mounted; i++) {
+            await new Promise(r => setTimeout(r, 1000));
+            const { data } = await supabase.from("rc_profiles").select("*").eq("id", uid).maybeSingle();
+            if (data && data.plan !== "trial" && data.plan !== "expired") { profile = data; break; }
+          }
+        }
+
         if (!mounted) return;
         setRcProfile(profile);
         routeAfterProfile(profile);
