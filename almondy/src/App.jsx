@@ -151,6 +151,21 @@ const GlobalStyle = () => (
 const Nav = ({ page, setPage }) => {
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [rcSession, setRcSession] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setRcSession(session ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => setRcSession(session ?? null));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleAuthBtn = () => {
+    if (rcSession) {
+      supabase.auth.signOut().then(() => { setRcSession(null); setPage("reviewchaser"); });
+    } else {
+      setPage("reviewchaser");
+    }
+  };
 
   const links = [
     { id: "home",         label: "Home" },
@@ -183,7 +198,7 @@ const Nav = ({ page, setPage }) => {
                 </li>
               ))}
             </ul>
-            <button style={{ background:"var(--white)",color:"var(--black)",border:"none",padding:"8px 20px",fontSize:13,fontWeight:700,borderRadius:7,letterSpacing:"-0.2px" }}>Get in Touch</button>
+            <button onClick={handleAuthBtn} style={{ background:"var(--white)",color:"var(--black)",border:"none",padding:"8px 20px",fontSize:13,fontWeight:700,borderRadius:7,letterSpacing:"-0.2px" }}>{rcSession ? "Log Out" : "Log In →"}</button>
           </>
         )}
       </nav>
@@ -198,7 +213,7 @@ const Nav = ({ page, setPage }) => {
               </button>
             ))}
             <div style={{ padding:"20px 24px" }}>
-              <button style={{ width:"100%",background:"var(--white)",color:"var(--black)",border:"none",padding:"12px 20px",fontSize:14,fontWeight:700,borderRadius:8 }}>Get in Touch</button>
+              <button onClick={handleAuthBtn} style={{ width:"100%",background:"var(--white)",color:"var(--black)",border:"none",padding:"12px 20px",fontSize:14,fontWeight:700,borderRadius:8 }}>{rcSession ? "Log Out" : "Log In →"}</button>
             </div>
           </div>
         </>
