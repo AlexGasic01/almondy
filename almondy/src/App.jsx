@@ -354,7 +354,7 @@ const HomePage = ({ setPage }) => {
       <span className="badge-dot" style={{ width:6,height:6 }} /> In Development
     </div>
     <div style={{ fontSize:isMobile?36:48,fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>PayChaser</div>
-    <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>Track invoices, chase payments, and collect faster — all in one place.</p>
+    <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>Track invoices, chase payments, and collect faster, all in one place.</p>
     <span style={{ fontSize:20,color:"var(--muted)" }}>↗</span>
   </button>
 
@@ -702,7 +702,7 @@ const [data, setData] = useState({
         <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
           {FONT_OPTIONS.map(f=>(
             <button key={f.id} onClick={()=>set("font",f.id)} style={{ background:data.font===f.id?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${data.font===f.id?"rgba(34,197,94,0.4)":"rgba(255,255,255,0.07)"}`,borderRadius:10,padding:"14px 18px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12 }}>
-              <span style={{ font:f.style,color:data.font===f.id?"#22c55e":"#ccc",fontSize:16 }}>Aa — {f.label}</span>
+              <span style={{ font:f.style,color:data.font===f.id?"#22c55e":"#ccc",fontSize:16 }}>Aa / {f.label}</span>
               <span style={{ fontSize:12,color:"#444" }}>{f.desc}</span>
             </button>
           ))}
@@ -870,10 +870,10 @@ const [data, setData] = useState({
    PAGE: PAYCHASER
 ════════════════════════════════════════════ */
 const STEPS = [
-  { num:"Step 01 — Connect", heading:"Add your invoices in seconds.", body:<>Connect your existing tools or add invoices manually. <strong style={{ color:"#888" }}>No complex setup, no training required.</strong></>, visLabel:"Invoice Import", vis:<VisInvoiceImport /> },
-  { num:"Step 02 — Automate", heading:"Set your reminder rules. Once.", body:<>Tell Almondy how you want to chase. <strong style={{ color:"#888" }}>It handles the timing, the wording, and the sending.</strong></>, visLabel:"Reminder Schedule", vis:<VisSchedule /> },
-  { num:"Step 03 — Track", heading:"Know exactly where every invoice stands.", body:<>Your dashboard shows every invoice, every reminder sent, and every payment received. <strong style={{ color:"#888" }}>No more chasing spreadsheets.</strong></>, visLabel:"Live Dashboard", vis:<VisTrack /> },
-  { num:"Step 04 — Collect", heading:"Get paid. Move on.", body:<>When a client pays, Almondy marks it done and stops all reminders. <strong style={{ color:"#888" }}>Automated end to end.</strong></>, visLabel:"Payment Received", vis:<VisCelebrate /> },
+  { num:"Step 01: Connect", heading:"Add your invoices in seconds.", body:<>Connect your existing tools or add invoices manually. <strong style={{ color:"#888" }}>No complex setup, no training required.</strong></>, visLabel:"Invoice Import", vis:<VisInvoiceImport /> },
+  { num:"Step 02: Automate", heading:"Set your reminder rules. Once.", body:<>Tell Almondy how you want to chase. <strong style={{ color:"#888" }}>It handles the timing, the wording, and the sending.</strong></>, visLabel:"Reminder Schedule", vis:<VisSchedule /> },
+  { num:"Step 03: Track", heading:"Know exactly where every invoice stands.", body:<>Your dashboard shows every invoice, every reminder sent, and every payment received. <strong style={{ color:"#888" }}>No more chasing spreadsheets.</strong></>, visLabel:"Live Dashboard", vis:<VisTrack /> },
+  { num:"Step 04: Collect", heading:"Get paid. Move on.", body:<>When a client pays, Almondy marks it done and stops all reminders. <strong style={{ color:"#888" }}>Automated end to end.</strong></>, visLabel:"Payment Received", vis:<VisCelebrate /> },
 ];
 
 function VisInvoiceImport() {
@@ -906,11 +906,11 @@ function VisSchedule() {
       <div style={{ background:"rgba(34,197,94,0.06)",border:"1px solid rgba(34,197,94,0.15)",borderRadius:8,padding:"10px 12px",display:"flex",alignItems:"flex-start",gap:8 }}>
         <span style={{ fontSize:14 }}>⚡</span>
         <div>
-          <div style={{ fontSize:11,color:"rgba(74,222,128,0.8)",lineHeight:1.5 }}>Automation active — 3 rules running</div>
+          <div style={{ fontSize:11,color:"rgba(74,222,128,0.8)",lineHeight:1.5 }}>Automation active, 3 rules running</div>
           <div style={{ fontSize:9.5,color:"rgba(74,222,128,0.3)",fontFamily:"var(--mono)",marginTop:2 }}>Updated now</div>
         </div>
       </div>
-      {[["Day 3 — Friendly nudge","Warm reminder","#22c55e"],["Day 7 — Firmer tone","Direct, professional","#f59e0b"],["Day 14 — Final notice","Last chance","#ef4444"]].map(([title,sub,dot],i)=>(
+      {[["Day 3: Friendly nudge","Warm reminder","#22c55e"],["Day 7: Firmer tone","Direct, professional","#f59e0b"],["Day 14: Final notice","Last chance","#ef4444"]].map(([title,sub,dot],i)=>(
         <div key={i} style={{ display:"flex",gap:12,padding:"8px 0",borderBottom:i<2?"1px solid rgba(255,255,255,0.04)":"none",alignItems:"flex-start" }}>
           <div style={{ display:"flex",flexDirection:"column",alignItems:"center",flexShrink:0,width:28 }}>
             <div style={{ width:8,height:8,borderRadius:"50%",background:dot,marginTop:3 }} />
@@ -1020,7 +1020,7 @@ const PaychaserPage = ({ setPage }) => {
             <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.09)",borderRadius:16,overflow:"hidden",boxShadow:"0 40px 100px rgba(0,0,0,0.8)" }}>
               <div style={{ background:"#090909",borderBottom:"1px solid rgba(255,255,255,0.05)",padding:"14px 18px",display:"flex",alignItems:"center",gap:7 }}>
                 {[["#ff5f57"],["#febc2e"],["#28c840"]].map(([c])=><div key={c} style={{ width:11,height:11,borderRadius:"50%",background:c }} />)}
-                <div style={{ flex:1,textAlign:"center",fontSize:12,fontWeight:600,color:"#656565",fontFamily:"var(--mono)",marginLeft:-55 }}>Almondy — Dashboard</div>
+                <div style={{ flex:1,textAlign:"center",fontSize:12,fontWeight:600,color:"#656565",fontFamily:"var(--mono)",marginLeft:-55 }}>Almondy Dashboard</div>
               </div>
               <div style={{ display:"grid",gridTemplateColumns:"200px 1fr",minHeight:420 }}>
                 <div style={{ background:"#0a0a0a",borderRight:"1px solid rgba(255,255,255,0.05)",padding:"20px 0",display:"flex",flexDirection:"column",gap:2 }}>
@@ -1046,7 +1046,7 @@ const PaychaserPage = ({ setPage }) => {
                     ))}
                   </div>
                   <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:10,padding:18 }}>
-                    <div style={{ fontSize:10,color:"#2a2a2a",fontFamily:"var(--mono)",marginBottom:14,letterSpacing:1,textTransform:"uppercase" }}>Collections — Last 8 months</div>
+                    <div style={{ fontSize:10,color:"#2a2a2a",fontFamily:"var(--mono)",marginBottom:14,letterSpacing:1,textTransform:"uppercase" }}>Collections: Last 8 months</div>
                     <div style={{ display:"flex",alignItems:"flex-end",gap:6,height:80 }}>
                       {[38,52,44,68,55,72,83,100].map((h,i)=>(
                         <div key={i} style={{ flex:1,borderRadius:"3px 3px 0 0",height:`${h}%`,background:i===7?"rgba(34,197,94,0.4)":"rgba(255,255,255,0.06)" }} />
@@ -1171,11 +1171,11 @@ const PRICES = {
   annual: { basic:"0",pro:"24",max:"48",basicP:"Free forever",proP:"per month, billed annually",maxP:"per month, billed annually" },
 };
 const FAQS_PRICING = [
-  ["Can I switch plans at any time?","Yes — upgrade or downgrade whenever you like. Upgrades are prorated immediately. Downgrades kick in at the start of your next billing period."],
+  ["Can I switch plans at any time?","Yes, upgrade or downgrade whenever you like. Upgrades are prorated immediately. Downgrades kick in at the start of your next billing period."],
   ["What counts as an \"active invoice\"?","An active invoice is any invoice Almondy is currently tracking or chasing. Once marked as paid or archived, it no longer counts toward your limit."],
-  ["Is there really a free trial on Pro?","Absolutely. 14 days, full Pro features, no credit card required. If it's not for you, walk away — no awkward cancellation flow, no hidden fees."],
+  ["Is there really a free trial on Pro?","Absolutely. 14 days, full Pro features, no credit card required. If it's not for you, walk away, no awkward cancellation flow, no hidden fees."],
   ["How does automated chasing work?","Almondy sends a series of reminders on a schedule you control. It starts polite, escalates over time, and stops automatically the moment the invoice is paid."],
-  ["Do my clients see Almondy branding?","On Basic and Pro, reminders come from your name and email — clients won't see \"Almondy\" anywhere. Max adds full white-label support."],
+  ["Do my clients see Almondy branding?","On Basic and Pro, reminders come from your name and email, clients won't see \"Almondy\" anywhere. Max adds full white-label support."],
 ];
 
 const PricingPage = ({ setPage }) => {
@@ -1429,7 +1429,7 @@ const DashboardPage = ({ setPage,user }) => {
             <div style={{ background:"rgba(245,158,11,0.07)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:isMobile?"12px 14px":"14px 20px",display:"flex",alignItems:"center",gap:12,marginBottom:20 }}>
               <span style={{ fontSize:16,flexShrink:0 }}>⚡</span>
               <div style={{ flex:1,minWidth:0 }}>
-                <div style={{ fontSize:12.5,fontWeight:700,color:"#f59e0b",marginBottom:2 }}>Free plan — 5 invoice limit</div>
+                <div style={{ fontSize:12.5,fontWeight:700,color:"#f59e0b",marginBottom:2 }}>Free plan: 5 invoice limit</div>
                 <div style={{ fontSize:11.5,color:"#858585" }}>Upgrade for unlimited invoices & automation.</div>
               </div>
               <button onClick={()=>setPage("paywall")} style={{ padding:"7px 12px",background:"#f59e0b",color:"#000",border:"none",borderRadius:7,fontSize:11.5,fontWeight:700,flexShrink:0,whiteSpace:"nowrap" }}>Upgrade →</button>
@@ -1576,7 +1576,7 @@ const PaywallPage = ({ setPage,user,setUser }) => {
             <span className="badge-dot" style={{ width:6,height:6 }} /> Upgrade PayChaser
           </div>
           <h1 style={{ fontSize:isMobile?"clamp(24px,7vw,34px)":"clamp(26px,4vw,36px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:10 }}>You've hit the free limit</h1>
-          <p style={{ fontSize:14,color:"#666",lineHeight:1.7,maxWidth:440,margin:"0 auto 22px" }}>Upgrade to keep chasing — and let Almondy do the hard work.</p>
+          <p style={{ fontSize:14,color:"#666",lineHeight:1.7,maxWidth:440,margin:"0 auto 22px" }}>Upgrade to keep chasing and let Almondy do the hard work.</p>
           <div style={{ display:"inline-flex",background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.07)",borderRadius:999,padding:"3px 4px" }}>
             {["monthly","annual"].map(m=>(
               <button key={m} onClick={()=>setBilling(m)} style={{ padding:"7px 18px",borderRadius:999,border:"none",fontSize:13,fontWeight:600,background:billing===m?"var(--white)":"transparent",color:billing===m?"var(--black)":"#555",display:"inline-flex",alignItems:"center",gap:7,transition:"all 0.2s",cursor:"pointer",fontFamily:"var(--font)" }}>
@@ -1882,6 +1882,11 @@ const RCStyles = () => (
   `}</style>
 );
 
+const shortLink = (url) => {
+  if (!url) return "your-review-link";
+  try { const u = new URL(url); return u.hostname.replace("www.","") + (u.pathname.length > 1 ? "/..." : ""); } catch { return url.length > 30 ? url.slice(0, 28) + "..." : url; }
+};
+
 const RC_INPUT = {
   width:"100%", padding:"13px 16px", background:"#0f0f0f",
   border:"1px solid rgba(255,255,255,0.1)", borderRadius:10,
@@ -1968,11 +1973,11 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
 
   const faqs = [
     ["Will it look like spam?","No. Messages come from a real Australian mobile number, not a shortcode or overseas number. It looks like a normal text from a local business."],
-    ["What does the SMS actually say?","Something like: 'Hi! Thanks for choosing [Your Business]. If you have a moment, we'd love a Google review — it really helps! [your link]' — under 160 characters, friendly, no pressure."],
+    ["What does the SMS actually say?","Something like: 'Hi! Thanks for choosing [Your Business]. If you have a moment, we'd love a Google review, it really helps! [your link]', under 160 characters, friendly, no pressure."],
     ["Can I customise the message?","On Growth and Crew plans you can edit the message template. The free trial uses the default."],
     ["What if I hit my send limit?","Sends stop until your next billing cycle. You're never charged overages. Upgrade any time to increase your cap."],
-    ["Is this legal in Australia?","Yes. The Spam Act 2003 permits relationship/transactional messages to existing customers. Your customer just did business with you — this qualifies."],
-    ["How is billing handled?","Via Stripe. Cancel any time from your account — no lock-in, no hidden fees."],
+    ["Is this legal in Australia?","Yes. The Spam Act 2003 permits relationship/transactional messages to existing customers. Your customer just did business with you, this qualifies."],
+    ["How is billing handled?","Via Stripe. Cancel any time from your account, no lock-in, no hidden fees."],
   ];
 
   return (
@@ -1983,7 +1988,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
         <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse 70% 55% at 50% 40%, rgba(34,197,94,0.06) 0%, transparent 70%)", pointerEvents:"none" }} />
         <div style={{ position:"relative", zIndex:1, maxWidth:860, margin:"0 auto", padding:isMobile?"64px 20px 56px":"100px 48px 90px", textAlign:"center", animation:"rc-fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"#22c55e", marginBottom:24, fontFamily:"var(--mono)" }}>
-            <span className="rc-badge-dot" /> ReviewChaser — Now Live
+            <span className="rc-badge-dot" /> ReviewChaser: Now Live
           </div>
           <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(46px,6vw,84px)", fontWeight:800, letterSpacing:"-3.5px", lineHeight:1.01, color:"#fff", marginBottom:18 }}>
             More Google reviews.<br /><span style={{ color:"#22c55e" }}>Zero awkwardness.</span>
@@ -2005,7 +2010,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
       {/* STATS */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"32px 20px":"44px 48px" }}>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)", gap:isMobile?20:0 }}>
-          {[["98%","SMS open rate"],["4.7×","vs email review requests"],["<160","chars — never double-billed"],["AU","Local sending number"]].map(([val,label],i) => (
+          {[["98%","SMS open rate"],["4.7×","vs email review requests"],["<160","chars, never double-billed"],["AU","Local sending number"]].map(([val,label],i) => (
             <div key={label} style={{ textAlign:"center", padding:isMobile?"0":"0 28px", borderRight:(!isMobile&&i<3)?"1px solid rgba(255,255,255,0.06)":"none" }}>
               <div style={{ fontSize:isMobile?28:38, fontWeight:800, letterSpacing:"-2px", color:"#fff", lineHeight:1, marginBottom:6 }}>{val}</div>
               <div style={{ fontSize:12.5, color:"#444", lineHeight:1.5 }}>{label}</div>
@@ -2056,7 +2061,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
         <div style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.09)", borderRadius:16, overflow:"hidden", boxShadow:"0 40px 100px rgba(0,0,0,0.7)" }}>
           <div style={{ background:"#090909", borderBottom:"1px solid rgba(255,255,255,0.05)", padding:"12px 16px", display:"flex", alignItems:"center", gap:6 }}>
             {["#ff5f57","#febc2e","#28c840"].map(c => <div key={c} style={{ width:10, height:10, borderRadius:"50%", background:c }} />)}
-            <div style={{ flex:1, textAlign:"center", fontSize:11, fontWeight:600, color:"#2a2a2a", fontFamily:"var(--mono)" }}>ReviewChaser — Demo</div>
+            <div style={{ flex:1, textAlign:"center", fontSize:11, fontWeight:600, color:"#2a2a2a", fontFamily:"var(--mono)" }}>ReviewChaser Demo</div>
           </div>
           <div style={{ padding:24 }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
@@ -2097,12 +2102,34 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
           <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"#fff" }}>Simple. Transparent. No surprises.</h2>
           <p style={{ fontSize:14, color:"#555", marginTop:12 }}>All prices AUD. Cancel any time.</p>
         </div>
-        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:10 }}>
-          {PLANS_DATA.map(p => <RCPlanCard key={p.id} plan={p} onSelect={handlePlanSelect} loading={loadingPlan} />)}
+        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":window.innerWidth<900?"1fr 1fr":"repeat(3,1fr)", gap:12, marginBottom:24 }}>
+          {[
+            { quote:"I went from 14 Google reviews to 61 in just over two months. Customers actually reply saying thanks for the message, it doesn't feel spammy at all.", name:"Jake M.", biz:"JM Electrical", location:"Brisbane, QLD", stars:5, stat:"61 reviews" },
+            { quote:"Used to forget to ask every time. Now I just type the number in while I'm packing up the van. Takes 10 seconds. Reviews started coming in that same day.", name:"Tom H.", biz:"Tom's Plumbing Co.", location:"Melbourne, VIC", stars:5, stat:"3× more reviews" },
+            { quote:"My Google rating went from 4.1 to 4.8. New customers mention they found me from my reviews. It's basically free marketing at this point.", name:"Sarah K.", biz:"SK Cleaning Services", location:"Sydney, NSW", stars:5, stat:"4.1 → 4.8 ★" },
+            { quote:"Tried asking in person and handing out cards. Nothing worked like this. The SMS lands while they're still happy with the job. Timing is everything.", name:"Dean P.", biz:"Precision Tiling", location:"Perth, WA", stars:5, stat:"40+ reviews" },
+            { quote:"Dead simple. No logins for my customers, no app to download. They just get a text and tap the link. Half of them leave a review within the hour.", name:"Marcus T.", biz:"MT Landscaping", location:"Gold Coast, QLD", stars:5, stat:"48hr avg. response" },
+            { quote:"I was skeptical but the 7-day trial sold me. Had 8 new reviews before the trial ended. Upgraded immediately. Worth every dollar.", name:"Priya S.", biz:"Sparkle Window Cleaning", location:"Adelaide, SA", stars:5, stat:"8 reviews in 7 days" },
+          ].map((r, i) => (
+            <div key={i} style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:"24px 22px", display:"flex", flexDirection:"column", gap:16 }}>
+              <div style={{ display:"flex", gap:2 }}>{[1,2,3,4,5].map(s => <span key={s} style={{ color:"#f59e0b", fontSize:13 }}>★</span>)}</div>
+              <p style={{ fontSize:13.5, color:"#999", lineHeight:1.8, flex:1 }}>"{r.quote}"</p>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                  <div style={{ width:34, height:34, borderRadius:"50%", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"#22c55e", flexShrink:0 }}>{r.name[0]}</div>
+                  <div>
+                    <div style={{ fontSize:12, fontWeight:700, color:"#ccc" }}>{r.name}</div>
+                    <div style={{ fontSize:11, color:"#444" }}>{r.biz} · {r.location}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize:11, fontWeight:700, color:"#22c55e", background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.15)", borderRadius:999, padding:"3px 10px", whiteSpace:"nowrap", fontFamily:"var(--mono)" }}>{r.stat}</div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div style={{ marginTop:20, background:"rgba(245,158,11,0.04)", border:"1px solid rgba(245,158,11,0.15)", borderRadius:12, padding:isMobile?"14px 16px":"16px 22px", display:"flex", gap:12, alignItems:"flex-start" }}>
-          <span style={{ fontSize:16, flexShrink:0, marginTop:1 }}>💡</span>
-          <p style={{ fontSize:13, color:"#555", lineHeight:1.75, margin:0 }}><strong style={{ color:"#777" }}>Why send limits?</strong> A typical operator doing 4–5 jobs a week sends ~20 requests a month. Growth's 140-send cap gives you 7× headroom. If you hit the limit, sends pause — you're never charged overages.</p>
+        <div style={{ textAlign:"center" }}>
+          <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#22c55e", color:"#000", padding:"14px 32px", fontSize:14, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial, 7 Days →</button>
+          <p style={{ fontSize:12, color:"#383838", marginTop:12 }}>20 sends included · Cancel any time</p>
         </div>
       </div>
       <Divider />
@@ -2252,7 +2279,7 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
         <div style={{ textAlign:"center", marginBottom:32 }}>
           <div style={{ width:52, height:52, background:"#111", border:"1px solid #2a2a2a", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>📱</div>
           <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Sign in to ReviewChaser</h1>
-          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>Enter your mobile number — we'll text you a code.</p>
+          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>Enter your mobile number, we'll text you a code.</p>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
           <div style={{ display:"flex", gap:8 }}>
@@ -2380,7 +2407,7 @@ const RCEmailCollectScreen = ({ isMobile, userId, onComplete }) => {
         <div style={{ textAlign:"center", marginBottom:32 }}>
           <div style={{ width:52, height:52, background:"#111", border:"1px solid #2a2a2a", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>🧾</div>
           <h1 style={{ fontSize:22, fontWeight:800, letterSpacing:"-0.8px", color:"#fff", marginBottom:10 }}>Where should we send your receipts and billing info?</h1>
-          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>This is optional — you can skip and add it later in Settings.</p>
+          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>This is optional, you can skip and add it later in Settings.</p>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
           <input
@@ -2439,10 +2466,103 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   const stepContent = () => {
     switch(step) {
       case 0: return (
-        <div>
-          <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Business name</label>
-          <input autoFocus style={RC_INPUT} className="rc-input" placeholder="e.g. Smith Electrical" value={data.bizName} onChange={e=>set("bizName",e.target.value)} onKeyDown={e=>e.key==="Enter"&&canNext()&&go(1)} />
-          <p style={{ fontSize:12,color:"#383838",marginTop:10,lineHeight:1.6 }}>This appears at the start of every SMS you send to customers.</p>
+        <div style={{ position:"relative" }}>
+          {!manualMode ? (
+            <>
+              <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Search your business name</label>
+              <div style={{ display:"flex", gap:8 }}>
+                {/* Country picker */}
+                <div ref={countryRef} style={{ position:"relative", flexShrink:0 }}>
+                  <button
+                    type="button"
+                    onClick={() => setCountryOpen(v => !v)}
+                    style={{ height:"100%", minHeight:50, padding:"0 12px", background:"#0f0f0f", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, color:"#fff", fontSize:14, fontFamily:"var(--font)", cursor:"pointer", display:"flex", alignItems:"center", gap:7, whiteSpace:"nowrap", transition:"border-color 0.2s" }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.25)"}
+                    onMouseLeave={e => e.currentTarget.style.borderColor=countryOpen?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.1)"}
+                  >
+                    <span style={{ fontSize:18, lineHeight:1 }}>{COUNTRIES.find(c => c.code === searchCountry)?.flag}</span>
+                    <span style={{ fontSize:12, color:"#888", fontWeight:600 }}>{COUNTRIES.find(c => c.code === searchCountry)?.code.toUpperCase()}</span>
+                    <span style={{ fontSize:9, color:"#444", marginLeft:2 }}>▼</span>
+                  </button>
+                  {countryOpen && (
+                    <div style={{ position:"absolute", top:"calc(100% + 6px)", left:0, background:"#111", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, overflow:"hidden", zIndex:50, minWidth:180, boxShadow:"0 8px 24px rgba(0,0,0,0.6)" }}>
+                      {COUNTRIES.map(c => (
+                        <button
+                          key={c.code}
+                          type="button"
+                          onClick={() => { handleCountryChange(c.code); setCountryOpen(false); }}
+                          style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"11px 14px", background:c.code===searchCountry?"rgba(255,255,255,0.05)":"transparent", border:"none", borderBottom:"1px solid rgba(255,255,255,0.04)", color: c.code===searchCountry?"#fff":"#888", fontSize:13, fontFamily:"var(--font)", cursor:"pointer", textAlign:"left" }}
+                          onMouseEnter={e => e.currentTarget.style.background="rgba(255,255,255,0.06)"}
+                          onMouseLeave={e => e.currentTarget.style.background=c.code===searchCountry?"rgba(255,255,255,0.05)":"transparent"}
+                        >
+                          <span style={{ fontSize:18 }}>{c.flag}</span>
+                          <span style={{ fontWeight: c.code===searchCountry ? 700 : 400 }}>{c.label}</span>
+                          {c.code===searchCountry && <span style={{ marginLeft:"auto", color:"#22c55e", fontSize:12 }}>✓</span>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {/* Search input */}
+                <div style={{ position:"relative", flex:1 }}>
+                  <input
+                    autoFocus
+                    style={{ ...RC_INPUT, paddingRight: searching ? 36 : undefined, width:"100%" }}
+                    className="rc-input"
+                    placeholder="e.g. Smith Electrical"
+                    value={searchQuery}
+                    onChange={e => handleSearch(e.target.value)}
+                  />
+                  {searching && <div style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)" }}><Spinner size={14} /></div>}
+                </div>
+              </div>
+              {searchResults.length > 0 && (
+                <div style={{ marginTop:6, border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, overflow:"hidden", background:"#0c0c0c" }}>
+                  {searchResults.map((biz, i) => (
+                    <button key={biz.placeId} onClick={() => handleSelectBiz(biz)} style={{ width:"100%", display:"flex", flexDirection:"column", gap:3, padding:"13px 14px", background:"transparent", border:"none", borderBottom: i < searchResults.length-1 ? "1px solid rgba(255,255,255,0.05)" : "none", textAlign:"left", cursor:"pointer" }}
+                      onMouseEnter={e => e.currentTarget.style.background="rgba(255,255,255,0.04)"}
+                      onMouseLeave={e => e.currentTarget.style.background="transparent"}
+                    >
+                      <span style={{ fontSize:13, fontWeight:600, color:"#ddd" }}>{biz.name}</span>
+                      <span style={{ fontSize:11, color:"#444" }}>{biz.address}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {selectedBiz && (
+                <div style={{ marginTop:10, background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.2)", borderRadius:9, padding:"10px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ color:"#22c55e", fontSize:14 }}>✓</span>
+                    <div>
+                      <div style={{ fontSize:13, fontWeight:600, color:"#ccc" }}>{selectedBiz.name}</div>
+                      <div style={{ fontSize:11, color:"#555" }}>{selectedBiz.address}</div>
+                    </div>
+                  </div>
+                  <button onClick={() => { setSelectedBiz(null); setSearchQuery(""); setSearchResults([]); }} style={{ background:"none", border:"none", color:"#444", fontSize:12, cursor:"pointer" }}>Change</button>
+                </div>
+              )}
+              {searchError && <p style={{ fontSize:12, color:"#f87171", marginTop:8 }}>{searchError}</p>}
+              {!selectedBiz && !searching && !searchError && searchQuery.length > 2 && searchResults.length === 0 && (
+                <p style={{ fontSize:12, color:"#555", marginTop:10 }}>No results. Try adding your suburb or city.</p>
+              )}
+              <button onClick={() => setManualMode(true)} style={{ background:"none", border:"none", color:"#444", fontSize:12, cursor:"pointer", marginTop:14, textDecoration:"underline", padding:0 }}>
+                Can't find your business? Enter details manually
+              </button>
+            </>
+          ) : (
+            <>
+              <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Business name</label>
+              <input autoFocus style={RC_INPUT} className="rc-input" placeholder="e.g. Smith Electrical" value={data.bizName} onChange={e => set("bizName", e.target.value)} />
+              <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8, marginTop:16 }}>Google Review URL</label>
+              <input style={RC_INPUT} className="rc-input" placeholder="https://search.google.com/local/writereview?placeid=..." value={data.googleLink} onChange={e => set("googleLink", e.target.value)} />
+              <p style={{ fontSize:12, color:"#383838", marginTop:8, lineHeight:1.6 }}>
+                Find it: search your business on Google → click "Ask for reviews" → copy the link.
+              </p>
+              <button onClick={() => setManualMode(false)} style={{ background:"none", border:"none", color:"#444", fontSize:12, cursor:"pointer", marginTop:10, textDecoration:"underline", padding:0 }}>
+                ← Back to search
+              </button>
+            </>
+          )}
         </div>
       );
       case 1: return (
@@ -2461,10 +2581,10 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
       );
       case 2: return (
         <div>
-          <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:12,padding:"20px 18px",marginBottom:16 }}>
-            <div style={{ fontSize:10,color:"#383838",fontFamily:"var(--mono)",letterSpacing:1,textTransform:"uppercase",marginBottom:12 }}>SMS your customers will receive</div>
-            <div style={{ background:"#080808",borderRadius:10,padding:"14px 16px",fontSize:14,color:"#bbb",lineHeight:1.8 }}>
-              Hi! Thanks for choosing <strong style={{ color:"#fff" }}>{data.bizName||"Your Business"}</strong>. If you have a moment, we'd love a Google review — it really helps! <span style={{ color:"#22c55e" }}>{data.googleLink||"your-review-link"}</span>
+          <div style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"20px 18px", marginBottom:16 }}>
+            <div style={{ fontSize:10, color:"#383838", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>SMS your customers will receive</div>
+            <div style={{ background:"#080808", borderRadius:10, padding:"14px 16px", fontSize:14, color:"#bbb", lineHeight:1.8 }}>
+              Hi! Thanks for choosing <strong style={{ color:"#fff" }}>{data.bizName||"Your Business"}</strong>. If you have a moment, we'd love a Google review, it really helps! <span style={{ color:"#22c55e" }}>{shortLink(data.googleLink)}</span>
             </div>
             <div style={{ fontSize:11,color:"#2a2a2a",marginTop:10,display:"flex",justifyContent:"space-between",fontFamily:"var(--mono)" }}>
               <span>From: AU mobile number</span>
@@ -2525,7 +2645,7 @@ const TOAST_COPY = {
   30:  { msg: "You've used 30% of your monthly sends." },
   50:  { msg: "You've used 50% of your monthly sends." },
   90:  { msg: "You've used 90% of your monthly sends.", btnText: "Upgrade Plan" },
-  100: { msg: "You've hit your monthly limit. Upgrade to keep sending review requests and never miss a job.", btnText: "Upgrade Now — Don't Miss Out" },
+  100: { msg: "You've hit your monthly limit. Upgrade to keep sending review requests and never miss a job.", btnText: "Upgrade Now" },
 };
 
 const RCUsageToast = ({ threshold, onDismiss, onUpgrade }) => {
@@ -2684,17 +2804,17 @@ const RC_MESSAGE_TEMPLATES = [
   {
     id: "friendly",
     label: "Friendly & warm",
-    preview: (biz, link) => `Hi! Thanks for choosing ${biz}. If you have a moment, we'd love a Google review — it really helps! ${link}`,
+    preview: (biz, link) => `Hi! Thanks for choosing ${biz}. If you have a moment, we'd love a Google review, it really helps! ${link}`,
   },
   {
     id: "brief",
     label: "Short & direct",
-    preview: (biz, link) => `Hey! Thanks for using ${biz}. Mind leaving us a quick Google review? ${link} — takes 30 seconds!`,
+    preview: (biz, link) => `Hey! Thanks for using ${biz}. Mind leaving us a quick Google review? ${link}. Takes 30 seconds!`,
   },
   {
     id: "tradies",
     label: "Tradie style",
-    preview: (biz, link) => `G'day! Job's done — if you're happy with the work, a Google review would mean a lot. ${link} Cheers!`,
+    preview: (biz, link) => `G'day! Job's done, if you're happy with the work, a Google review would mean a lot. ${link} Cheers!`,
   },
   {
     id: "professional",
@@ -2751,7 +2871,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const activeTemplate = RC_MESSAGE_TEMPLATES.find(t => t.id === settingsData.templateId) ?? RC_MESSAGE_TEMPLATES[0];
   const livePreview = activeTemplate.id === "custom"
     ? settingsData.customMsg
-    : activeTemplate.preview(settingsData.bizName || "Your Business", settingsData.googleLink || "your-link");
+    : activeTemplate.preview(settingsData.bizName || "Your Business", shortLink(settingsData.googleLink) || "your-link");
 
   useEffect(() => { getRCSendsThisMonth(userId).then(setSendsUsed).catch(() => {}); }, [userId, sent]);
 
@@ -2925,7 +3045,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
 
             {plan === "trial" && !trialExpired && (
               <div style={{ background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.18)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                <div style={{ fontSize: 13, color: "#858585" }}>⚡ <strong style={{ color: "#f59e0b" }}>Free trial</strong> — 7 days, 20 sends.</div>
+                <div style={{ fontSize: 13, color: "#858585" }}>⚡ <strong style={{ color: "#f59e0b" }}>Free trial</strong>, 7 days, 20 sends.</div>
                 <button onClick={() => setShowPaywall(true)} style={{ padding: "7px 14px", background: "transparent", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 7, fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Upgrade →</button>
               </div>
             )}
@@ -3026,7 +3146,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                     {/* Message template */}
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>
-                        Message template {!canCustomise && <span style={{ color: "#f59e0b", fontSize: 10 }}>— Growth & Crew only</span>}
+                        Message template {!canCustomise && <span style={{ color: "#f59e0b", fontSize: 10 }}>(Growth & Crew only)</span>}
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
                         {RC_MESSAGE_TEMPLATES.map(t => {
@@ -3090,7 +3210,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                           <button onClick={handleContactSupport} disabled={!contactMsg.trim()} style={{ padding: "10px 18px", background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, fontSize: 13, fontWeight: 600, color: "#666", cursor: contactMsg.trim() ? "pointer" : "default", opacity: contactMsg.trim() ? 1 : 0.4 }}>Send to support →</button>
                         </div>
                       ) : (
-                        <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 9, padding: "12px 14px", fontSize: 13, color: "#22c55e" }}>✓ Message sent — we'll get back to you within 24h.</div>
+                        <div style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 9, padding: "12px 14px", fontSize: 13, color: "#22c55e" }}>✓ Message sent, we'll get back to you within 24h.</div>
                       )}
                     </div>
 
