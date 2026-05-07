@@ -2436,11 +2436,22 @@ const RCEmailCollectScreen = ({ isMobile, userId, onComplete }) => {
 
 // ── Onboarding Wizard ─────────────────────────────────────────────
 const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
-  const [step, setStep] = useState(0);
+  const savedKey = `rc_onboarding_${userId}`;
+  const saved = (() => { try { return JSON.parse(localStorage.getItem(savedKey) || "{}"); } catch { return {}; } })();
+
+  const [step, setStep] = useState(() => {
+    if (saved.bizName && saved.googleLink) return 2;
+    if (saved.bizName) return 1;
+    return 0;
+  });
   const [visible, setVisible] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [data, setData] = useState({ bizName:"", googleLink:"" });
-  const set = (k,v) => setData(d=>({ ...d,[k]:v }));
+  const [data, setData] = useState({ bizName: saved.bizName || "", googleLink: saved.googleLink || "" });
+  const set = (k, v) => setData(d => {
+    const next = { ...d, [k]: v };
+    try { localStorage.setItem(savedKey, JSON.stringify({ bizName: next.bizName, googleLink: next.googleLink })); } catch {}
+    return next;
+  });
 
   const go = dir => { setVisible(false); setTimeout(()=>{ setStep(s=>s+dir); setVisible(true); },200); };
   const canNext = () => { if(step===0) return data.bizName.trim().length>0; if(step===1) return data.googleLink.trim().length>10; return true; };
@@ -2448,6 +2459,7 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   const handleFinish = async () => {
     setSaving(true);
     await supabase.from("rc_profiles").upsert({ id:userId, email, biz_name:data.bizName.trim(), google_link:data.googleLink.trim(), plan:"trial", sends_used:0, trial_started_at:new Date().toISOString() });
+    try { localStorage.removeItem(savedKey); } catch {}
     setSaving(false);
     onComplete({ bizName:data.bizName.trim(), googleLink:data.googleLink.trim(), plan:"trial", sends_used:0 }, true);
   };
