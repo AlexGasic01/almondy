@@ -3248,6 +3248,20 @@ function ReviewChaserPage({ setPage, user, setUser }) {
     return () => { mounted = false; subscription.unsubscribe(); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleStartTrial = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const uid = session.user.id;
+      const phone = session.user.user_metadata?.phone ?? null;
+      const profile = rcProfile ?? await getOrCreateRCProfile(uid, session.user.email, phone);
+      setRcUserId(uid);
+      setRcProfile(profile);
+      routeAfterProfile(profile);
+    } else {
+      setViewAndRef("auth");
+    }
+  };
+
   const handleSignOut = async () => {
     try { await supabase.auth.signOut(); } catch (e) {}
     setViewAndRef("marketing");
@@ -3267,7 +3281,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
   return (
     <>
       <RCStyles />
-      {view==="marketing" && <div style={{ paddingTop:62 }}><RCMarketingPage isMobile={isMobile} onStartTrial={()=>setViewAndRef("auth")} onSignIn={()=>setViewAndRef("auth")} setPage={setPage} /></div>}
+      {view==="marketing" && <div style={{ paddingTop:62 }}><RCMarketingPage isMobile={isMobile} onStartTrial={handleStartTrial} onSignIn={()=>setViewAndRef("auth")} setPage={setPage} /></div>}
       {view==="auth" && <RCPhoneAuthFlow isMobile={isMobile} onBack={()=>setViewAndRef("marketing")} />}
       {view==="email-collect" && rcUserId && <RCEmailCollectScreen isMobile={isMobile} userId={rcUserId} onComplete={handleEmailCollectDone} />}
       {view==="onboarding" && rcUserId && <RCOnboardingWizard isMobile={isMobile} userId={rcUserId} email={rcProfile?.email??""} onComplete={(profile)=>{ setRcProfile(p=>({...p,...profile})); setViewAndRef("paywall"); }} />}
