@@ -8,27 +8,35 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "GOOGLE_PLACES_KEY not set" });
   }
 
-  // Use Autocomplete for live typing, then Text Search as fallback for precision
-  const autocompleteUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(q)}&types=establishment&key=${process.env.GOOGLE_PLACES_KEY}`;
-
   try {
-    const acRes = await fetch(autocompleteUrl);
-    const acData = await acRes.json();
+    const response = await fetch("https://places.googleapis.com/v1/places:autocomplete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": process.env.GOOGLE_PLACES_KEY,
+      },
+      body: JSON.stringify({
+        input: q,
+        includedPrimaryTypes: ["establishment"],
+      }),
+    });
 
-    if (acData.status !== "OK" && acData.status !== "ZERO_RESULTS") {
-      console.error("Places Autocomplete error:", acData.status, acData.error_message);
-      return res.status(500).json({ error: acData.error_message || acData.status });
+    const data = await response.json();
+
+    if (data.error) {
+      console.error("Places API error:", data.error);
+      return res.status(500).json({ error: data.error.message || "Places API error" });
     }
 
-    const predictions = acData.predictions || [];
-
-    // For each prediction we already have place_id — no extra call needed
-    const results = predictions.slice(0, 6).map(p => ({
-      name: p.structured_formatting?.main_text || p.description,
-      address: p.structured_formatting?.secondary_text || "",
-      placeId: p.place_id,
-      reviewUrl: `https://search.google.com/local/writereview?placeid=${p.place_id}`,
-    }));
+    const results = (data.suggestions || []).slice(0, 6).map(s => {
+      const p = s.placePrediction;
+      return {
+        name: p.structuredFormat?.mainText?.text || p.text?.text || "",
+        address: p.structuredFormat?.secondaryText?.text || "",
+        placeId: p.placeId,
+        reviewUrl: `https://search.google.com/local/writereview?placeid=${p.placeId}`,
+      };
+    });
 
     return res.json({ results });
   } catch (e) {
