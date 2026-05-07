@@ -2110,19 +2110,40 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
         </div>
       </div>
       <Divider />
-      {/* PRICING */}
-      <div id="rc-pricing" style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px" }}>
+      {/* REVIEWS */}
+      <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px" }}>
         <div style={{ textAlign:"center", marginBottom:isMobile?40:64 }}>
-          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:12, fontFamily:"var(--mono)" }}>Pricing</p>
-          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"#fff" }}>Simple. Transparent. No surprises.</h2>
-          <p style={{ fontSize:14, color:"#555", marginTop:12 }}>All prices AUD. Cancel any time.</p>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:12, fontFamily:"var(--mono)" }}>Real Results</p>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"#fff" }}>Tradies are getting reviews.<br /><span style={{ color:"#22c55e" }}>Every single week.</span></h2>
         </div>
-        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:10 }}>
-          {PLANS_DATA.map(p => <RCPlanCard key={p.id} plan={p} onSelect={handlePlanSelect} loading={loadingPlan} />)}
+        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":window.innerWidth<900?"1fr 1fr":"repeat(3,1fr)", gap:12, marginBottom:24 }}>
+          {[
+            { quote:"I went from 14 Google reviews to 61 in just over two months. Customers actually reply saying thanks for the message — it doesn't feel spammy at all.", name:"Jake M.", biz:"JM Electrical", location:"Brisbane, QLD", stars:5, stat:"61 reviews" },
+            { quote:"Used to forget to ask every time. Now I just type the number in while I'm packing up the van. Takes 10 seconds. Reviews started coming in that same day.", name:"Tom H.", biz:"Tom's Plumbing Co.", location:"Melbourne, VIC", stars:5, stat:"3× more reviews" },
+            { quote:"My Google rating went from 4.1 to 4.8. New customers mention they found me from my reviews. It's basically free marketing at this point.", name:"Sarah K.", biz:"SK Cleaning Services", location:"Sydney, NSW", stars:5, stat:"4.1 → 4.8 ★" },
+            { quote:"Tried asking in person and handing out cards. Nothing worked like this. The SMS lands while they're still happy with the job — timing is everything.", name:"Dean P.", biz:"Precision Tiling", location:"Perth, WA", stars:5, stat:"40+ reviews" },
+            { quote:"Dead simple. No logins for my customers, no app to download. They just get a text and tap the link. Half of them leave a review within the hour.", name:"Marcus T.", biz:"MT Landscaping", location:"Gold Coast, QLD", stars:5, stat:"48hr avg. response" },
+            { quote:"I was skeptical but the 7-day trial sold me. Had 8 new reviews before the trial ended. Upgraded immediately. Worth every dollar.", name:"Priya S.", biz:"Sparkle Window Cleaning", location:"Adelaide, SA", stars:5, stat:"8 reviews in 7 days" },
+          ].map((r, i) => (
+            <div key={i} style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:"24px 22px", display:"flex", flexDirection:"column", gap:16 }}>
+              <div style={{ display:"flex", gap:2 }}>{[1,2,3,4,5].map(s => <span key={s} style={{ color:"#f59e0b", fontSize:13 }}>★</span>)}</div>
+              <p style={{ fontSize:13.5, color:"#999", lineHeight:1.8, flex:1 }}>"{r.quote}"</p>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                  <div style={{ width:34, height:34, borderRadius:"50%", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"#22c55e", flexShrink:0 }}>{r.name[0]}</div>
+                  <div>
+                    <div style={{ fontSize:12, fontWeight:700, color:"#ccc" }}>{r.name}</div>
+                    <div style={{ fontSize:11, color:"#444" }}>{r.biz} · {r.location}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize:11, fontWeight:700, color:"#22c55e", background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.15)", borderRadius:999, padding:"3px 10px", whiteSpace:"nowrap", fontFamily:"var(--mono)" }}>{r.stat}</div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div style={{ marginTop:20, background:"rgba(245,158,11,0.04)", border:"1px solid rgba(245,158,11,0.15)", borderRadius:12, padding:isMobile?"14px 16px":"16px 22px", display:"flex", gap:12, alignItems:"flex-start" }}>
-          <span style={{ fontSize:16, flexShrink:0, marginTop:1 }}>💡</span>
-          <p style={{ fontSize:13, color:"#555", lineHeight:1.75, margin:0 }}><strong style={{ color:"#777" }}>Why send limits?</strong> A typical operator doing 4–5 jobs a week sends ~20 requests a month. Growth's 140-send cap gives you 7× headroom. If you hit the limit, sends pause — you're never charged overages.</p>
+        <div style={{ textAlign:"center" }}>
+          <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#22c55e", color:"#000", padding:"14px 32px", fontSize:14, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial — 7 Days →</button>
+          <p style={{ fontSize:12, color:"#383838", marginTop:12 }}>20 sends included · No credit card required</p>
         </div>
       </div>
       <Divider />
