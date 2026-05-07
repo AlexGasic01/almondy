@@ -3229,7 +3229,8 @@ function ReviewChaserPage({ setPage, user, setUser }) {
 
         // After a successful checkout Stripe's webhook may not have updated the plan yet.
         // Poll until the plan changes or we time out (10s).
-        const isPostCheckout = new URLSearchParams(window.location.search).get("rc_session") === "success";
+        const isPostCheckout = sessionStorage.getItem("rc_post_checkout") === "1";
+        if (isPostCheckout) sessionStorage.removeItem("rc_post_checkout");
         if (isPostCheckout && (profile.plan === "trial" || profile.plan === "expired")) {
           for (let i = 0; i < 10 && mounted; i++) {
             await new Promise(r => setTimeout(r, 1000));
@@ -3275,6 +3276,7 @@ function ReviewChaserPage({ setPage, user, setUser }) {
 
     const params = new URLSearchParams(window.location.search);
     if (params.get("rc_session") === "success") {
+      sessionStorage.setItem("rc_post_checkout", "1");
       window.history.replaceState({}, "", "/reviewchaser");
     }
 
@@ -3417,6 +3419,7 @@ export default function App() {
     const pageParam = params.get("page");
     const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact"];
     if (params.get("rc_session") === "success") {
+      sessionStorage.setItem("rc_post_checkout", "1");
       setPage("reviewchaser");
       window.history.replaceState({ page:"reviewchaser" }, "", "/reviewchaser");
     } else if (pageParam && publicPages.includes(pageParam)) {
