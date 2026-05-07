@@ -2468,14 +2468,48 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   const [visible, setVisible] = useState(true);
   const [saving, setSaving] = useState(false);
   const [data, setData] = useState({ bizName: saved.bizName || "", googleLink: saved.googleLink || "" });
+  const [searchQuery, setSearchQuery] = useState(saved.bizName || "");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [selectedBiz, setSelectedBiz] = useState(null);
+  const searchTimer = useRef(null);
+
   const set = (k, v) => setData(d => {
     const next = { ...d, [k]: v };
     try { localStorage.setItem(savedKey, JSON.stringify({ bizName: next.bizName, googleLink: next.googleLink })); } catch {}
     return next;
   });
 
-  const go = dir => { setVisible(false); setTimeout(()=>{ setStep(s=>s+dir); setVisible(true); },200); };
-  const canNext = () => { if(step===0) return data.bizName.trim().length>0; if(step===1) return data.googleLink.trim().length>10; return true; };
+  const handleSearch = (q) => {
+    setSearchQuery(q);
+    setSelectedBiz(null);
+    clearTimeout(searchTimer.current);
+    if (q.trim().length < 2) { setSearchResults([]); return; }
+    setSearching(true);
+    searchTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search-places?q=${encodeURIComponent(q)}`);
+        const json = await res.json();
+        setSearchResults(json.results || []);
+      } catch { setSearchResults([]); }
+      setSearching(false);
+    }, 400);
+  };
+
+  const handleSelectBiz = (biz) => {
+    setSelectedBiz(biz);
+    setSearchQuery(biz.name);
+    setSearchResults([]);
+    set("bizName", biz.name);
+    set("googleLink", biz.reviewUrl);
+  };
+
+  const go = dir => { setVisible(false); setTimeout(() => { setStep(s => s + dir); setVisible(true); }, 200); };
+  const canNext = () => {
+    if (step === 0) return !!selectedBiz || data.bizName.trim().length > 0;
+    if (step === 1) return data.googleLink.trim().length > 10;
+    return true;
+  };
 
   const handleFinish = async () => {
     setSaving(true);
@@ -2485,46 +2519,75 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
     onComplete({ bizName:data.bizName.trim(), googleLink:data.googleLink.trim(), plan:"trial", sends_used:0 }, true);
   };
 
-  const stepLabels = ["Business","Google Link","Preview"];
-  const headings   = ["What's your business called?","Paste your Google Review link.","Preview your SMS."];
-  const subheadings = ["1/3","2/3","3/3"];
+  const stepLabels = ["Find Business", "Confirm Link", "Preview"];
+  const headings   = ["Search for your business.", "Your Google Review link.", "Preview your SMS."];
+  const subheadings = ["1/3", "2/3", "3/3"];
 
   const stepContent = () => {
-    switch(step) {
+    switch (step) {
       case 0: return (
-        <div>
-          <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Business name</label>
-          <input autoFocus style={RC_INPUT} className="rc-input" placeholder="e.g. Smith Electrical" value={data.bizName} onChange={e=>set("bizName",e.target.value)} onKeyDown={e=>e.key==="Enter"&&canNext()&&go(1)} />
-          <p style={{ fontSize:12,color:"#383838",marginTop:10,lineHeight:1.6 }}>This appears at the start of every SMS you send to customers.</p>
+        <div style={{ position:"relative" }}>
+          <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Search your business name</label>
+          <div style={{ position:"relative" }}>
+            <input
+              autoFocus
+              style={{ ...RC_INPUT, paddingRight: searching ? 36 : undefined }}
+              className="rc-input"
+              placeholder="e.g. Smith Electrical Brisbane"
+              value={searchQuery}
+              onChange={e => handleSearch(e.target.value)}
+            />
+            {searching && <div style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)" }}><Spinner size={14} /></div>}
+          </div>
+          {searchResults.length > 0 && (
+            <div style={{ marginTop:6, border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, overflow:"hidden", background:"#0c0c0c" }}>
+              {searchResults.map((biz, i) => (
+                <button key={biz.placeId} onClick={() => handleSelectBiz(biz)} style={{ width:"100%", display:"flex", flexDirection:"column", gap:2, padding:"12px 14px", background:i%2===0?"#0c0c0c":"#0e0e0e", border:"none", borderBottom: i < searchResults.length-1 ? "1px solid rgba(255,255,255,0.05)" : "none", textAlign:"left", cursor:"pointer" }}>
+                  <span style={{ fontSize:13, fontWeight:600, color:"#ddd" }}>{biz.name}</span>
+                  <span style={{ fontSize:11, color:"#444" }}>{biz.address}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {selectedBiz && (
+            <div style={{ marginTop:10, background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.2)", borderRadius:9, padding:"10px 14px", display:"flex", alignItems:"center", gap:8 }}>
+              <span style={{ color:"#22c55e", fontSize:14 }}>✓</span>
+              <div>
+                <div style={{ fontSize:13, fontWeight:600, color:"#ccc" }}>{selectedBiz.name}</div>
+                <div style={{ fontSize:11, color:"#555" }}>{selectedBiz.address}</div>
+              </div>
+            </div>
+          )}
+          {!selectedBiz && searchQuery.length > 1 && !searching && searchResults.length === 0 && (
+            <p style={{ fontSize:12, color:"#555", marginTop:10 }}>No results — try adding your suburb or city.</p>
+          )}
+          <p style={{ fontSize:12, color:"#383838", marginTop:12, lineHeight:1.6 }}>We'll automatically find your Google Review link.</p>
         </div>
       );
       case 1: return (
         <div>
-          <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Google Review URL</label>
-          <input autoFocus style={RC_INPUT} className="rc-input" placeholder="https://g.page/r/your-business/review" value={data.googleLink} onChange={e=>set("googleLink",e.target.value)} />
-          <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.06)",borderRadius:10,padding:"14px 16px",marginTop:14 }}>
-            <div style={{ fontSize:11,fontWeight:700,color:"#383838",letterSpacing:1,textTransform:"uppercase",fontFamily:"var(--mono)",marginBottom:8 }}>How to find your link</div>
-            <ol style={{ fontSize:13,color:"#555",lineHeight:1.9,paddingLeft:18,margin:0 }}>
-              <li>Search your business on Google</li>
-              <li>Click <strong style={{ color:"#666" }}>"Ask for reviews"</strong> on your Business Profile</li>
-              <li>Copy the link and paste it above</li>
-            </ol>
-          </div>
+          <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Google Review URL</label>
+          <input style={RC_INPUT} className="rc-input" value={data.googleLink} onChange={e => set("googleLink", e.target.value)} placeholder="https://search.google.com/local/writereview?placeid=..." />
+          {data.googleLink && (
+            <div style={{ marginTop:10, background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.15)", borderRadius:9, padding:"10px 14px", fontSize:12, color:"#555", lineHeight:1.6 }}>
+              <span style={{ color:"#22c55e" }}>✓</span> Link auto-filled from your Google listing. Edit if needed.
+            </div>
+          )}
         </div>
       );
       case 2: return (
         <div>
-          <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:12,padding:"20px 18px",marginBottom:16 }}>
-            <div style={{ fontSize:10,color:"#383838",fontFamily:"var(--mono)",letterSpacing:1,textTransform:"uppercase",marginBottom:12 }}>SMS your customers will receive</div>
-            <div style={{ background:"#080808",borderRadius:10,padding:"14px 16px",fontSize:14,color:"#bbb",lineHeight:1.8 }}>
+          <div style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"20px 18px", marginBottom:16 }}>
+            <div style={{ fontSize:10, color:"#383838", fontFamily:"var(--mono)", letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>SMS your customers will receive</div>
+            <div style={{ background:"#080808", borderRadius:10, padding:"14px 16px", fontSize:14, color:"#bbb", lineHeight:1.8 }}>
               Hi! Thanks for choosing <strong style={{ color:"#fff" }}>{data.bizName||"Your Business"}</strong>. If you have a moment, we'd love a Google review — it really helps! <span style={{ color:"#22c55e" }}>{data.googleLink||"your-review-link"}</span>
             </div>
-            <div style={{ fontSize:11,color:"#2a2a2a",marginTop:10,display:"flex",justifyContent:"space-between",fontFamily:"var(--mono)" }}>
+            <div style={{ fontSize:11, color:"#2a2a2a", marginTop:10, display:"flex", justifyContent:"space-between", fontFamily:"var(--mono)" }}>
               <span>From: AU mobile number</span>
               <span style={{ color:"rgba(34,197,94,0.4)" }}>✓ Under 160 chars</span>
             </div>
           </div>
-          <p style={{ fontSize:13,color:"#555",lineHeight:1.75 }}>This is exactly what your customers receive. You can customise the message in Settings on Growth and Crew plans.</p>
+          <p style={{ fontSize:13, color:"#555", lineHeight:1.75 }}>This is exactly what your customers receive. You can customise the message in Settings on Growth and Crew plans.</p>
         </div>
       );
       default: return null;
