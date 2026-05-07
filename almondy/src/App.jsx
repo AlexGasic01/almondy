@@ -2533,14 +2533,16 @@ const RCUsageToast = ({ threshold, onDismiss, onUpgrade }) => {
   const c = TOAST_COPY[threshold];
   if (!s || !c) return null;
   return (
-    <div style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 10, padding: "12px 14px", marginBottom: 14, display: "flex", alignItems: "flex-start", gap: 10, animation: "rc-fadeIn 0.3s both" }}>
-      <div style={{ flex: 1, fontSize: 13, color: s.color, lineHeight: 1.6 }}>{c.msg}</div>
+    <div style={{ position: "fixed", bottom: 20, left: 20, zIndex: 9999, maxWidth: 320, width: "calc(100vw - 40px)", background: "#111", border: `1px solid ${s.border}`, borderRadius: 12, padding: "14px 16px", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", animation: "rc-fadeIn 0.3s both", display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+        <div style={{ flex: 1, fontSize: 13, color: s.color, lineHeight: 1.6 }}>{c.msg}</div>
+        <button onClick={onDismiss} style={{ background: "none", border: "none", color: "#555", fontSize: 16, cursor: "pointer", flexShrink: 0, lineHeight: 1, padding: 0, marginTop: 1 }}>✕</button>
+      </div>
       {c.btnText && (
-        <button onClick={onUpgrade} style={{ padding: "7px 13px", background: threshold === 100 ? "#ef4444" : "transparent", color: threshold === 100 ? "#fff" : s.color, border: `1px solid ${s.border}`, borderRadius: 7, fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>
+        <button onClick={onUpgrade} style={{ width: "100%", padding: "8px 14px", background: threshold === 100 ? "#ef4444" : s.bg, color: threshold === 100 ? "#fff" : s.color, border: `1px solid ${s.border}`, borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
           {c.btnText}
         </button>
       )}
-      <button onClick={onDismiss} style={{ background: "none", border: "none", color: "#383838", fontSize: 16, cursor: "pointer", flexShrink: 0, lineHeight: 1, padding: 0 }}>✕</button>
     </div>
   );
 };
@@ -2784,15 +2786,6 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
       } catch {}
       return next;
     });
-    // Fire-and-forget email notification (server deduplicates per month)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) return;
-      fetch("/api/notify-rc-usage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ threshold: highest }),
-      }).catch(() => {});
-    }).catch(() => {});
   }, [pct]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSwitchPlan = (newPlan) => {
@@ -2890,6 +2883,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
     <>
       {(showPaywall || trialExpired) && <RCPaywallScreen isMobile={isMobile} profile={profile} onClose={() => !trialExpired && setShowPaywall(false)} />}
       {showUpgradeModal && <RCUpgradeModal isMobile={isMobile} profile={profile} onClose={() => setShowUpgradeModal(false)} onPlanChanged={handleSwitchPlan} />}
+      {activeToast && <RCUsageToast threshold={activeToast} onDismiss={() => setActiveToast(null)} onUpgrade={() => { setActiveToast(null); setShowUpgradeModal(true); }} />}
       <div style={{ minHeight: "100vh", background: "#060606" }}>
         {/* ── TOPBAR ── */}
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: 62, background: "rgba(8,8,8,0.96)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "0 16px" : "0 48px" }}>
@@ -2928,14 +2922,6 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
               <div style={{ fontSize: 12, color: pct >= 90 ? "#f87171" : pct >= 75 ? "#f59e0b" : "#444", fontFamily: "var(--mono)", flexShrink: 0 }}>{pct}% used</div>
               {pct >= 80 && <button onClick={() => setShowPaywall(true)} style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 999, padding: "3px 9px", cursor: "pointer", flexShrink: 0 }}>Upgrade</button>}
             </div>
-
-            {activeToast && (
-              <RCUsageToast
-                threshold={activeToast}
-                onDismiss={() => setActiveToast(null)}
-                onUpgrade={() => { setActiveToast(null); setShowUpgradeModal(true); }}
-              />
-            )}
 
             {plan === "trial" && !trialExpired && (
               <div style={{ background: "rgba(245,158,11,0.04)", border: "1px solid rgba(245,158,11,0.18)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
