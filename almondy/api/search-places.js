@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).end();
 
-  const { q } = req.query;
+  const { q, country = "au" } = req.query;
   if (!q || q.trim().length < 2) return res.json({ results: [] });
 
   if (!process.env.GOOGLE_PLACES_KEY) {
@@ -18,6 +18,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         input: q,
         includedPrimaryTypes: ["establishment"],
+        includedRegionCodes: [country.toLowerCase()],
       }),
     });
 

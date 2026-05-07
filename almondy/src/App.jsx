@@ -2469,6 +2469,7 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   const [saving, setSaving] = useState(false);
   const [data, setData] = useState({ bizName: saved.bizName || "", googleLink: saved.googleLink || "" });
   const [searchQuery, setSearchQuery] = useState(saved.bizName || "");
+  const [searchCountry, setSearchCountry] = useState("au");
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
@@ -2476,28 +2477,49 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   const [manualMode, setManualMode] = useState(false);
   const searchTimer = useRef(null);
 
+  const COUNTRIES = [
+    { code:"au", flag:"🇦🇺", label:"Australia" },
+    { code:"nz", flag:"🇳🇿", label:"New Zealand" },
+    { code:"us", flag:"🇺🇸", label:"United States" },
+    { code:"gb", flag:"🇬🇧", label:"United Kingdom" },
+    { code:"ca", flag:"🇨🇦", label:"Canada" },
+    { code:"sg", flag:"🇸🇬", label:"Singapore" },
+  ];
+
   const set = (k, v) => setData(d => {
     const next = { ...d, [k]: v };
     try { localStorage.setItem(savedKey, JSON.stringify({ bizName: next.bizName, googleLink: next.googleLink })); } catch {}
     return next;
   });
 
-  const handleSearch = (q) => {
-    setSearchQuery(q);
-    setSelectedBiz(null);
-    setSearchError("");
+  const doSearch = (q, country) => {
     clearTimeout(searchTimer.current);
-    if (q.trim().length < 2) { setSearchResults([]); return; }
+    if (q.trim().length < 2) { setSearchResults([]); setSearching(false); return; }
     setSearching(true);
     searchTimer.current = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search-places?q=${encodeURIComponent(q)}`);
+        const res = await fetch(`/api/search-places?q=${encodeURIComponent(q)}&country=${country}`);
         const json = await res.json();
         if (json.error) { setSearchError(json.error); setSearchResults([]); }
         else setSearchResults(json.results || []);
       } catch { setSearchError("Search unavailable."); setSearchResults([]); }
       setSearching(false);
     }, 400);
+  };
+
+  const handleSearch = (q) => {
+    setSearchQuery(q);
+    setSelectedBiz(null);
+    setSearchError("");
+    doSearch(q, searchCountry);
+  };
+
+  const handleCountryChange = (code) => {
+    setSearchCountry(code);
+    setSelectedBiz(null);
+    setSearchError("");
+    setSearchResults([]);
+    if (searchQuery.trim().length >= 2) doSearch(searchQuery, code);
   };
 
   const handleSelectBiz = (biz) => {
@@ -2548,16 +2570,27 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
           {!manualMode ? (
             <>
               <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Search your business name</label>
-              <div style={{ position:"relative" }}>
-                <input
-                  autoFocus
-                  style={{ ...RC_INPUT, paddingRight: searching ? 36 : undefined }}
-                  className="rc-input"
-                  placeholder="e.g. Smith Electrical Brisbane"
-                  value={searchQuery}
-                  onChange={e => handleSearch(e.target.value)}
-                />
-                {searching && <div style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)" }}><Spinner size={14} /></div>}
+              <div style={{ display:"flex", gap:8, marginBottom:0 }}>
+                <select
+                  value={searchCountry}
+                  onChange={e => handleCountryChange(e.target.value)}
+                  style={{ ...RC_INPUT, width:"auto", paddingLeft:10, paddingRight:10, flexShrink:0, cursor:"pointer", appearance:"none", backgroundImage:"none" }}
+                >
+                  {COUNTRIES.map(c => (
+                    <option key={c.code} value={c.code}>{c.flag} {c.label}</option>
+                  ))}
+                </select>
+                <div style={{ position:"relative", flex:1 }}>
+                  <input
+                    autoFocus
+                    style={{ ...RC_INPUT, paddingRight: searching ? 36 : undefined, width:"100%" }}
+                    className="rc-input"
+                    placeholder="e.g. Smith Electrical"
+                    value={searchQuery}
+                    onChange={e => handleSearch(e.target.value)}
+                  />
+                  {searching && <div style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)" }}><Spinner size={14} /></div>}
+                </div>
               </div>
               {searchResults.length > 0 && (
                 <div style={{ marginTop:6, border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, overflow:"hidden", background:"#0c0c0c" }}>
