@@ -8,9 +8,9 @@ const supabase = createClient(
 );
 
 const RC_STRIPE_PRICES = {
-  starter: process.env.RC_PRICE_STARTER || "", // $29/mo — set in env once created in Stripe
-  growth:  "price_1TTu1PKVRE4IsC8ThYKGACBz",   // $49/mo
-  crew:    "price_1TTu1pKVRE4IsC8T19RkUMWr",   // $79/mo
+  starter: "price_1TULjZKVRE4IsC8Tg4eFyXgj", // $29/mo
+  growth:  "price_1TULjsKVRE4IsC8TcVn3PanJ", // $49/mo
+  crew:    "price_1TULk6KVRE4IsC8TwbKKDkTj", // $79/mo
 };
 
 const VALID_PLANS = ["starter", "growth", "crew"];

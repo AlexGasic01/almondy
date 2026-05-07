@@ -1803,7 +1803,7 @@ const TestimonialsPage = ({ setPage }) => {
 
 // ── Stripe Price IDs ─────────────────────────────────────────────
 const STRIPE_PRICES = {
-  starter: "", // TODO: create $19/mo Starter price in Stripe Dashboard and paste ID here
+  starter: "price_1TULjZKVRE4IsC8Tg4eFyXgj", // $29/mo
   growth:  "price_1TTu1PKVRE4IsC8ThYKGACBz", // $39/mo Growth
   crew:    "price_1TTu1pKVRE4IsC8T19RkUMWr", // $59/mo Crew
 };

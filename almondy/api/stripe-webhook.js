@@ -15,9 +15,9 @@ const PC_PRICE_TO_PLAN = {
 };
 
 const RC_PRICE_TO_PLAN = {
-  // TODO: add starter price ID here once created in Stripe Dashboard
-  price_1TTu1PKVRE4IsC8ThYKGACBz: "growth",  // Growth $39/mo
-  price_1TTu1pKVRE4IsC8T19RkUMWr: "crew",    // Crew $59/mo
+  "price_1TULjZKVRE4IsC8Tg4eFyXgj": "starter", // Starter $29/mo
+  "price_1TULjsKVRE4IsC8TcVn3PanJ": "growth",   // Growth $49/mo
+  "price_1TULk6KVRE4IsC8TwbKKDkTj": "crew",      // Crew $79/mo
 };
 
 export default async function handler(req, res) {
