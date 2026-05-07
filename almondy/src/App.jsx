@@ -2470,12 +2470,20 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   const [data, setData] = useState({ bizName: saved.bizName || "", googleLink: saved.googleLink || "" });
   const [searchQuery, setSearchQuery] = useState(saved.bizName || "");
   const [searchCountry, setSearchCountry] = useState("au");
+  const [countryOpen, setCountryOpen] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
   const [selectedBiz, setSelectedBiz] = useState(null);
   const [manualMode, setManualMode] = useState(false);
   const searchTimer = useRef(null);
+  const countryRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (countryRef.current && !countryRef.current.contains(e.target)) setCountryOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const COUNTRIES = [
     { code:"au", flag:"🇦🇺", label:"Australia" },
@@ -2570,16 +2578,40 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
           {!manualMode ? (
             <>
               <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Search your business name</label>
-              <div style={{ display:"flex", gap:8, marginBottom:0 }}>
-                <select
-                  value={searchCountry}
-                  onChange={e => handleCountryChange(e.target.value)}
-                  style={{ ...RC_INPUT, width:"auto", paddingLeft:10, paddingRight:10, flexShrink:0, cursor:"pointer", appearance:"none", backgroundImage:"none" }}
-                >
-                  {COUNTRIES.map(c => (
-                    <option key={c.code} value={c.code}>{c.flag} {c.label}</option>
-                  ))}
-                </select>
+              <div style={{ display:"flex", gap:8 }}>
+                {/* Country picker */}
+                <div ref={countryRef} style={{ position:"relative", flexShrink:0 }}>
+                  <button
+                    type="button"
+                    onClick={() => setCountryOpen(v => !v)}
+                    style={{ height:"100%", minHeight:50, padding:"0 12px", background:"#0f0f0f", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, color:"#fff", fontSize:14, fontFamily:"var(--font)", cursor:"pointer", display:"flex", alignItems:"center", gap:7, whiteSpace:"nowrap", transition:"border-color 0.2s" }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.25)"}
+                    onMouseLeave={e => e.currentTarget.style.borderColor=countryOpen?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.1)"}
+                  >
+                    <span style={{ fontSize:18, lineHeight:1 }}>{COUNTRIES.find(c => c.code === searchCountry)?.flag}</span>
+                    <span style={{ fontSize:12, color:"#888", fontWeight:600 }}>{COUNTRIES.find(c => c.code === searchCountry)?.code.toUpperCase()}</span>
+                    <span style={{ fontSize:9, color:"#444", marginLeft:2 }}>▼</span>
+                  </button>
+                  {countryOpen && (
+                    <div style={{ position:"absolute", top:"calc(100% + 6px)", left:0, background:"#111", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, overflow:"hidden", zIndex:50, minWidth:180, boxShadow:"0 8px 24px rgba(0,0,0,0.6)" }}>
+                      {COUNTRIES.map(c => (
+                        <button
+                          key={c.code}
+                          type="button"
+                          onClick={() => { handleCountryChange(c.code); setCountryOpen(false); }}
+                          style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"11px 14px", background:c.code===searchCountry?"rgba(255,255,255,0.05)":"transparent", border:"none", borderBottom:"1px solid rgba(255,255,255,0.04)", color: c.code===searchCountry?"#fff":"#888", fontSize:13, fontFamily:"var(--font)", cursor:"pointer", textAlign:"left" }}
+                          onMouseEnter={e => e.currentTarget.style.background="rgba(255,255,255,0.06)"}
+                          onMouseLeave={e => e.currentTarget.style.background=c.code===searchCountry?"rgba(255,255,255,0.05)":"transparent"}
+                        >
+                          <span style={{ fontSize:18 }}>{c.flag}</span>
+                          <span style={{ fontWeight: c.code===searchCountry ? 700 : 400 }}>{c.label}</span>
+                          {c.code===searchCountry && <span style={{ marginLeft:"auto", color:"#22c55e", fontSize:12 }}>✓</span>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {/* Search input */}
                 <div style={{ position:"relative", flex:1 }}>
                   <input
                     autoFocus
