@@ -61,32 +61,38 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Invalid phone number format." });
   }
 
-  // Rate limit: max 5 OTPs per phone per hour
-  const oneHourAgo = new Date(Date.now() - 3_600_000).toISOString();
-  const { count } = await supabase
-    .from("phone_otps")
-    .select("*", { count: "exact", head: true })
-    .eq("phone", phone)
-    .gt("created_at", oneHourAgo);
-
-  if (count >= 5) {
-    return res.status(429).json({ error: "Too many codes sent. Please wait before requesting another." });
-  }
-
-  // Invalidate any existing unused OTPs for this phone
-  await supabase.from("phone_otps").update({ used: true }).eq("phone", phone).eq("used", false);
-
-  const code = generateCode();
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
-
-  await supabase.from("phone_otps").insert({ phone, code, expires_at: expiresAt });
-
   try {
-    await sendViaCLickSend(phone, code);
-  } catch (e) {
-    console.error("ClickSend error:", e.message);
-    return res.status(500).json({ error: "Failed to send SMS. Please try again." });
-  }
+    // Rate limit: max 5 OTPs per phone per hour
+    const oneHourAgo = new Date(Date.now() - 3_600_000).toISOString();
+    const { count, error: countErr } = await supabase
+      .from("phone_otps")
+      .select("*", { count: "exact", head: true })
+      .eq("phone", phone)
+      .gt("created_at", oneHourAgo);
 
-  return res.json({ sent: true });
+    if (countErr) throw new Error(`DB count error: ${countErr.message}`);
+
+    if (count >= 5) {
+      return res.status(429).json({ error: "Too many codes sent. Please wait before requesting another." });
+    }
+
+    // Invalidate any existing unused OTPs for this phone
+    await supabase.from("phone_otps").update({ used: true }).eq("phone", phone).eq("used", false);
+
+    const code = generateCode();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+    const { error: insertErr } = await supabase
+      .from("phone_otps")
+      .insert({ phone, code, expires_at: expiresAt });
+
+    if (insertErr) throw new Error(`DB insert error: ${insertErr.message}`);
+
+    await sendViaCLickSend(phone, code);
+
+    return res.json({ sent: true });
+  } catch (e) {
+    console.error("send-phone-otp error:", e.message);
+    return res.status(500).json({ error: e.message || "Failed to send code. Please try again." });
+  }
 }
