@@ -1806,20 +1806,24 @@ const Spinner = ({ size=16, dark=false }) => (
 );
 
 // ── Supabase helpers ─────────────────────────────────────────────
-async function getOrCreateRCProfile(userId, email) {
+async function getOrCreateRCProfile(userId, email, phone) {
   const { data } = await supabase.from("rc_profiles").select("*").eq("id", userId).maybeSingle();
   if (data) return data;
 
-  // Check if this email already burned a trial on a previous account
-  const { data: prev } = await supabase.from("rc_profiles").select("id").eq("email", email).maybeSingle();
+  // Check if this phone (or email) already burned a trial on a previous account
+  const { data: prev } = phone
+    ? await supabase.from("rc_profiles").select("id").eq("phone", phone).maybeSingle()
+    : await supabase.from("rc_profiles").select("id").eq("email", email).maybeSingle();
   const trialUsed = !!prev;
 
   const fresh = {
-    id: userId, email,
+    id: userId,
+    email,
+    phone: phone ?? null,
     plan: "expired",
     sends_used: 0,
     trial_started_at: trialUsed ? null : new Date().toISOString(),
-    sends_reset_at: new Date().toISOString()
+    sends_reset_at: new Date().toISOString(),
   };
   await supabase.from("rc_profiles").insert(fresh);
   return fresh;
@@ -2130,53 +2134,281 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
 };
 
 // ── Auth Screen ───────────────────────────────────────────────────
-const RCAuthScreen = ({ isMobile, onBack }) => {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [err, setErr] = useState("");
+const COUNTRY_CODES = [
+  { code: "+61", label: "🇦🇺  +61" },
+  { code: "+64", label: "🇳🇿  +64" },
+  { code: "+1",  label: "🇺🇸  +1"  },
+  { code: "+44", label: "🇬🇧  +44" },
+  { code: "+65", label: "🇸🇬  +65" },
+];
 
-  const handleSend = async () => {
-    if (!email.includes("@")) return;
-    setLoading(true); setErr("");
+function normalizeToE164(raw, countryCode) {
+  const digits = raw.replace(/\D/g, "");
+  const prefix = countryCode.replace("+", "");
+  if (digits.startsWith(prefix)) return `+${digits}`;
+  if (digits.startsWith("0")) return `${countryCode}${digits.slice(1)}`;
+  return `${countryCode}${digits}`;
+}
+
+function isValidPhone(raw, countryCode) {
+  const n = normalizeToE164(raw, countryCode);
+  const digits = n.replace(/\D/g, "");
+  return /^\+[1-9]/.test(n) && digits.length >= 9 && digits.length <= 15;
+}
+
+const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
+  const [step, setStep]           = useState("phone"); // "phone" | "otp"
+  const [countryCode, setCountryCode] = useState("+61");
+  const [rawPhone, setRawPhone]   = useState("");
+  const [phoneErr, setPhoneErr]   = useState("");
+  const [sending, setSending]     = useState(false);
+  const [verifiedPhone, setVerifiedPhone] = useState("");
+  const [digits, setDigits]       = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [otpErr, setOtpErr]       = useState("");
+  const [locked, setLocked]       = useState(false);
+  const [resendTimer, setResendTimer] = useState(30);
+  const [resending, setResending] = useState(false);
+
+  // Countdown timer for resend button
+  useEffect(() => {
+    if (step !== "otp" || resendTimer <= 0) return;
+    const t = setTimeout(() => setResendTimer(n => n - 1), 1000);
+    return () => clearTimeout(t);
+  }, [step, resendTimer]);
+
+  const handleSendOTP = async (phoneOverride) => {
+    const phone = phoneOverride ?? normalizeToE164(rawPhone, countryCode);
+    if (!isValidPhone(rawPhone, countryCode) && !phoneOverride) {
+      setPhoneErr("Please enter a valid mobile number.");
+      return;
+    }
+    setSending(true); setPhoneErr(""); setOtpErr(""); setLocked(false);
     try {
-      const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo:`${window.location.origin}/?page=reviewchaser` } });
-      if (error) throw error;
-      setSent(true);
-    } catch(e) { setErr("Something went wrong. Try again."); }
-    finally { setLoading(false); }
+      const res = await fetch("/api/send-phone-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Failed to send code.");
+      setVerifiedPhone(phone);
+      setDigits("");
+      setResendTimer(30);
+      setStep("otp");
+    } catch (e) {
+      setPhoneErr(e.message || "Something went wrong. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
+
+  const handleVerifyOTP = async (codeOverride) => {
+    const code = codeOverride ?? digits;
+    if (code.length !== 6) return;
+    setVerifying(true); setOtpErr("");
+    try {
+      const res = await fetch("/api/verify-phone-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: verifiedPhone, code }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.code === "too_many_attempts") setLocked(true);
+        setOtpErr(json.error || "Incorrect code.");
+        setVerifying(false);
+        return;
+      }
+      // Establish Supabase session — onAuthStateChange in ReviewChaserPage takes it from here
+      const { error: verifyErr } = await supabase.auth.verifyOtp({
+        token_hash: json.tokenHash,
+        type: "magiclink",
+      });
+      if (verifyErr) throw verifyErr;
+      // View will be changed by onAuthStateChange; no further action needed here
+    } catch (e) {
+      setOtpErr("Verification failed. Please try again.");
+      setVerifying(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendTimer > 0 || resending) return;
+    setResending(true);
+    await handleSendOTP(verifiedPhone);
+    setResending(false);
+  };
+
+  const BG = (
+    <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
+  );
+
+  if (step === "phone") return (
+    <div style={{ minHeight:"100vh", background:"#080808", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24, position:"relative", overflow:"hidden" }}>
+      {BG}
+      <button onClick={onBack} style={{ position:"absolute", top:24, left:20, background:"none", border:"none", color:"#555", fontSize:13, fontWeight:600, cursor:"pointer" }}>← Back</button>
+      <div style={{ position:"relative", zIndex:1, width:"100%", maxWidth:400, animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
+        <div style={{ textAlign:"center", marginBottom:32 }}>
+          <div style={{ width:52, height:52, background:"#111", border:"1px solid #2a2a2a", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>📱</div>
+          <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Sign in to ReviewChaser</h1>
+          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>Enter your mobile number — we'll text you a code.</p>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          <div style={{ display:"flex", gap:8 }}>
+            <select
+              value={countryCode}
+              onChange={e => setCountryCode(e.target.value)}
+              style={{ background:"#0f0f0f", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, color:"#fff", fontSize:14, padding:"13px 10px", fontFamily:"var(--font)", flexShrink:0, outline:"none" }}
+            >
+              {COUNTRY_CODES.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
+            </select>
+            <input
+              type="tel"
+              value={rawPhone}
+              onChange={e => { setRawPhone(e.target.value); setPhoneErr(""); }}
+              onKeyDown={e => e.key === "Enter" && handleSendOTP()}
+              placeholder="0412 345 678"
+              autoFocus
+              className="rc-input"
+              style={{ ...RC_INPUT, padding:"13px 16px", flex:1 }}
+            />
+          </div>
+          {phoneErr && <p style={{ fontSize:12, color:"#f87171", margin:0 }}>{phoneErr}</p>}
+          <button
+            onClick={() => handleSendOTP()}
+            disabled={!rawPhone.trim() || sending}
+            className="rc-btn-primary"
+            style={{ width:"100%", padding:14, background:sending?"rgba(255,255,255,0.5)":"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:!rawPhone.trim()?0.4:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, cursor:sending||!rawPhone.trim()?"default":"pointer" }}
+          >
+            {sending ? <><Spinner size={14} dark />Sending code…</> : "Send code →"}
+          </button>
+        </div>
+        <p style={{ textAlign:"center", fontSize:12, color:"#383838", marginTop:16 }}>By continuing you agree to our Terms &amp; Privacy Policy.</p>
+      </div>
+    </div>
+  );
 
   return (
     <div style={{ minHeight:"100vh", background:"#080808", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24, position:"relative", overflow:"hidden" }}>
-      <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
-      <button onClick={onBack} style={{ position:"absolute", top:24, left:20, background:"none", border:"none", color:"#555", fontSize:13, fontWeight:600, cursor:"pointer" }}>← Back</button>
+      {BG}
+      <button onClick={() => setStep("phone")} style={{ position:"absolute", top:24, left:20, background:"none", border:"none", color:"#555", fontSize:13, fontWeight:600, cursor:"pointer" }}>← Back</button>
       <div style={{ position:"relative", zIndex:1, width:"100%", maxWidth:400, animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
-        {!sent ? (
-          <>
-            <div style={{ textAlign:"center", marginBottom:32 }}>
-              <div style={{ width:52, height:52, background:"#111", border:"1px solid #2a2a2a", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>✉️</div>
-              <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Sign in to ReviewChaser</h1>
-              <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>Enter your email — we'll send a magic link. No password needed.</p>
-            </div>
-            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSend()} placeholder="yourname@domain.com" autoFocus className="rc-input" style={{ ...RC_INPUT, padding:"13px 16px" }} />
-              {err && <p style={{ fontSize:12, color:"#f87171", margin:0 }}>{err}</p>}
-              <button onClick={handleSend} disabled={!email.includes("@")||loading} className="rc-btn-primary" style={{ width:"100%", padding:14, background:loading?"rgba(255,255,255,0.5)":"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:!email.includes("@")?0.4:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
-                {loading ? <><Spinner size={14} dark /> Sending…</> : "Send magic link →"}
+        <div style={{ textAlign:"center", marginBottom:32 }}>
+          <div style={{ width:52, height:52, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>💬</div>
+          <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Enter your code</h1>
+          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>We texted a 6-digit code to<br /><strong style={{ color:"#999" }}>{verifiedPhone}</strong></p>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={digits}
+            onChange={e => {
+              if (locked) return;
+              const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+              setDigits(val);
+              setOtpErr("");
+              if (val.length === 6) handleVerifyOTP(val);
+            }}
+            autoFocus
+            maxLength={6}
+            placeholder="000000"
+            disabled={locked || verifying}
+            className="rc-input"
+            style={{ ...RC_INPUT, fontSize:30, letterSpacing:"0.5em", textAlign:"center", padding:"16px 12px", fontFamily:"monospace" }}
+          />
+          {otpErr && <p style={{ fontSize:12, color:"#f87171", margin:0, textAlign:"center" }}>{otpErr}</p>}
+          {!locked && (
+            <button
+              onClick={() => handleVerifyOTP()}
+              disabled={digits.length !== 6 || verifying}
+              className="rc-btn-primary"
+              style={{ width:"100%", padding:14, background:verifying?"rgba(255,255,255,0.5)":"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:digits.length!==6?0.4:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, cursor:digits.length!==6||verifying?"default":"pointer" }}
+            >
+              {verifying ? <><Spinner size={14} dark />Verifying…</> : "Verify code →"}
+            </button>
+          )}
+          <div style={{ textAlign:"center", marginTop:4 }}>
+            {locked ? (
+              <button onClick={handleResend} style={{ fontSize:13, color:"#22c55e", background:"none", border:"none", cursor:"pointer", fontWeight:600 }}>
+                Request a new code
               </button>
-            </div>
-            <p style={{ textAlign:"center", fontSize:12, color:"#383838", marginTop:16 }}>By continuing you agree to our Terms &amp; Privacy Policy.</p>
-          </>
-        ) : (
-          <div style={{ textAlign:"center" }}>
-            <div style={{ width:52, height:52, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>📬</div>
-            <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:10 }}>Check your inbox</h1>
-            <p style={{ fontSize:14, color:"#666", lineHeight:1.7 }}>Magic link sent to<br /><strong style={{ color:"#fff" }}>{email}</strong></p>
-            <p style={{ fontSize:12, color:"#383838", marginTop:16 }}>Check spam if you don't see it. Link expires in 15 minutes.</p>
-            <button onClick={() => setSent(false)} style={{ marginTop:18, background:"transparent", border:"1px solid rgba(255,255,255,0.08)", color:"#555", borderRadius:9, padding:"10px 20px", fontSize:13, fontWeight:600, cursor:"pointer" }}>← Different email</button>
+            ) : resendTimer > 0 ? (
+              <span style={{ fontSize:12, color:"#383838" }}>Resend code in {resendTimer}s</span>
+            ) : (
+              <button onClick={handleResend} disabled={resending} style={{ fontSize:13, color:"#22c55e", background:"none", border:"none", cursor:resending?"default":"pointer", fontWeight:600 }}>
+                {resending ? "Sending…" : "Resend code"}
+              </button>
+            )}
           </div>
-        )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── Email Collection (post-login, optional) ───────────────────────
+const RCEmailCollectScreen = ({ isMobile, userId, onComplete }) => {
+  const [email, setEmail]   = useState("");
+  const [saving, setSaving] = useState(false);
+  const [err, setErr]       = useState("");
+
+  const valid = email.includes("@") && email.includes(".");
+
+  const handleSave = async () => {
+    if (!valid) return;
+    setSaving(true); setErr("");
+    try {
+      await supabase.from("rc_profiles").update({ billing_email: email }).eq("id", userId);
+    } catch (e) {
+      console.error("billing email save error:", e);
+      setErr("Couldn't save. You can update this later in Settings.");
+    } finally {
+      setSaving(false);
+    }
+    onComplete();
+  };
+
+  const BG = <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />;
+
+  return (
+    <div style={{ minHeight:"100vh", background:"#080808", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24, position:"relative", overflow:"hidden" }}>
+      {BG}
+      <div style={{ position:"relative", zIndex:1, width:"100%", maxWidth:400, animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
+        <div style={{ textAlign:"center", marginBottom:32 }}>
+          <div style={{ width:52, height:52, background:"#111", border:"1px solid #2a2a2a", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>🧾</div>
+          <h1 style={{ fontSize:22, fontWeight:800, letterSpacing:"-0.8px", color:"#fff", marginBottom:10 }}>Where should we send your receipts and billing info?</h1>
+          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>This is optional — you can skip and add it later in Settings.</p>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          <input
+            type="email"
+            value={email}
+            onChange={e => { setEmail(e.target.value); setErr(""); }}
+            onKeyDown={e => e.key === "Enter" && handleSave()}
+            placeholder="your@email.com"
+            autoFocus
+            className="rc-input"
+            style={{ ...RC_INPUT, padding:"13px 16px" }}
+          />
+          {err && <p style={{ fontSize:12, color:"#f87171", margin:0 }}>{err}</p>}
+          <button
+            onClick={handleSave}
+            disabled={!valid || saving}
+            className="rc-btn-primary"
+            style={{ width:"100%", padding:14, background:saving?"rgba(255,255,255,0.5)":"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:!valid?0.5:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, cursor:!valid||saving?"default":"pointer" }}
+          >
+            {saving ? <><Spinner size={14} dark />Saving…</> : "Save email →"}
+          </button>
+          <button
+            onClick={onComplete}
+            style={{ width:"100%", padding:12, background:"transparent", color:"#555", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, fontSize:14, fontWeight:600, cursor:"pointer" }}
+          >
+            Skip for now
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -2933,84 +3165,96 @@ function ReviewChaserPage({ setPage, user, setUser }) {
   const [rcProfile, setRcProfile] = useState(null);
   const [rcUserId, setRcUserId] = useState(null);
 
- useEffect(() => {
-  let mounted = true;
+  // Track current view in a ref so onAuthStateChange (defined once) can read it
+  const viewRef = useRef("loading");
+  const setViewAndRef = (v) => { viewRef.current = v; setView(v); };
 
-  const init = async () => {
-    try {
-      const { data:{ session } } = await supabase.auth.getSession();
-      if (!mounted) return;
-      if (!session) { setView("marketing"); return; }
-      const uid = session.user.id;
-      setRcUserId(uid);
-      const profile = await getOrCreateRCProfile(uid, session.user.email);
-      if (!mounted) return;
-      setRcProfile(profile);
-      setView(!profile.biz_name ? "onboarding" : (profile.plan === "trial" || profile.plan === "expired") ? "paywall" : "dashboard");
-    } catch (e) {
-      console.error("RC init error:", e);
-      if (mounted) setView("marketing");
-    }
+  const routeAfterProfile = (profile) => {
+    if (!profile.biz_name) return setViewAndRef("onboarding");
+    if (profile.plan === "trial" || profile.plan === "expired") return setViewAndRef("paywall");
+    setViewAndRef("dashboard");
   };
-  init();
 
-  const { data:{ subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-    if (event==="SIGNED_IN"&&session) {
+  useEffect(() => {
+    let mounted = true;
+
+    const init = async () => {
       try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted) return;
+        if (!session) { setViewAndRef("marketing"); return; }
         const uid = session.user.id;
+        const phone = session.user.user_metadata?.phone ?? null;
         setRcUserId(uid);
-        const profile = await getOrCreateRCProfile(uid, session.user.email);
+        const profile = await getOrCreateRCProfile(uid, session.user.email, phone);
+        if (!mounted) return;
         setRcProfile(profile);
-        setView(!profile.biz_name ? "onboarding" : (profile.plan === "trial" || profile.plan === "expired") ? "paywall" : "dashboard");
-        window.history.replaceState({}, "", "/reviewchaser");
+        routeAfterProfile(profile);
       } catch (e) {
-        console.error("RC auth error:", e);
-        setView("marketing");
+        console.error("RC init error:", e);
+        if (mounted) setViewAndRef("marketing");
       }
-    }
-    if (event==="SIGNED_OUT") { setRcProfile(null); setRcUserId(null); setView("marketing"); }
-  });
+    };
+    init();
 
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("rc_session")==="success") {
-    window.history.replaceState({}, "", "/reviewchaser");
-    setTimeout(async () => {
-      try {
-        const { data:{ session } } = await supabase.auth.getSession();
-        if (session) {
-          const profile = await getOrCreateRCProfile(session.user.id, session.user.email);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        try {
+          const uid = session.user.id;
+          const phone = session.user.user_metadata?.phone ?? null;
+          setRcUserId(uid);
+          const profile = await getOrCreateRCProfile(uid, session.user.email, phone);
           setRcProfile(profile);
-          setView("dashboard");
+          window.history.replaceState({}, "", "/reviewchaser");
+
+          // Show email-collect screen if user just came through the auth flow
+          // and hasn't provided a billing email yet
+          if (viewRef.current === "auth" && !profile.billing_email) {
+            setViewAndRef("email-collect");
+          } else {
+            routeAfterProfile(profile);
+          }
+        } catch (e) {
+          console.error("RC auth error:", e);
+          setViewAndRef("marketing");
         }
-      } catch (e) {
-        console.error("RC session restore error:", e);
       }
-    }, 1500);
-  }
+      if (event === "SIGNED_OUT") { setRcProfile(null); setRcUserId(null); setViewAndRef("marketing"); }
+    });
 
-  return () => { mounted = false; subscription.unsubscribe(); };
-}, []);
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("rc_session") === "success") {
+      window.history.replaceState({}, "", "/reviewchaser");
+    }
 
-  
+    return () => { mounted = false; subscription.unsubscribe(); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSignOut = async () => { try { await supabase.auth.signOut(); } catch(e) {} setView("marketing"); };
+  const handleSignOut = async () => {
+    try { await supabase.auth.signOut(); } catch (e) {}
+    setViewAndRef("marketing");
+  };
 
+  const handleEmailCollectDone = () => {
+    routeAfterProfile(rcProfile);
+  };
 
-  if (view==="loading") return (
+  if (view === "loading") return (
     <>
       <RCStyles />
-      <div style={{ minHeight:"100vh",background:"#080808",display:"flex",alignItems:"center",justifyContent:"center" }}><Spinner size={28} /></div>
+      <div style={{ minHeight:"100vh", background:"#080808", display:"flex", alignItems:"center", justifyContent:"center" }}><Spinner size={28} /></div>
     </>
   );
 
   return (
     <>
       <RCStyles />
-      {view==="marketing" && <div style={{ paddingTop:62 }}><RCMarketingPage isMobile={isMobile} onStartTrial={()=>setView("auth")} onSignIn={()=>setView("auth")} setPage={setPage} /></div>}
-      {view==="auth" && <RCAuthScreen isMobile={isMobile} onBack={()=>setView("marketing")} />}
-      {view==="onboarding"&&rcUserId && <RCOnboardingWizard isMobile={isMobile} userId={rcUserId} email={rcProfile?.email??""} onComplete={(profile, forcePaywall)=>{ setRcProfile(p=>({...p,...profile})); setView("paywall"); }} />}
-      {view==="paywall"&&rcUserId&&rcProfile && <RCPaywallScreen isMobile={isMobile} profile={rcProfile} onClose={null} onBack={() => setView("marketing")} />}
-      {view==="dashboard"&&rcUserId&&rcProfile && <RCDashboardApp isMobile={isMobile} profile={rcProfile} userId={rcUserId} onSignOut={handleSignOut} />}
+      {view==="marketing" && <div style={{ paddingTop:62 }}><RCMarketingPage isMobile={isMobile} onStartTrial={()=>setViewAndRef("auth")} onSignIn={()=>setViewAndRef("auth")} setPage={setPage} /></div>}
+      {view==="auth" && <RCPhoneAuthFlow isMobile={isMobile} onBack={()=>setViewAndRef("marketing")} />}
+      {view==="email-collect" && rcUserId && <RCEmailCollectScreen isMobile={isMobile} userId={rcUserId} onComplete={handleEmailCollectDone} />}
+      {view==="onboarding" && rcUserId && <RCOnboardingWizard isMobile={isMobile} userId={rcUserId} email={rcProfile?.email??""} onComplete={(profile)=>{ setRcProfile(p=>({...p,...profile})); setViewAndRef("paywall"); }} />}
+      {view==="paywall" && rcUserId && rcProfile && <RCPaywallScreen isMobile={isMobile} profile={rcProfile} onClose={null} onBack={() => setViewAndRef("marketing")} />}
+      {view==="dashboard" && rcUserId && rcProfile && <RCDashboardApp isMobile={isMobile} profile={rcProfile} userId={rcUserId} onSignOut={handleSignOut} />}
     </>
   );
 }
