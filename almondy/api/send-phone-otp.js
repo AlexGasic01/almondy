@@ -72,7 +72,7 @@ export default async function handler(req, res) {
 
     if (countErr) throw new Error(`DB count error: ${countErr.message}`);
 
-    if (count >= 5) {
+    if (count >= 8) {
       return res.status(429).json({ error: "Rate limited — please try again later." });
     }
 
