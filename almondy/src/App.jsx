@@ -1911,7 +1911,7 @@ const RC_INPUT = {
 
 // ── Plan data ─────────────────────────────────────────────────────
 const PLANS_DATA = [
-  { id:"trial",   name:"Free Trial", price:"0",  priceLabel:"Free", period:"7 days, then cancel or upgrade", sends:20,  desc:"Try ReviewChaser risk-free. No credit card required to start.", cta:"Start Free Trial →", solid:false, badge:null, features:[[true,"20 review requests"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Basic send dashboard"],[false,"Send history"],[false,"Custom SMS message"],[false,"Priority support"]] },
+  { id:"trial",   name:"Free Trial", price:"0",  priceLabel:"Free", period:"7 days, then cancel or upgrade", sends:20,  desc:"Try ReviewChaser risk-free for 7 days with 20 sends included.", cta:"Start Free Trial →", solid:false, badge:null, features:[[true,"20 review requests"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Basic send dashboard"],[false,"Send history"],[false,"Custom SMS message"],[false,"Priority support"]] },
   { id:"starter", name:"Starter",    price:"29", priceLabel:"29",   period:"per month AUD",                  sends:75,  desc:"For sole operators just getting started with review collection.", cta:"Start 7-Day Free Trial →", solid:false, badge:null, features:[[true,"<strong>75 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
   { id:"growth",  name:"Growth",     price:"49", priceLabel:"49",   period:"per month AUD",                  sends:220, desc:"For small businesses building their reputation at scale.", cta:"Get Growth →", solid:true, badge:"⚡ Most Popular", features:[[true,"<strong>220 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
   { id:"crew",    name:"Crew",       price:"79", priceLabel:"79",   period:"per month AUD",                  sends:400, desc:"For multi-van operators, agencies, and businesses scaling fast.", cta:"Get Crew →", solid:false, badge:"Enterprise", features:[[true,"<strong>400 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history & exports"],[true,"Advanced analytics"],[true,"Custom SMS message"],[true,"Priority support"]] },
@@ -2018,7 +2018,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
             <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#fff", color:"#000", padding:"14px 28px", fontSize:15, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial →</button>
             <button onClick={onSignIn} style={{ background:"transparent", color:"#666", border:"1px solid rgba(255,255,255,0.12)", padding:"14px 22px", fontSize:14, fontWeight:600, borderRadius:9 }}>Sign In</button>
           </div>
-          <p style={{ fontSize:12, color:"#656565", marginTop:14 }}>7 days free · 20 sends · No credit card required</p>
+          <p style={{ fontSize:12, color:"#656565", marginTop:14 }}>7 days free · 20 sends included</p>
         </div>
       </div>
       <Divider />
@@ -2143,7 +2143,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
         </div>
         <div style={{ textAlign:"center" }}>
           <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#22c55e", color:"#000", padding:"14px 32px", fontSize:14, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial — 7 Days →</button>
-          <p style={{ fontSize:12, color:"#383838", marginTop:12 }}>20 sends included · No credit card required</p>
+          <p style={{ fontSize:12, color:"#383838", marginTop:12 }}>20 sends included · Cancel any time</p>
         </div>
       </div>
       <Divider />
