@@ -73,7 +73,7 @@ export default async function handler(req, res) {
     if (countErr) throw new Error(`DB count error: ${countErr.message}`);
 
     if (count >= 5) {
-      return res.status(429).json({ error: "Too many codes sent. Please wait before requesting another." });
+      return res.status(429).json({ error: "Rate limited — please try again later." });
     }
 
     // Invalidate any existing unused OTPs for this phone
