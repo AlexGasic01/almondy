@@ -522,23 +522,23 @@ const FONT_OPTIONS = [
   { id:"custom",   label:"Custom",     style:"400 15px sans-serif",               desc:"I have a specific font in mind" },
 ];
 
-const HEADER_STYLES = [
+const HERO_LAYOUT_OPTIONS = [
   {
-    id:"centered",
-    label:"Centered hero",
-    desc:"Big headline centre of screen, CTA below",
+    id: "centered",
+    label: "Centered hero",
+    desc: "Big headline centre of screen, CTA below",
     preview: (
       <div style={{background:"#0c0c0c",borderRadius:8,padding:"20px 16px",textAlign:"center"}}>
         <div style={{fontSize:11,fontWeight:700,color:"#22c55e",letterSpacing:2,marginBottom:6}}>YOUR TAGLINE</div>
         <div style={{fontSize:18,fontWeight:800,color:"#fff",letterSpacing:"-0.8px",lineHeight:1.1,marginBottom:10}}>Big Bold<br/>Headline Here</div>
         <div style={{display:"inline-block",background:"#fff",color:"#000",borderRadius:6,padding:"6px 14px",fontSize:10,fontWeight:700}}>Get Started</div>
       </div>
-    )
+    ),
   },
   {
-    id:"split",
-    label:"Split layout",
-    desc:"Text left, image or visual right",
+    id: "split",
+    label: "Split layout",
+    desc: "Text left, image or visual right",
     preview: (
       <div style={{background:"#0c0c0c",borderRadius:8,padding:"16px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,alignItems:"center"}}>
         <div>
@@ -550,12 +550,12 @@ const HEADER_STYLES = [
           <div style={{width:28,height:28,borderRadius:"50%",background:"#2a2a2a",border:"1px solid #656565"}} />
         </div>
       </div>
-    )
+    ),
   },
   {
-    id:"fullscreen",
-    label:"Full-screen image",
-    desc:"Edge-to-edge background image with overlay text",
+    id: "fullscreen",
+    label: "Full-screen image",
+    desc: "Edge-to-edge background image with overlay text",
     preview: (
       <div style={{background:"#1a1a1a",borderRadius:8,padding:"20px 16px",textAlign:"center",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.55)"}} />
@@ -564,12 +564,12 @@ const HEADER_STYLES = [
           <div style={{display:"inline-block",border:"1px solid rgba(255,255,255,0.4)",color:"#fff",borderRadius:5,padding:"4px 12px",fontSize:9,fontWeight:600}}>Explore →</div>
         </div>
       </div>
-    )
+    ),
   },
   {
-    id:"minimal",
-    label:"Minimal / text only",
-    desc:"Clean, no-frills typography-first hero",
+    id: "minimal",
+    label: "Minimal / text only",
+    desc: "Clean, no-frills typography-first hero",
     preview: (
       <div style={{background:"#fff",borderRadius:8,padding:"16px 14px"}}>
         <div style={{fontSize:9,color:"#999",marginBottom:4}}>Est. 2024</div>
@@ -577,35 +577,71 @@ const HEADER_STYLES = [
         <div style={{fontSize:9,color:"#666",marginBottom:8}}>A short punchy line about what makes you different.</div>
         <div style={{fontSize:9,color:"#111",borderBottom:"1px solid #111",display:"inline",paddingBottom:1}}>Learn more →</div>
       </div>
-    )
+    ),
   },
 ];
 
 const PAGE_OPTIONS = [
-  { id:"home",       label:"Home / Landing" },
-  { id:"about",      label:"About" },
-  { id:"services",   label:"Services" },
-  { id:"portfolio",  label:"Portfolio / Work" },
-  { id:"pricing",    label:"Pricing" },
-  { id:"contact",    label:"Contact" },
-  { id:"blog",       label:"Blog" },
-  { id:"faq",        label:"FAQ" },
+  { id:"home",        label:"Home / Landing" },
+  { id:"about",       label:"About" },
+  { id:"services",    label:"Services" },
+  { id:"portfolio",   label:"Portfolio / Work" },
+  { id:"pricing",     label:"Pricing" },
+  { id:"contact",     label:"Contact" },
+  { id:"blog",        label:"Blog" },
+  { id:"faq",         label:"FAQ" },
   { id:"testimonials",label:"Testimonials" },
 ];
 
-const EXTRA_OPTIONS = [
+const VIBE_OPTIONS = [
+  { id:"modern_minimal",    label:"Modern minimal",     desc:"Clean, lots of white space" },
+  { id:"bold_impact",       label:"Bold & impactful",   desc:"Strong, high contrast" },
+  { id:"warm_friendly",     label:"Warm & friendly",    desc:"Approachable, inviting" },
+  { id:"premium_luxury",    label:"Premium luxury",     desc:"Refined, high-end feel" },
+  { id:"playful_creative",  label:"Playful & creative", desc:"Fun, energetic" },
+  { id:"corporate_trust",   label:"Corporate & trusted",desc:"Professional, authoritative" },
+  { id:"rustic_earthy",     label:"Rustic & earthy",    desc:"Natural, handcrafted feel" },
+  { id:"techy_futuristic",  label:"Techy & futuristic", desc:"Cutting-edge, digital-forward" },
+];
+
+const SOCIAL_PROOF_OPTIONS = [
+  { id:"google_reviews", label:"Google Reviews" },
+  { id:"testimonials",   label:"Testimonials" },
+  { id:"before_after",   label:"Before & After" },
+  { id:"client_logos",   label:"Client Logos" },
+  { id:"stats",          label:"Stats / Numbers" },
+  { id:"awards",         label:"Awards / Certifications" },
+  { id:"none",           label:"None needed" },
+];
+
+const LEAD_OPTIONS = [
+  { id:"phone_call",    label:"Phone call" },
   { id:"contact_form",  label:"Contact form" },
-  { id:"booking",       label:"Booking / scheduling" },
-  { id:"chat_widget",   label:"Live chat widget" },
-  { id:"analytics",     label:"Analytics (GA / Plausible)" },
-  { id:"seo",           label:"SEO setup" },
-  { id:"newsletter",    label:"Newsletter signup" },
-  { id:"ecommerce",     label:"E-commerce / payments" },
-  { id:"cms",           label:"CMS (edit content yourself)" },
+  { id:"quote_form",    label:"Quote form" },
+  { id:"booking",       label:"Online booking" },
+  { id:"whatsapp",      label:"WhatsApp" },
+  { id:"email",         label:"Email" },
+];
+
+const FEATURE_OPTIONS = [
+  { id:"contact_form",   label:"Contact form" },
+  { id:"booking",        label:"Booking / scheduling" },
+  { id:"chat_widget",    label:"Live chat widget" },
+  { id:"analytics",      label:"Analytics (GA / Plausible)" },
+  { id:"seo",            label:"SEO setup" },
+  { id:"newsletter",     label:"Newsletter signup" },
+  { id:"maps",           label:"Google Maps embed" },
+  { id:"instagram",      label:"Instagram feed" },
+  { id:"facebook_pixel", label:"Facebook Pixel" },
+  { id:"cms",            label:"CMS (edit content yourself)" },
+  { id:"ecommerce",      label:"E-commerce / payments" },
+  { id:"multilingual",   label:"Multilingual" },
 ];
 
 const STEPS_ONBOARDING = [
-  "Business","Colours","Typography","Header","Hero","Pages","Extras","Review",
+  "Business","Vibe","Colours","Typography","Assets","Hero Layout",
+  "Hero Content","Social Proof","Lead Capture","Pages","Features",
+  "Technical","Inspiration","Timeline","Review",
 ];
 
 const WebDevOnboardingPage = ({ setPage }) => {
@@ -615,11 +651,23 @@ const WebDevOnboardingPage = ({ setPage }) => {
   const [visible, setVisible] = useState(true);
   const [submitted, setSubmitted] = useState(false);
 
-const [data, setData] = useState({
-  bizName:"",bizDesc:"",palette:"",paletteCustom:"",font:"",fontCustom:"",
-  headerStyle:"",headerUpload:null,headerUploadName:"",headerUrl:"",heroHeadline:"",
-  heroSubline:"",heroCta:"",pages:[],extras:[],otherNotes:"",email:"",
-});
+  const [data, setData] = useState({
+    bizName: "", bizDesc: "", bizLocation: "", idealCustomer: "",
+    vibe: "", vibeInspo: "",
+    palette: "", paletteCustom: "", colourNotes: "",
+    font: "", fontCustom: "",
+    hasLogo: null, hasPhotos: null, hasHeadshot: null, needsLogo: null, assetNotes: "",
+    heroLayout: "", heroRefUrl: "", heroUploadName: "",
+    heroHeadline: "", heroSubline: "", heroCta: "", heroBackground: "solid",
+    socialProof: [], socialProofNotes: "",
+    leadMethod: [], formFields: "",
+    pages: [],
+    features: [],
+    hasDomain: null, domainName: "", hasHosting: null, existingSite: "", needsCms: null,
+    competitors: "", inspiration: "", antiInspo: "", oneFeelingWord: "",
+    deadline: "", hardDeadline: null, budget: "", concerns: "",
+    email: "",
+  });
 
   const go = (dir) => {
     setAnimDir(dir);
@@ -630,187 +678,384 @@ const [data, setData] = useState({
   const set = (key, val) => setData(d => ({ ...d, [key]: val }));
   const toggle = (key, val) => setData(d => ({
     ...d,
-    [key]: d[key].includes(val) ? d[key].filter(x => x !== val) : [...d[key], val]
+    [key]: d[key].includes(val) ? d[key].filter(x => x !== val) : [...d[key], val],
   }));
 
   const canNext = () => {
-    if (step === 0) return data.bizName.trim().length > 0;
-    if (step === 1) return data.palette !== "";
-    if (step === 2) return data.font !== "";
-    if (step === 3) return data.headerStyle !== "";
-    if (step === 4) return data.heroHeadline.trim().length > 0;
-    if (step === 5) return data.pages.length > 0;
-    if (step === 7) return data.email.trim().includes("@");
+    if (step === 0)  return data.bizName.trim().length > 0 && data.bizDesc.trim().length > 0;
+    if (step === 1)  return data.vibe !== "";
+    if (step === 2)  return data.palette !== "";
+    if (step === 3)  return data.font !== "";
+    if (step === 4)  return data.hasLogo !== null && data.hasPhotos !== null;
+    if (step === 5)  return data.heroLayout !== "";
+    if (step === 6)  return data.heroHeadline.trim().length > 0;
+    if (step === 7)  return data.socialProof.length > 0;
+    if (step === 8)  return data.leadMethod.length > 0;
+    if (step === 9)  return data.pages.length > 0;
+    if (step === 14) return data.email.trim().includes("@");
     return true;
   };
 
   const inputStyle = {
-    width:"100%",padding:"12px 16px",background:"#0f0f0f",
-    border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,
-    fontSize:15,color:"#fff",outline:"none",fontFamily:"var(--font)",boxSizing:"border-box",
+    width: "100%", padding: "12px 16px", background: "#0f0f0f",
+    border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10,
+    fontSize: 15, color: "#fff", outline: "none", fontFamily: "var(--font)", boxSizing: "border-box",
   };
-  const textareaStyle = { ...inputStyle, resize:"vertical", minHeight:90 };
+  const textareaStyle = { ...inputStyle, resize: "vertical", minHeight: 90 };
+  const labelStyle = { fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 };
+  const optStyle = (active) => ({
+    background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c",
+    border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`,
+    borderRadius: 9, padding: "11px 14px", cursor: "pointer",
+    display: "flex", alignItems: "flex-start", gap: 9,
+    fontSize: 13, fontWeight: 600, color: active ? "#22c55e" : "#666", textAlign: "left",
+  });
+
+  const Tick = ({ active, round }) => (
+    <div style={{
+      width: 14, height: 14, borderRadius: round ? "50%" : 3, flexShrink: 0, marginTop: 1,
+      border: `1px solid ${active ? "rgba(34,197,94,0.5)" : "#656565"}`,
+      background: active ? "#22c55e" : "transparent",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontSize: 8, color: "#000", fontWeight: 900,
+    }}>{active ? "✓" : ""}</div>
+  );
+
+  const ToggleGrid = ({ options, field, multi = true, cols = 2 }) => (
+    <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 8 }}>
+      {options.map(opt => {
+        const active = multi ? data[field].includes(opt.id) : data[field] === opt.id;
+        return (
+          <button key={opt.id} onClick={() => multi ? toggle(field, opt.id) : set(field, opt.id)} style={optStyle(active)}>
+            <Tick active={active} round={!multi} />
+            <div>
+              <div>{opt.label}</div>
+              {opt.desc && <div style={{ fontSize: 10, color: "#444", fontWeight: 400, marginTop: 2 }}>{opt.desc}</div>}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const YesNo = ({ field, label }) => (
+    <div>
+      {label && <label style={labelStyle}>{label}</label>}
+      <div style={{ display: "flex", gap: 8 }}>
+        {["yes", "no"].map(v => {
+          const active = data[field] === v;
+          const isYes = v === "yes";
+          return (
+            <button key={v} onClick={() => set(field, v)} style={{
+              flex: 1, padding: "11px",
+              background: active ? (isYes ? "rgba(34,197,94,0.07)" : "rgba(239,68,68,0.07)") : "#0c0c0c",
+              border: `1px solid ${active ? (isYes ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)") : "rgba(255,255,255,0.07)"}`,
+              borderRadius: 9, cursor: "pointer", fontSize: 13, fontWeight: 600,
+              color: active ? (isYes ? "#22c55e" : "#f87171") : "#666",
+            }}>{isYes ? "Yes" : "No"}</button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const ConditionalInput = ({ condition, children }) => condition ? children : null;
 
   const stepContent = () => {
-    switch(step) {
+    switch (step) {
       case 0: return (
-        <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Business / project name</label>
-            <input autoFocus style={inputStyle} placeholder="e.g. Smith Electrical" value={data.bizName} onChange={e=>set("bizName",e.target.value)} onKeyDown={e=>e.key==="Enter"&&canNext()&&go(1)} />
+            <label style={labelStyle}>Business / project name</label>
+            <input autoFocus style={inputStyle} placeholder="e.g. Smith Electrical" value={data.bizName}
+              onChange={e => set("bizName", e.target.value)}
+              onKeyDown={e => e.key === "Enter" && data.bizDesc.trim() && go(1)} />
           </div>
           <div>
-            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>What do you do? <span style={{color:"#383838",fontWeight:400}}>(brief)</span></label>
-            <textarea style={textareaStyle} placeholder="e.g. We install solar panels for residential homes in Brisbane." value={data.bizDesc} onChange={e=>set("bizDesc",e.target.value)} />
+            <label style={labelStyle}>What do you do? <span style={{ color: "#383838", fontWeight: 400 }}>(brief)</span></label>
+            <textarea style={textareaStyle} placeholder="e.g. We install solar panels for residential homes in Brisbane." value={data.bizDesc} onChange={e => set("bizDesc", e.target.value)} />
+          </div>
+          <div>
+            <label style={labelStyle}>Location <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={inputStyle} placeholder="e.g. Brisbane, QLD" value={data.bizLocation} onChange={e => set("bizLocation", e.target.value)} />
+          </div>
+          <div>
+            <label style={labelStyle}>Who is your ideal customer? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={inputStyle} placeholder="e.g. Homeowners aged 35-60 in Brisbane suburbs" value={data.idealCustomer} onChange={e => set("idealCustomer", e.target.value)} />
           </div>
         </div>
       );
       case 1: return (
-        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
-          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
-            {PALETTE_OPTIONS.map(p => (
-              <button key={p.id} onClick={()=>set("palette",p.id)} style={{ background:data.palette===p.id?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${data.palette===p.id?"rgba(34,197,94,0.4)":"rgba(255,255,255,0.07)"}`,borderRadius:10,padding:"12px 14px",cursor:"pointer",textAlign:"left" }}>
-                <div style={{ display:"flex",gap:5,marginBottom:8 }}>
-                  {p.colors.length>0?p.colors.map(c=>(<div key={c} style={{ width:16,height:16,borderRadius:"50%",background:c,border:"1px solid rgba(255,255,255,0.1)" }} />)):(<div style={{ width:16,height:16,borderRadius:"50%",background:"conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)",flexShrink:0 }} />)}
-                </div>
-                <div style={{ fontSize:12,fontWeight:600,color:data.palette===p.id?"#22c55e":"#888" }}>{p.label}</div>
-              </button>
-            ))}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <ToggleGrid options={VIBE_OPTIONS} field="vibe" multi={false} cols={2} />
+          <div>
+            <label style={labelStyle}>Any sites you love? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...textareaStyle, minHeight: 76 }} placeholder="Paste URLs or describe what you like about them..." value={data.vibeInspo} onChange={e => set("vibeInspo", e.target.value)} />
           </div>
-          {data.palette==="custom"&&(
-            <div style={{ display:"flex",flexDirection:"column",gap:16,background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:12,padding:20 }}>
-              <p style={{ fontSize:12,color:"#555",margin:0 }}>Pick your two brand colours:</p>
-              <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
+        </div>
+      );
+      case 2: return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {PALETTE_OPTIONS.map(p => {
+              const active = data.palette === p.id;
+              return (
+                <button key={p.id} onClick={() => set("palette", p.id)} style={{ background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c", border: `1px solid ${active ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "12px 14px", cursor: "pointer", textAlign: "left" }}>
+                  <div style={{ display: "flex", gap: 5, marginBottom: 8 }}>
+                    {p.colors.length > 0 ? p.colors.map(c => <div key={c} style={{ width: 16, height: 16, borderRadius: "50%", background: c, border: "1px solid rgba(255,255,255,0.1)" }} />) : <div style={{ width: 16, height: 16, borderRadius: "50%", background: "conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)", flexShrink: 0 }} />}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: active ? "#22c55e" : "#888" }}>{p.label}</div>
+                </button>
+              );
+            })}
+          </div>
+          {data.palette === "custom" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16, background: "#0c0c0c", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: 20 }}>
+              <p style={{ fontSize: 12, color: "#555", margin: 0 }}>Pick your two brand colours:</p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
-                  <label style={{ fontSize:11,fontWeight:700,color:"#555",display:"block",marginBottom:10,letterSpacing:"1px",textTransform:"uppercase" }}>Primary</label>
-                  <div style={{ width:86,height:86,borderRadius:"50%",overflow:"hidden",border:"2px solid rgba(255,255,255,0.12)",cursor:"pointer" }}>
-                    <input type="color" value={data.paletteCustom?.split("|")[0]||"#6366f1"} onChange={e=>{const s=data.paletteCustom?.split("|")[1]||"#ffffff";set("paletteCustom",e.target.value+"|"+s);}} style={{ width:"150%",height:"150%",marginTop:"-25%",marginLeft:"-25%",border:"none",padding:0,cursor:"pointer" }} />
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#555", display: "block", marginBottom: 10, letterSpacing: "1px", textTransform: "uppercase" }}>Primary</label>
+                  <div style={{ width: 86, height: 86, borderRadius: "50%", overflow: "hidden", border: "2px solid rgba(255,255,255,0.12)", cursor: "pointer" }}>
+                    <input type="color" value={data.paletteCustom?.split("|")[0] || "#6366f1"} onChange={e => { const s = data.paletteCustom?.split("|")[1] || "#ffffff"; set("paletteCustom", e.target.value + "|" + s); }} style={{ width: "150%", height: "150%", marginTop: "-25%", marginLeft: "-25%", border: "none", padding: 0, cursor: "pointer" }} />
                   </div>
                 </div>
                 <div>
-                  <label style={{ fontSize:11,fontWeight:700,color:"#555",display:"block",marginBottom:10,letterSpacing:"1px",textTransform:"uppercase" }}>Secondary</label>
-                  <div style={{ width:86,height:86,borderRadius:"50%",overflow:"hidden",border:"2px solid rgba(255,255,255,0.12)",cursor:"pointer" }}>
-                    <input type="color" value={data.paletteCustom?.split("|")[1]||"#ffffff"} onChange={e=>{const p=data.paletteCustom?.split("|")[0]||"#6366f1";set("paletteCustom",p+"|"+e.target.value);}} style={{ width:"150%",height:"150%",marginTop:"-25%",marginLeft:"-25%",border:"none",padding:0,cursor:"pointer" }} />
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#555", display: "block", marginBottom: 10, letterSpacing: "1px", textTransform: "uppercase" }}>Secondary</label>
+                  <div style={{ width: 86, height: 86, borderRadius: "50%", overflow: "hidden", border: "2px solid rgba(255,255,255,0.12)", cursor: "pointer" }}>
+                    <input type="color" value={data.paletteCustom?.split("|")[1] || "#ffffff"} onChange={e => { const p = data.paletteCustom?.split("|")[0] || "#6366f1"; set("paletteCustom", p + "|" + e.target.value); }} style={{ width: "150%", height: "150%", marginTop: "-25%", marginLeft: "-25%", border: "none", padding: 0, cursor: "pointer" }} />
                   </div>
                 </div>
               </div>
             </div>
           )}
-        </div>
-      );
-      case 2: return (
-        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
-          {FONT_OPTIONS.map(f=>(
-            <button key={f.id} onClick={()=>set("font",f.id)} style={{ background:data.font===f.id?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${data.font===f.id?"rgba(34,197,94,0.4)":"rgba(255,255,255,0.07)"}`,borderRadius:10,padding:"14px 18px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12 }}>
-              <span style={{ font:f.style,color:data.font===f.id?"#22c55e":"#ccc",fontSize:16 }}>Aa / {f.label}</span>
-              <span style={{ fontSize:12,color:"#444" }}>{f.desc}</span>
-            </button>
-          ))}
-          {data.font==="custom"&&<input autoFocus style={inputStyle} placeholder="Font name e.g. 'Raleway'" value={data.fontCustom} onChange={e=>set("fontCustom",e.target.value)} />}
+          <div>
+            <label style={labelStyle}>Colour notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={inputStyle} placeholder='e.g. "Must use our brand red #E63946"' value={data.colourNotes} onChange={e => set("colourNotes", e.target.value)} />
+          </div>
         </div>
       );
       case 3: return (
-        <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
-          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
-            {HEADER_STYLES.map(h=>(
-              <button key={h.id} onClick={()=>set("headerStyle",h.id)} style={{ background:"transparent",border:`2px solid ${data.headerStyle===h.id?"rgba(34,197,94,0.5)":"rgba(255,255,255,0.07)"}`,borderRadius:12,padding:0,cursor:"pointer",textAlign:"left",overflow:"hidden" }}>
-                <div style={{ pointerEvents:"none" }}>{h.preview}</div>
-                <div style={{ padding:"10px 12px",borderTop:"1px solid rgba(255,255,255,0.05)" }}>
-                  <div style={{ fontSize:12,fontWeight:700,color:data.headerStyle===h.id?"#22c55e":"#888",marginBottom:3 }}>{h.label}</div>
-                  <div style={{ fontSize:11,color:"#444",lineHeight:1.5 }}>{h.desc}</div>
-                </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {FONT_OPTIONS.map(f => {
+            const active = data.font === f.id;
+            return (
+              <button key={f.id} onClick={() => set("font", f.id)} style={{ background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c", border: `1px solid ${active ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "14px 18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                <span style={{ font: f.style, color: active ? "#22c55e" : "#ccc", fontSize: 16 }}>Aa / {f.label}</span>
+                <span style={{ fontSize: 12, color: "#444" }}>{f.desc}</span>
               </button>
-            ))}
-          </div>
-          <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)",paddingTop:14 }}>
-            <p style={{ fontSize:12,color:"#555",marginBottom:10 }}>Have a site you love? Upload a screenshot or paste a URL.</p>
-            <div style={{ display:"flex",gap:10,flexWrap:"wrap" }}>
-              <label style={{ flex:1,minWidth:140,background:"#0c0c0c",border:"1px dashed rgba(255,255,255,0.12)",borderRadius:10,padding:"13px 16px",display:"flex",alignItems:"center",gap:10,cursor:"pointer",fontSize:13,color:data.headerUploadName?"#22c55e":"#555" }}>
-                <input type="file" accept="image/*" style={{ display:"none" }} onChange={e=>{const f=e.target.files?.[0];if(f){set("headerUpload",f);set("headerUploadName",f.name);}}} />
-                {data.headerUploadName?`✓ ${data.headerUploadName}`:"Upload image reference"}
-              </label>
-              <input style={{ ...inputStyle,flex:1,minWidth:140 }} placeholder="or paste a URL" value={data.headerUrl||""} onChange={e=>set("headerUrl",e.target.value)} />
-            </div>
-          </div>
+            );
+          })}
+          {data.font === "custom" && <input autoFocus style={inputStyle} placeholder="Font name e.g. 'Raleway'" value={data.fontCustom} onChange={e => set("fontCustom", e.target.value)} />}
         </div>
       );
       case 4: return (
-        <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <YesNo field="hasLogo"     label="Do you have a logo?" />
+          <YesNo field="hasPhotos"   label="Do you have professional photos?" />
+          <YesNo field="hasHeadshot" label="Do you have a headshot / team photo?" />
+          <YesNo field="needsLogo"   label="Do you need a logo designed?" />
           <div>
-            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Main headline</label>
-            <input autoFocus style={inputStyle} placeholder='"Solar done right. Every time."' value={data.heroHeadline} onChange={e=>set("heroHeadline",e.target.value)} />
+            <label style={labelStyle}>Asset notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="e.g. Logo is in .AI format, photos coming next week..." value={data.assetNotes} onChange={e => set("assetNotes", e.target.value)} />
           </div>
-          <div>
-            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Subheadline <span style={{color:"#383838",fontWeight:400}}>(optional)</span></label>
-            <textarea style={textareaStyle} placeholder="A short supporting line." value={data.heroSubline} onChange={e=>set("heroSubline",e.target.value)} />
-          </div>
-          <div>
-            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>CTA button text</label>
-            <input style={inputStyle} placeholder='"Get a free quote"' value={data.heroCta} onChange={e=>set("heroCta",e.target.value)} />
-          </div>
-          {data.heroHeadline&&(
-            <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:10,padding:20,marginTop:4 }}>
-              <div style={{ fontSize:9,color:"#383838",fontFamily:"var(--mono)",letterSpacing:2,marginBottom:10 }}>PREVIEW</div>
-              <div style={{ fontSize:20,fontWeight:800,color:"#fff",letterSpacing:"-0.8px",lineHeight:1.1,marginBottom:6 }}>{data.heroHeadline}</div>
-              {data.heroSubline&&<div style={{ fontSize:13,color:"#666",lineHeight:1.7,marginBottom:12 }}>{data.heroSubline}</div>}
-              {data.heroCta&&<div style={{ display:"inline-block",background:"#fff",color:"#000",borderRadius:7,padding:"8px 16px",fontSize:12,fontWeight:700 }}>{data.heroCta} →</div>}
-            </div>
-          )}
         </div>
       );
       case 5: return (
-        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
-          <p style={{ fontSize:13,color:"#666",marginBottom:4 }}>Select all pages you need:</p>
-          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
-            {PAGE_OPTIONS.map(p=>{const on=data.pages.includes(p.id);return(
-              <button key={p.id} onClick={()=>toggle("pages",p.id)} style={{ background:on?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${on?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.07)"}`,borderRadius:9,padding:"11px 14px",display:"flex",alignItems:"center",gap:9,cursor:"pointer",fontSize:13,fontWeight:600,color:on?"#22c55e":"#666",textAlign:"left" }}>
-                <div style={{ width:14,height:14,borderRadius:"50%",border:`1px solid ${on?"rgba(34,197,94,0.5)":"#656565"}`,background:on?"#22c55e":"transparent",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#000",fontWeight:900 }}>{on?"✓":""}</div>
-                {p.label}
-              </button>
-            );})}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {HERO_LAYOUT_OPTIONS.map(h => {
+              const active = data.heroLayout === h.id;
+              return (
+                <button key={h.id} onClick={() => set("heroLayout", h.id)} style={{ background: "transparent", border: `2px solid ${active ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, padding: 0, cursor: "pointer", textAlign: "left", overflow: "hidden" }}>
+                  <div style={{ pointerEvents: "none" }}>{h.preview}</div>
+                  <div style={{ padding: "10px 12px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: active ? "#22c55e" : "#888", marginBottom: 3 }}>{h.label}</div>
+                    <div style={{ fontSize: 11, color: "#444", lineHeight: 1.5 }}>{h.desc}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 14 }}>
+            <p style={{ fontSize: 12, color: "#555", marginBottom: 10 }}>Have a site you love? Upload a screenshot or paste a URL.</p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <label style={{ flex: 1, minWidth: 140, background: "#0c0c0c", border: "1px dashed rgba(255,255,255,0.12)", borderRadius: 10, padding: "13px 16px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: data.heroUploadName ? "#22c55e" : "#555" }}>
+                <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) set("heroUploadName", f.name); }} />
+                {data.heroUploadName ? `✓ ${data.heroUploadName}` : "Upload image reference"}
+              </label>
+              <input style={{ ...inputStyle, flex: 1, minWidth: 140 }} placeholder="or paste a URL" value={data.heroRefUrl} onChange={e => set("heroRefUrl", e.target.value)} />
+            </div>
           </div>
         </div>
       );
       case 6: return (
-        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
-          <p style={{ fontSize:13,color:"#666",marginBottom:4 }}>Extra features? <span style={{color:"#383838"}}>(optional)</span></p>
-          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
-            {EXTRA_OPTIONS.map(e=>{const on=data.extras.includes(e.id);return(
-              <button key={e.id} onClick={()=>toggle("extras",e.id)} style={{ background:on?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${on?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.07)"}`,borderRadius:9,padding:"11px 14px",display:"flex",alignItems:"center",gap:9,cursor:"pointer",fontSize:13,fontWeight:600,color:on?"#22c55e":"#666",textAlign:"left" }}>
-                <div style={{ width:14,height:14,borderRadius:"50%",border:`1px solid ${on?"rgba(34,197,94,0.5)":"#656565"}`,background:on?"#22c55e":"transparent",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#000",fontWeight:900 }}>{on?"✓":""}</div>
-                {e.label}
-              </button>
-            );})}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <label style={labelStyle}>Main headline</label>
+            <input autoFocus style={inputStyle} placeholder='"Solar done right. Every time."' value={data.heroHeadline} onChange={e => set("heroHeadline", e.target.value)} />
           </div>
-          <div style={{ marginTop:4 }}>
-            <label style={{ fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:8 }}>Anything else?</label>
-            <textarea style={textareaStyle} placeholder="Competitors, inspirations, must-haves..." value={data.otherNotes} onChange={e=>set("otherNotes",e.target.value)} />
+          <div>
+            <label style={labelStyle}>Subheadline <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={textareaStyle} placeholder="A short supporting line." value={data.heroSubline} onChange={e => set("heroSubline", e.target.value)} />
           </div>
+          <div>
+            <label style={labelStyle}>CTA button text <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={inputStyle} placeholder='"Get a free quote"' value={data.heroCta} onChange={e => set("heroCta", e.target.value)} />
+          </div>
+          <div>
+            <label style={labelStyle}>Hero background style</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              {["solid", "photo", "gradient", "video"].map(bg => {
+                const active = data.heroBackground === bg;
+                return (
+                  <button key={bg} onClick={() => set("heroBackground", bg)} style={{ flex: 1, padding: "10px 6px", background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 8, cursor: "pointer", fontSize: 11, fontWeight: 600, color: active ? "#22c55e" : "#666" }}>
+                    {bg.charAt(0).toUpperCase() + bg.slice(1)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          {data.heroHeadline && (
+            <div style={{ background: "#0c0c0c", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: 20 }}>
+              <div style={{ fontSize: 9, color: "#383838", fontFamily: "var(--mono)", letterSpacing: 2, marginBottom: 10 }}>PREVIEW</div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: "-0.8px", lineHeight: 1.1, marginBottom: 6 }}>{data.heroHeadline}</div>
+              {data.heroSubline && <div style={{ fontSize: 13, color: "#666", lineHeight: 1.7, marginBottom: 12 }}>{data.heroSubline}</div>}
+              {data.heroCta && <div style={{ display: "inline-block", background: "#fff", color: "#000", borderRadius: 7, padding: "8px 16px", fontSize: 12, fontWeight: 700 }}>{data.heroCta} →</div>}
+            </div>
+          )}
         </div>
       );
       case 7: return (
-        <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
-          <div style={{ background:"#0c0c0c",border:"1px solid rgba(255,255,255,0.07)",borderRadius:12,padding:20,display:"flex",flexDirection:"column",gap:10 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <ToggleGrid options={SOCIAL_PROOF_OPTIONS} field="socialProof" multi={true} cols={2} />
+          <div>
+            <label style={labelStyle}>Notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="e.g. We have 80+ Google reviews, 4.9 stars..." value={data.socialProofNotes} onChange={e => set("socialProofNotes", e.target.value)} />
+          </div>
+        </div>
+      );
+      case 8: return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <ToggleGrid options={LEAD_OPTIONS} field="leadMethod" multi={true} cols={2} />
+          <div>
+            <label style={labelStyle}>What info do you need from leads? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="e.g. Name, phone, address, type of job, preferred time..." value={data.formFields} onChange={e => set("formFields", e.target.value)} />
+          </div>
+        </div>
+      );
+      case 9: return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <p style={{ fontSize: 13, color: "#666", marginBottom: 4 }}>Select all pages you need:</p>
+          <ToggleGrid options={PAGE_OPTIONS} field="pages" multi={true} cols={2} />
+        </div>
+      );
+      case 10: return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <p style={{ fontSize: 13, color: "#666", marginBottom: 4 }}>Select any features you need: <span style={{ color: "#383838" }}>(all optional)</span></p>
+          <ToggleGrid options={FEATURE_OPTIONS} field="features" multi={true} cols={2} />
+        </div>
+      );
+      case 11: return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <YesNo field="hasDomain" label="Do you have a domain name?" />
+          <ConditionalInput condition={data.hasDomain === "yes"}>
+            <input style={inputStyle} placeholder="e.g. smithelectrical.com.au" value={data.domainName} onChange={e => set("domainName", e.target.value)} />
+          </ConditionalInput>
+          <YesNo field="hasHosting" label="Do you have existing hosting?" />
+          <div>
+            <label style={labelStyle}>Current website URL <span style={{ color: "#383838", fontWeight: 400 }}>(if you have one)</span></label>
+            <input style={inputStyle} placeholder="https://..." value={data.existingSite} onChange={e => set("existingSite", e.target.value)} />
+          </div>
+          <YesNo field="needsCms" label="Do you want to be able to edit the site yourself?" />
+        </div>
+      );
+      case 12: return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div>
+            <label style={labelStyle}>Top 2-3 local competitor URLs <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder={"e.g. https://smithelectrical.com.au\nhttps://brisbaneelectrics.com.au"} value={data.competitors} onChange={e => set("competitors", e.target.value)} />
+          </div>
+          <div>
+            <label style={labelStyle}>Sites you love — any industry <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="Paste URLs or describe what you like..." value={data.inspiration} onChange={e => set("inspiration", e.target.value)} />
+          </div>
+          <div>
+            <label style={labelStyle}>Anything you hate the look of? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="Styles, colours, trends you want to avoid..." value={data.antiInspo} onChange={e => set("antiInspo", e.target.value)} />
+          </div>
+          <div>
+            <label style={labelStyle}>One word to describe how you want the site to feel <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={inputStyle} placeholder='"trustworthy" / "premium" / "energetic"' value={data.oneFeelingWord} onChange={e => set("oneFeelingWord", e.target.value)} />
+          </div>
+        </div>
+      );
+      case 13: return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div>
+            <label style={labelStyle}>When do you need it live? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <input style={inputStyle} placeholder="e.g. End of July, or ASAP" value={data.deadline} onChange={e => set("deadline", e.target.value)} />
+          </div>
+          <YesNo field="hardDeadline" label="Is this a hard deadline?" />
+          <div>
+            <label style={labelStyle}>Budget range</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {["Under $500/month", "$500-$1000/month", "$1000+/month", "Not sure"].map(b => {
+                const active = data.budget === b;
+                return (
+                  <button key={b} onClick={() => set("budget", b)} style={{ padding: "11px 14px", background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 9, cursor: "pointer", fontSize: 13, fontWeight: 600, color: active ? "#22c55e" : "#666", textAlign: "left", display: "flex", alignItems: "center", gap: 9 }}>
+                    <Tick active={active} round={true} />
+                    {b}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>Any concerns or questions? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <textarea style={{ ...textareaStyle, minHeight: 70 }} placeholder="Anything on your mind..." value={data.concerns} onChange={e => set("concerns", e.target.value)} />
+          </div>
+        </div>
+      );
+      case 14: return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ background: "#0c0c0c", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: 20, display: "flex", flexDirection: "column", gap: 10 }}>
             {[
-              ["Business",data.bizName],
-              ["Colours",PALETTE_OPTIONS.find(p=>p.id===data.palette)?.label??"—"],
-              ["Font",FONT_OPTIONS.find(f=>f.id===data.font)?.label??"—"],
-              ["Hero style",HEADER_STYLES.find(h=>h.id===data.headerStyle)?.label??"—"],
-              ["Headline",data.heroHeadline||"—"],
-              ["CTA",data.heroCta||"—"],
-              ["Pages",data.pages.map(p=>PAGE_OPTIONS.find(x=>x.id===p)?.label).join(", ")||"—"],
-              ["Extras",data.extras.length?data.extras.map(e=>EXTRA_OPTIONS.find(x=>x.id===e)?.label).join(", "):"None"],
-            ].map(([k,v])=>(
-              <div key={k} style={{ display:"flex",gap:12,alignItems:"flex-start",borderBottom:"1px solid rgba(255,255,255,0.04)",paddingBottom:8 }}>
-                <div style={{ fontSize:11,color:"#444",fontFamily:"var(--mono)",minWidth:100,paddingTop:2 }}>{k}</div>
-                <div style={{ fontSize:13,color:"#aaa",lineHeight:1.5,flex:1 }}>{v}</div>
+              ["Business",      data.bizName],
+              ["Description",   data.bizDesc],
+              ["Location",      data.bizLocation],
+              ["Ideal customer",data.idealCustomer],
+              ["Vibe",          VIBE_OPTIONS.find(v => v.id === data.vibe)?.label],
+              ["Colours",       data.palette === "custom" ? `Custom: ${data.paletteCustom?.split("|")[0] || ""} / ${data.paletteCustom?.split("|")[1] || ""}` : PALETTE_OPTIONS.find(p => p.id === data.palette)?.label],
+              ["Font",          FONT_OPTIONS.find(f => f.id === data.font)?.label + (data.fontCustom ? `: ${data.fontCustom}` : "")],
+              ["Has logo",      data.hasLogo],
+              ["Has photos",    data.hasPhotos],
+              ["Needs logo",    data.needsLogo],
+              ["Hero layout",   HERO_LAYOUT_OPTIONS.find(h => h.id === data.heroLayout)?.label],
+              ["Headline",      data.heroHeadline],
+              ["Subheadline",   data.heroSubline],
+              ["CTA",           data.heroCta],
+              ["Background",    data.heroBackground],
+              ["Social proof",  data.socialProof.map(s => SOCIAL_PROOF_OPTIONS.find(x => x.id === s)?.label).filter(Boolean).join(", ")],
+              ["Lead method",   data.leadMethod.map(l => LEAD_OPTIONS.find(x => x.id === l)?.label).filter(Boolean).join(", ")],
+              ["Pages",         data.pages.map(p => PAGE_OPTIONS.find(x => x.id === p)?.label).filter(Boolean).join(", ")],
+              ["Features",      data.features.map(f => FEATURE_OPTIONS.find(x => x.id === f)?.label).filter(Boolean).join(", ")],
+              ["Has domain",    data.hasDomain + (data.domainName ? `: ${data.domainName}` : "")],
+              ["Has hosting",   data.hasHosting],
+              ["Existing site", data.existingSite],
+              ["Needs CMS",     data.needsCms],
+              ["Budget",        data.budget],
+              ["Deadline",      data.deadline + (data.hardDeadline ? ` (hard: ${data.hardDeadline})` : "")],
+            ].filter(([, v]) => v).map(([k, v]) => (
+              <div key={k} style={{ display: "flex", gap: 12, alignItems: "flex-start", borderBottom: "1px solid rgba(255,255,255,0.04)", paddingBottom: 8 }}>
+                <div style={{ fontSize: 11, color: "#444", fontFamily: "var(--mono)", minWidth: 110, paddingTop: 2 }}>{k}</div>
+                <div style={{ fontSize: 13, color: "#aaa", lineHeight: 1.5, flex: 1 }}>{v}</div>
               </div>
             ))}
           </div>
           <div>
-            <label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Your email <span style={{color:"#22c55e"}}>*</span></label>
-            <input autoFocus style={inputStyle} type="email" placeholder="yourname@domain.com" value={data.email} onChange={e=>set("email",e.target.value)} />
-            <p style={{ fontSize:11.5,color:"#383838",marginTop:8 }}>We'll get back to you within 24 hours with a quote.</p>
+            <label style={{ ...labelStyle, color: "#666" }}>Your email <span style={{ color: "#22c55e" }}>*</span></label>
+            <input autoFocus style={inputStyle} type="email" placeholder="yourname@domain.com" value={data.email} onChange={e => set("email", e.target.value)} />
+            <p style={{ fontSize: 11.5, color: "#383838", marginTop: 8 }}>We'll get back to you within 24 hours with a quote.</p>
           </div>
         </div>
       );
@@ -818,47 +1063,118 @@ const [data, setData] = useState({
     }
   };
 
-  const headings=[["1/8","What's your business called?"],["2/8","Pick a colour palette"],["3/8","Choose your typography style"],["4/8","What kind of header do you want?"],["5/8","What content goes on the hero?"],["6/8","What pages do you need?"],["7/8","Any extra features?"],["8/8","Review & submit"]];
-  const [h1,h2]=headings[step];
+  const headings = [
+    ["Business",          "Tell us about your business"],
+    ["Vibe",              "What's the vibe?"],
+    ["Colours",           "Pick a colour palette"],
+    ["Typography",        "Choose your typography style"],
+    ["Assets",            "What assets do you have?"],
+    ["Hero Layout",       "What kind of hero layout do you want?"],
+    ["Hero Content",      "What goes on your hero section?"],
+    ["Social Proof",      "How do you build trust?"],
+    ["Lead Capture",      "How should people reach you?"],
+    ["Pages",             "What pages do you need?"],
+    ["Features",          "Any extra features?"],
+    ["Technical",         "A few technical details"],
+    ["Inspiration",       "References and inspiration"],
+    ["Timeline & Budget", "When do you need it and what's the budget?"],
+    ["Review & Submit",   "Review your answers"],
+  ];
+  const [h1, h2] = headings[step];
+
+  const handleSubmit = async () => {
+    if (!canNext()) return;
+    try {
+      await fetch("https://formspree.io/f/mlgzbpng", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          "🏢 Business Name":      data.bizName,
+          "📝 Description":        data.bizDesc,
+          "📍 Location":           data.bizLocation || "",
+          "👤 Ideal Customer":     data.idealCustomer || "",
+          "✨ Vibe":               VIBE_OPTIONS.find(v => v.id === data.vibe)?.label || "",
+          "💬 Vibe Inspiration":   data.vibeInspo || "",
+          "🎨 Colour Palette":     data.palette === "custom"
+            ? `Custom: ${data.paletteCustom?.split("|")[0] || ""} / ${data.paletteCustom?.split("|")[1] || ""}`
+            : PALETTE_OPTIONS.find(p => p.id === data.palette)?.label || "",
+          "🎨 Colour Notes":       data.colourNotes || "",
+          "✏️ Font Style":         FONT_OPTIONS.find(f => f.id === data.font)?.label + (data.fontCustom ? `: ${data.fontCustom}` : ""),
+          "✅ Has Logo":           data.hasLogo || "",
+          "📸 Has Photos":         data.hasPhotos || "",
+          "🤳 Has Headshot":       data.hasHeadshot || "",
+          "🎨 Needs Logo Design":  data.needsLogo || "",
+          "📁 Asset Notes":        data.assetNotes || "",
+          "🖼️ Hero Layout":        HERO_LAYOUT_OPTIONS.find(h => h.id === data.heroLayout)?.label || "",
+          "🔗 Hero Ref URL":       data.heroRefUrl || "",
+          "💬 Hero Headline":      data.heroHeadline,
+          "💬 Hero Subheadline":   data.heroSubline || "",
+          "🎯 CTA Button":         data.heroCta || "",
+          "🖼️ Hero Background":    data.heroBackground || "",
+          "⭐ Social Proof":       data.socialProof.map(s => SOCIAL_PROOF_OPTIONS.find(x => x.id === s)?.label).join(", ") || "",
+          "⭐ Social Proof Notes": data.socialProofNotes || "",
+          "📞 Lead Method":        data.leadMethod.map(l => LEAD_OPTIONS.find(x => x.id === l)?.label).join(", ") || "",
+          "📋 Form Fields":        data.formFields || "",
+          "📄 Pages":              data.pages.map(p => PAGE_OPTIONS.find(x => x.id === p)?.label).join(", ") || "",
+          "⚙️ Features":           data.features.map(f => FEATURE_OPTIONS.find(x => x.id === f)?.label).join(", ") || "None",
+          "🌐 Has Domain":         data.hasDomain || "",
+          "🌐 Domain Name":        data.domainName || "",
+          "🖥️ Has Hosting":        data.hasHosting || "",
+          "🔗 Existing Site":      data.existingSite || "",
+          "📝 Needs CMS":          data.needsCms || "",
+          "🏆 Competitors":        data.competitors || "",
+          "💡 Inspiration":        data.inspiration || "",
+          "🚫 Anti-Inspiration":   data.antiInspo || "",
+          "💭 One Feeling Word":   data.oneFeelingWord || "",
+          "📅 Deadline":           data.deadline || "",
+          "⚠️ Hard Deadline":      data.hardDeadline || "",
+          "💰 Budget":             data.budget || "",
+          "❓ Concerns":           data.concerns || "",
+          "📧 Client Email":       data.email,
+        }),
+      });
+    } catch (e) { console.error(e); }
+    setSubmitted(true);
+  };
 
   return (
-    <div style={{ paddingTop:62,minHeight:"100vh" }}>
-      <div style={{ position:"fixed",top:62,left:0,right:0,height:2,background:"rgba(255,255,255,0.05)",zIndex:100 }}>
-        <div style={{ height:"100%",width:`${((step+1)/STEPS_ONBOARDING.length)*100}%`,background:"var(--green)",transition:"width 0.4s cubic-bezier(0.22,1,0.36,1)" }} />
+    <div style={{ paddingTop: 62, minHeight: "100vh" }}>
+      <div style={{ position: "fixed", top: 62, left: 0, right: 0, height: 2, background: "rgba(255,255,255,0.05)", zIndex: 100 }}>
+        <div style={{ height: "100%", width: `${((step + 1) / STEPS_ONBOARDING.length) * 100}%`, background: "var(--green)", transition: "width 0.4s cubic-bezier(0.22,1,0.36,1)" }} />
       </div>
 
-      {submitted&&(
-        <div style={{ position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,0.75)",backdropFilter:"blur(10px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24 }}>
-          <div style={{ background:"#111",border:"1px solid rgba(255,255,255,0.1)",borderRadius:20,padding:"40px 32px 32px",maxWidth:400,width:"100%",textAlign:"center",boxShadow:"0 32px 80px rgba(0,0,0,0.8)",position:"relative" }}>
-            <div style={{ position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:120,height:2,background:"linear-gradient(90deg, transparent, rgba(34,197,94,0.7), transparent)",borderRadius:999 }} />
-            <div style={{ width:56,height:56,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,margin:"0 auto 18px" }}>✓</div>
-            <h2 style={{ fontSize:22,fontWeight:800,letterSpacing:"-0.8px",color:"#fff",marginBottom:10 }}>You're all set, {data.bizName}!</h2>
-            <p style={{ fontSize:14,color:"#666",lineHeight:1.75,marginBottom:28 }}>We'll review your details and get back to you at <strong style={{ color:"#999" }}>{data.email}</strong> within 24 hours.</p>
-            <button onClick={()=>{setSubmitted(false);setPage("home");}} style={{ width:"100%",padding:"13px 20px",background:"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"var(--font)" }}>Back to Home →</button>
+      {submitted && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div style={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "40px 32px 32px", maxWidth: 400, width: "100%", textAlign: "center", boxShadow: "0 32px 80px rgba(0,0,0,0.8)", position: "relative" }}>
+            <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 120, height: 2, background: "linear-gradient(90deg, transparent, rgba(34,197,94,0.7), transparent)", borderRadius: 999 }} />
+            <div style={{ width: 56, height: 56, background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 18px" }}>✓</div>
+            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.8px", color: "#fff", marginBottom: 10 }}>You're all set, {data.bizName}!</h2>
+            <p style={{ fontSize: 14, color: "#666", lineHeight: 1.75, marginBottom: 28 }}>We'll review your details and get back to you at <strong style={{ color: "#999" }}>{data.email}</strong> within 24 hours.</p>
+            <button onClick={() => { setSubmitted(false); setPage("home"); }} style={{ width: "100%", padding: "13px 20px", background: "var(--white)", color: "var(--black)", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "var(--font)" }}>Back to Home →</button>
           </div>
         </div>
       )}
 
-      <div style={{ maxWidth:640,margin:"0 auto",padding:isMobile?"40px 20px 80px":"80px 48px 100px" }}>
-        <div style={{ display:"flex",gap:6,flexWrap:"wrap",marginBottom:32 }}>
-          {STEPS_ONBOARDING.map((s,i)=>(
-            <div key={s} style={{ fontSize:10,fontWeight:700,letterSpacing:"0.5px",padding:"3px 10px",borderRadius:999,background:i<step?"rgba(34,197,94,0.1)":i===step?"var(--green)":"rgba(255,255,255,0.04)",color:i<step?"#22c55e":i===step?"#000":"#656565",border:`1px solid ${i<step?"rgba(34,197,94,0.25)":i===step?"transparent":"rgba(255,255,255,0.06)"}`,transition:"all 0.3s" }}>{s}</div>
+      <div style={{ maxWidth: 640, margin: "0 auto", padding: isMobile ? "40px 20px 80px" : "80px 48px 100px" }}>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 32 }}>
+          {STEPS_ONBOARDING.map((s, i) => (
+            <div key={s} style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.5px", padding: "3px 10px", borderRadius: 999, background: i < step ? "rgba(34,197,94,0.1)" : i === step ? "var(--green)" : "rgba(255,255,255,0.04)", color: i < step ? "#22c55e" : i === step ? "#000" : "#656565", border: `1px solid ${i < step ? "rgba(34,197,94,0.25)" : i === step ? "transparent" : "rgba(255,255,255,0.06)"}`, transition: "all 0.3s" }}>{s}</div>
           ))}
         </div>
-        <div style={{ opacity:visible?1:0,transform:visible?"translateY(0)":`translateY(${animDir>0?14:-14}px)`,transition:"all 0.25s cubic-bezier(0.22,1,0.36,1)",marginBottom:28 }}>
-          <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2px",textTransform:"uppercase",color:"var(--muted)",fontFamily:"var(--mono)",marginBottom:8 }}>{h1}</p>
-          <h1 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(26px,4vw,40px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",lineHeight:1.05,marginBottom:0 }}>{h2}</h1>
+        <div style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : `translateY(${animDir > 0 ? 14 : -14}px)`, transition: "all 0.25s cubic-bezier(0.22,1,0.36,1)", marginBottom: 28 }}>
+          <p style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: "2px", textTransform: "uppercase", color: "var(--muted)", fontFamily: "var(--mono)", marginBottom: 8 }}>{h1}</p>
+          <h1 style={{ fontSize: isMobile ? "clamp(24px,7vw,36px)" : "clamp(26px,4vw,40px)", fontWeight: 800, letterSpacing: "-1.5px", color: "var(--white)", lineHeight: 1.05, marginBottom: 0 }}>{h2}</h1>
         </div>
-        <div style={{ opacity:visible?1:0,transform:visible?"translateY(0)":`translateY(${animDir>0?14:-14}px)`,transition:"all 0.25s 0.04s cubic-bezier(0.22,1,0.36,1)" }}>
+        <div style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : `translateY(${animDir > 0 ? 14 : -14}px)`, transition: "all 0.25s 0.04s cubic-bezier(0.22,1,0.36,1)" }}>
           {stepContent()}
         </div>
-        <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:36,paddingTop:24,borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-          <button onClick={()=>step===0?setPage("webdev"):go(-1)} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"11px 20px",fontSize:13,fontWeight:600,borderRadius:8,background:"transparent",color:"#555",border:"1px solid rgba(255,255,255,0.08)",cursor:"pointer" }}>← {step===0?"Back":"Previous"}</button>
-          <span style={{ fontSize:11,color:"#656565",fontFamily:"var(--mono)" }}>{step+1} / {STEPS_ONBOARDING.length}</span>
-          {step<STEPS_ONBOARDING.length-1?(
-            <button onClick={()=>canNext()&&go(1)} disabled={!canNext()} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:canNext()?"var(--white)":"rgba(255,255,255,0.08)",color:canNext()?"var(--black)":"#656565",border:"none",cursor:canNext()?"pointer":"default",transition:"all 0.2s" }}>Next →</button>
-          ):(
-            <button onClick={async()=>{if(!canNext())return;try{await fetch("https://formspree.io/f/mlgzbpng",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({"🏢 Business Name":data.bizName,"📧 Client Email":data.email,"📝 Description":data.bizDesc||"—","🎨 Colour Palette":data.palette==="custom"?`Custom — Primary: ${data.paletteCustom?.split("|")[0]||"—"}, Secondary: ${data.paletteCustom?.split("|")[1]||"—"}`:PALETTE_OPTIONS.find(p=>p.id===data.palette)?.label||"—","✏️ Font Style":FONT_OPTIONS.find(f=>f.id===data.font)?.label+(data.fontCustom?` — ${data.fontCustom}`:""),"🖼️ Header Style":HEADER_STYLES.find(h=>h.id===data.headerStyle)?.label||"—","🔗 Reference URL":data.headerUrl||"—","💬 Headline":data.heroHeadline,"💬 Subheadline":data.heroSubline||"—","🎯 CTA Button":data.heroCta||"—","📄 Pages":data.pages.map(p=>PAGE_OPTIONS.find(x=>x.id===p)?.label).join(", ")||"—","⚙️ Extras":data.extras.map(e=>EXTRA_OPTIONS.find(x=>x.id===e)?.label).join(", ")||"None","📌 Notes":data.otherNotes||"—"})});}catch(e){console.error(e);}setSubmitted(true);}} disabled={!canNext()} style={{ display:"inline-flex",alignItems:"center",gap:8,padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:8,background:canNext()?"var(--green)":"rgba(34,197,94,0.15)",color:canNext()?"#000":"#1a4a2e",border:"none",cursor:canNext()?"pointer":"default" }}>Submit →</button>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 36, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <button onClick={() => step === 0 ? setPage("webdev") : go(-1)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", fontSize: 13, fontWeight: 600, borderRadius: 8, background: "transparent", color: "#555", border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer" }}>← {step === 0 ? "Back" : "Previous"}</button>
+          <span style={{ fontSize: 11, color: "#656565", fontFamily: "var(--mono)" }}>{step + 1} / {STEPS_ONBOARDING.length}</span>
+          {step < STEPS_ONBOARDING.length - 1 ? (
+            <button onClick={() => canNext() && go(1)} disabled={!canNext()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", fontSize: 13, fontWeight: 700, borderRadius: 8, background: canNext() ? "var(--white)" : "rgba(255,255,255,0.08)", color: canNext() ? "var(--black)" : "#656565", border: "none", cursor: canNext() ? "pointer" : "default", transition: "all 0.2s" }}>Next →</button>
+          ) : (
+            <button onClick={handleSubmit} disabled={!canNext()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", fontSize: 13, fontWeight: 700, borderRadius: 8, background: canNext() ? "var(--green)" : "rgba(34,197,94,0.15)", color: canNext() ? "#000" : "#1a4a2e", border: "none", cursor: canNext() ? "pointer" : "default" }}>Submit →</button>
           )}
         </div>
       </div>
