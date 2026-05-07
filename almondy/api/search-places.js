@@ -4,15 +4,28 @@ export default async function handler(req, res) {
   const { q } = req.query;
   if (!q || q.trim().length < 2) return res.json({ results: [] });
 
-  const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(q)}&key=${process.env.GOOGLE_PLACES_KEY}`;
+  if (!process.env.GOOGLE_PLACES_KEY) {
+    return res.status(500).json({ error: "GOOGLE_PLACES_KEY not set" });
+  }
+
+  // Use Autocomplete for live typing, then Text Search as fallback for precision
+  const autocompleteUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(q)}&types=establishment&key=${process.env.GOOGLE_PLACES_KEY}`;
 
   try {
-    const response = await fetch(url);
-    const data = await response.json();
+    const acRes = await fetch(autocompleteUrl);
+    const acData = await acRes.json();
 
-    const results = (data.results || []).slice(0, 5).map(p => ({
-      name: p.name,
-      address: p.formatted_address,
+    if (acData.status !== "OK" && acData.status !== "ZERO_RESULTS") {
+      console.error("Places Autocomplete error:", acData.status, acData.error_message);
+      return res.status(500).json({ error: acData.error_message || acData.status });
+    }
+
+    const predictions = acData.predictions || [];
+
+    // For each prediction we already have place_id — no extra call needed
+    const results = predictions.slice(0, 6).map(p => ({
+      name: p.structured_formatting?.main_text || p.description,
+      address: p.structured_formatting?.secondary_text || "",
       placeId: p.place_id,
       reviewUrl: `https://search.google.com/local/writereview?placeid=${p.place_id}`,
     }));

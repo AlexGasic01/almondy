@@ -2471,7 +2471,9 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   const [searchQuery, setSearchQuery] = useState(saved.bizName || "");
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState("");
   const [selectedBiz, setSelectedBiz] = useState(null);
+  const [manualMode, setManualMode] = useState(false);
   const searchTimer = useRef(null);
 
   const set = (k, v) => setData(d => {
@@ -2483,6 +2485,7 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
   const handleSearch = (q) => {
     setSearchQuery(q);
     setSelectedBiz(null);
+    setSearchError("");
     clearTimeout(searchTimer.current);
     if (q.trim().length < 2) { setSearchResults([]); return; }
     setSearching(true);
@@ -2490,8 +2493,9 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
       try {
         const res = await fetch(`/api/search-places?q=${encodeURIComponent(q)}`);
         const json = await res.json();
-        setSearchResults(json.results || []);
-      } catch { setSearchResults([]); }
+        if (json.error) { setSearchError(json.error); setSearchResults([]); }
+        else setSearchResults(json.results || []);
+      } catch { setSearchError("Search unavailable."); setSearchResults([]); }
       setSearching(false);
     }, 400);
   };
@@ -2504,9 +2508,23 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
     set("googleLink", biz.reviewUrl);
   };
 
-  const go = dir => { setVisible(false); setTimeout(() => { setStep(s => s + dir); setVisible(true); }, 200); };
+  const go = dir => {
+    setVisible(false);
+    setTimeout(() => {
+      setStep(s => {
+        let next = s + dir;
+        // Skip the "confirm link" step when in manual mode (already entered)
+        if (next === 1 && manualMode) next += dir;
+        return next;
+      });
+      setVisible(true);
+    }, 200);
+  };
   const canNext = () => {
-    if (step === 0) return !!selectedBiz || data.bizName.trim().length > 0;
+    if (step === 0) {
+      if (manualMode) return data.bizName.trim().length > 0 && data.googleLink.trim().length > 10;
+      return !!selectedBiz;
+    }
     if (step === 1) return data.googleLink.trim().length > 10;
     return true;
   };
@@ -2527,41 +2545,67 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
     switch (step) {
       case 0: return (
         <div style={{ position:"relative" }}>
-          <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Search your business name</label>
-          <div style={{ position:"relative" }}>
-            <input
-              autoFocus
-              style={{ ...RC_INPUT, paddingRight: searching ? 36 : undefined }}
-              className="rc-input"
-              placeholder="e.g. Smith Electrical Brisbane"
-              value={searchQuery}
-              onChange={e => handleSearch(e.target.value)}
-            />
-            {searching && <div style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)" }}><Spinner size={14} /></div>}
-          </div>
-          {searchResults.length > 0 && (
-            <div style={{ marginTop:6, border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, overflow:"hidden", background:"#0c0c0c" }}>
-              {searchResults.map((biz, i) => (
-                <button key={biz.placeId} onClick={() => handleSelectBiz(biz)} style={{ width:"100%", display:"flex", flexDirection:"column", gap:2, padding:"12px 14px", background:i%2===0?"#0c0c0c":"#0e0e0e", border:"none", borderBottom: i < searchResults.length-1 ? "1px solid rgba(255,255,255,0.05)" : "none", textAlign:"left", cursor:"pointer" }}>
-                  <span style={{ fontSize:13, fontWeight:600, color:"#ddd" }}>{biz.name}</span>
-                  <span style={{ fontSize:11, color:"#444" }}>{biz.address}</span>
-                </button>
-              ))}
-            </div>
-          )}
-          {selectedBiz && (
-            <div style={{ marginTop:10, background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.2)", borderRadius:9, padding:"10px 14px", display:"flex", alignItems:"center", gap:8 }}>
-              <span style={{ color:"#22c55e", fontSize:14 }}>✓</span>
-              <div>
-                <div style={{ fontSize:13, fontWeight:600, color:"#ccc" }}>{selectedBiz.name}</div>
-                <div style={{ fontSize:11, color:"#555" }}>{selectedBiz.address}</div>
+          {!manualMode ? (
+            <>
+              <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Search your business name</label>
+              <div style={{ position:"relative" }}>
+                <input
+                  autoFocus
+                  style={{ ...RC_INPUT, paddingRight: searching ? 36 : undefined }}
+                  className="rc-input"
+                  placeholder="e.g. Smith Electrical Brisbane"
+                  value={searchQuery}
+                  onChange={e => handleSearch(e.target.value)}
+                />
+                {searching && <div style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)" }}><Spinner size={14} /></div>}
               </div>
-            </div>
+              {searchResults.length > 0 && (
+                <div style={{ marginTop:6, border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, overflow:"hidden", background:"#0c0c0c" }}>
+                  {searchResults.map((biz, i) => (
+                    <button key={biz.placeId} onClick={() => handleSelectBiz(biz)} style={{ width:"100%", display:"flex", flexDirection:"column", gap:3, padding:"13px 14px", background:"transparent", border:"none", borderBottom: i < searchResults.length-1 ? "1px solid rgba(255,255,255,0.05)" : "none", textAlign:"left", cursor:"pointer" }}
+                      onMouseEnter={e => e.currentTarget.style.background="rgba(255,255,255,0.04)"}
+                      onMouseLeave={e => e.currentTarget.style.background="transparent"}
+                    >
+                      <span style={{ fontSize:13, fontWeight:600, color:"#ddd" }}>{biz.name}</span>
+                      <span style={{ fontSize:11, color:"#444" }}>{biz.address}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {selectedBiz && (
+                <div style={{ marginTop:10, background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.2)", borderRadius:9, padding:"10px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ color:"#22c55e", fontSize:14 }}>✓</span>
+                    <div>
+                      <div style={{ fontSize:13, fontWeight:600, color:"#ccc" }}>{selectedBiz.name}</div>
+                      <div style={{ fontSize:11, color:"#555" }}>{selectedBiz.address}</div>
+                    </div>
+                  </div>
+                  <button onClick={() => { setSelectedBiz(null); setSearchQuery(""); setSearchResults([]); }} style={{ background:"none", border:"none", color:"#444", fontSize:12, cursor:"pointer" }}>Change</button>
+                </div>
+              )}
+              {searchError && <p style={{ fontSize:12, color:"#f87171", marginTop:8 }}>{searchError}</p>}
+              {!selectedBiz && !searching && !searchError && searchQuery.length > 2 && searchResults.length === 0 && (
+                <p style={{ fontSize:12, color:"#555", marginTop:10 }}>No results — try adding your suburb or city.</p>
+              )}
+              <button onClick={() => setManualMode(true)} style={{ background:"none", border:"none", color:"#444", fontSize:12, cursor:"pointer", marginTop:14, textDecoration:"underline", padding:0 }}>
+                Can't find your business? Enter details manually
+              </button>
+            </>
+          ) : (
+            <>
+              <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Business name</label>
+              <input autoFocus style={RC_INPUT} className="rc-input" placeholder="e.g. Smith Electrical" value={data.bizName} onChange={e => set("bizName", e.target.value)} />
+              <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8, marginTop:16 }}>Google Review URL</label>
+              <input style={RC_INPUT} className="rc-input" placeholder="https://search.google.com/local/writereview?placeid=..." value={data.googleLink} onChange={e => set("googleLink", e.target.value)} />
+              <p style={{ fontSize:12, color:"#383838", marginTop:8, lineHeight:1.6 }}>
+                Find it: search your business on Google → click "Ask for reviews" → copy the link.
+              </p>
+              <button onClick={() => setManualMode(false)} style={{ background:"none", border:"none", color:"#444", fontSize:12, cursor:"pointer", marginTop:10, textDecoration:"underline", padding:0 }}>
+                ← Back to search
+              </button>
+            </>
           )}
-          {!selectedBiz && searchQuery.length > 1 && !searching && searchResults.length === 0 && (
-            <p style={{ fontSize:12, color:"#555", marginTop:10 }}>No results — try adding your suburb or city.</p>
-          )}
-          <p style={{ fontSize:12, color:"#383838", marginTop:12, lineHeight:1.6 }}>We'll automatically find your Google Review link.</p>
         </div>
       );
       case 1: return (
