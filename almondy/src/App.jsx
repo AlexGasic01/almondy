@@ -1783,15 +1783,17 @@ const TestimonialsPage = ({ setPage }) => {
 
 // ── Stripe Price IDs ─────────────────────────────────────────────
 const STRIPE_PRICES = {
-  growth: "price_1TTu1PKVRE4IsC8ThYKGACBz",
-  crew:   "price_1TTu1pKVRE4IsC8T19RkUMWr",
+  starter: "", // TODO: create $19/mo Starter price in Stripe Dashboard and paste ID here
+  growth:  "price_1TTu1PKVRE4IsC8ThYKGACBz", // $39/mo Growth
+  crew:    "price_1TTu1pKVRE4IsC8T19RkUMWr", // $59/mo Crew
 };
 
 // ── Plan config ──────────────────────────────────────────────────
 const PLAN_CONFIG = {
   trial:   { label:"Free Trial",  sends: 20,  color:"#888" },
   expired: { label:"Trial Ended", sends: 0,   color:"#ef4444" },
-  growth:  { label:"Growth",      sends: 140, color:"#22c55e" },
+  starter: { label:"Starter",     sends: 75,  color:"#60a5fa" },
+  growth:  { label:"Growth",      sends: 220, color:"#22c55e" },
   crew:    { label:"Crew",        sends: 400, color:"#f59e0b" },
 };
 
@@ -1885,9 +1887,10 @@ const RC_INPUT = {
 
 // ── Plan data ─────────────────────────────────────────────────────
 const PLANS_DATA = [
-  { id:"trial",  name:"Free Trial", price:"0",     priceLabel:"Free", period:"7 days, then cancel or upgrade", sends:20,  desc:"Try ReviewChaser risk-free. No credit card required to start.", cta:"Start Free Trial →", solid:false, badge:null, features:[[true,"20 review requests"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Basic send dashboard"],[false,"Send history"],[false,"Custom SMS message"],[false,"Priority support"]] },
-  { id:"growth", name:"Growth",     price:"29.99", priceLabel:"29",   period:"per month AUD",                  sends:140, desc:"For sole operators and small businesses building their reputation.", cta:"Start 7-Day Free Trial →", solid:true, badge:"⚡ Most Popular", features:[[true,"<strong>140 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
-  { id:"crew",   name:"Crew",       price:"59.99", priceLabel:"59",   period:"per month AUD",                  sends:400, desc:"For multi-van operators, agencies, and businesses scaling fast.", cta:"Get Crew →", solid:false, badge:"Enterprise", features:[[true,"<strong>400 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history & exports"],[true,"Advanced analytics"],[true,"Custom SMS message"],[true,"Priority support"]] },
+  { id:"trial",   name:"Free Trial", price:"0",  priceLabel:"Free", period:"7 days, then cancel or upgrade", sends:20,  desc:"Try ReviewChaser risk-free. No credit card required to start.", cta:"Start Free Trial →", solid:false, badge:null, features:[[true,"20 review requests"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Basic send dashboard"],[false,"Send history"],[false,"Custom SMS message"],[false,"Priority support"]] },
+  { id:"starter", name:"Starter",    price:"19", priceLabel:"19",   period:"per month AUD",                  sends:75,  desc:"For sole operators just getting started with review collection.", cta:"Get Starter →", solid:false, badge:null, features:[[true,"<strong>75 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
+  { id:"growth",  name:"Growth",     price:"39", priceLabel:"39",   period:"per month AUD",                  sends:220, desc:"For small businesses building their reputation at scale.", cta:"Start 7-Day Free Trial →", solid:true, badge:"⚡ Most Popular", features:[[true,"<strong>220 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
+  { id:"crew",    name:"Crew",       price:"59", priceLabel:"59",   period:"per month AUD",                  sends:400, desc:"For multi-van operators, agencies, and businesses scaling fast.", cta:"Get Crew →", solid:false, badge:"Enterprise", features:[[true,"<strong>400 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history & exports"],[true,"Advanced analytics"],[true,"Custom SMS message"],[true,"Priority support"]] },
 ];
 
 const RCPlanCard = ({ plan, onSelect, loading }) => {
@@ -2381,7 +2384,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const pct = Math.min(100, Math.round((sendsUsed / sendLimit) * 100));
   const atLimit = sendsUsed >= sendLimit;
 
-  const canCustomise = plan === "growth" || plan === "crew";
+  const canCustomise = plan === "starter" || plan === "growth" || plan === "crew";
 
   const activeTemplate = RC_MESSAGE_TEMPLATES.find(t => t.id === settingsData.templateId) ?? RC_MESSAGE_TEMPLATES[0];
   const livePreview = activeTemplate.id === "custom"
