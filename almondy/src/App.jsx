@@ -1932,7 +1932,7 @@ const RCPlanCard = ({ plan, onSelect, loading }) => {
       </div>
       <div style={{ fontSize:12, color:"#656565", marginBottom:10 }}>{plan.period}</div>
       <div style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.15)", borderRadius:999, padding:"3px 10px", fontSize:11, fontWeight:700, color:"rgba(34,197,94,0.7)", marginBottom:16, width:"fit-content", fontFamily:"var(--mono)" }}>{plan.sends} sends/mo</div>
-      <p style={{ fontSize:13, color:"#858585", lineHeight:1.75, marginBottom:22 }}>{plan.desc}</p>
+      <p style={{ fontSize:13, color:"#858585", lineHeight:1.75, marginBottom:22, flex:1 }}>{plan.desc}</p>
       <button onClick={() => onSelect(plan.id)} disabled={!!loading} className="rc-btn-primary" style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, width:"100%", padding:"12px 20px", fontSize:13, fontWeight:700, borderRadius:9, border:plan.solid?"none":"1px solid rgba(255,255,255,0.1)", background:plan.solid?"#fff":"transparent", color:plan.solid?"#000":"#666", marginBottom:22, opacity:loading&&loading!==plan.id?0.4:1, transition:"opacity 0.2s" }}>
         {loading===plan.id ? <><Spinner size={14} dark={plan.solid} /> Redirecting…</> : plan.cta}
       </button>
