@@ -1892,8 +1892,8 @@ const RC_INPUT = {
 // ── Plan data ─────────────────────────────────────────────────────
 const PLANS_DATA = [
   { id:"trial",   name:"Free Trial", price:"0",  priceLabel:"Free", period:"7 days, then cancel or upgrade", sends:20,  desc:"Try ReviewChaser risk-free. No credit card required to start.", cta:"Start Free Trial →", solid:false, badge:null, features:[[true,"20 review requests"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Basic send dashboard"],[false,"Send history"],[false,"Custom SMS message"],[false,"Priority support"]] },
-  { id:"starter", name:"Starter",    price:"29", priceLabel:"29",   period:"per month AUD",                  sends:75,  desc:"For sole operators just getting started with review collection.", cta:"Get Starter →", solid:false, badge:null, features:[[true,"<strong>75 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
-  { id:"growth",  name:"Growth",     price:"49", priceLabel:"49",   period:"per month AUD",                  sends:220, desc:"For small businesses building their reputation at scale.", cta:"Start 7-Day Free Trial →", solid:true, badge:"⚡ Most Popular", features:[[true,"<strong>220 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
+  { id:"starter", name:"Starter",    price:"29", priceLabel:"29",   period:"per month AUD",                  sends:75,  desc:"For sole operators just getting started with review collection.", cta:"Start 7-Day Free Trial →", solid:false, badge:null, features:[[true,"<strong>75 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
+  { id:"growth",  name:"Growth",     price:"49", priceLabel:"49",   period:"per month AUD",                  sends:220, desc:"For small businesses building their reputation at scale.", cta:"Get Growth →", solid:true, badge:"⚡ Most Popular", features:[[true,"<strong>220 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
   { id:"crew",    name:"Crew",       price:"79", priceLabel:"79",   period:"per month AUD",                  sends:400, desc:"For multi-van operators, agencies, and businesses scaling fast.", cta:"Get Crew →", solid:false, badge:"Enterprise", features:[[true,"<strong>400 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history & exports"],[true,"Advanced analytics"],[true,"Custom SMS message"],[true,"Priority support"]] },
 ];
 
@@ -2643,7 +2643,7 @@ const RCPaywallScreen = ({ isMobile, profile, onClose, onBack }) => {
     setLoadingPlan(planId);
     try {
       const { data:{ session } } = await supabase.auth.getSession();
-      await startStripeCheckout(STRIPE_PRICES[planId], session.user.email, session.user.id, planId === "growth");
+      await startStripeCheckout(STRIPE_PRICES[planId], session.user.email, session.user.id, planId === "starter");
     } catch(e) { console.error(e); setLoadingPlan(null); }
   };
 
@@ -2651,7 +2651,7 @@ const RCPaywallScreen = ({ isMobile, profile, onClose, onBack }) => {
 
   return (
     <div style={{ position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,0,0.8)",backdropFilter:"blur(10px)",display:"flex",alignItems:isMobile?"flex-start":"center",justifyContent:"center",padding:isMobile?"72px 16px 24px":24,overflowY:"auto" }}>
-      <div style={{ background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:20,padding:isMobile?"24px 20px":"36px 32px",maxWidth:740,width:"100%",maxHeight:"90vh",overflowY:"auto",position:"relative",boxShadow:"0 40px 100px rgba(0,0,0,0.8)",animation:"rc-fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both" }}>
+      <div style={{ background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:20,padding:isMobile?"24px 20px":"36px 32px",maxWidth:980,width:"100%",maxHeight:"90vh",overflowY:"auto",position:"relative",boxShadow:"0 40px 100px rgba(0,0,0,0.8)",animation:"rc-fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:120,height:2,background:"linear-gradient(90deg,transparent,rgba(34,197,94,0.6),transparent)",borderRadius:999 }} />
         {onBack && <button onClick={onBack} style={{ position:"absolute",top:16,left:16,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5 }}>← Back</button>}
         <div style={{ textAlign:"center",marginBottom:28 }}>
@@ -2664,7 +2664,7 @@ const RCPaywallScreen = ({ isMobile, profile, onClose, onBack }) => {
           <p style={{ fontSize:14,color:"#555",lineHeight:1.7 }}>
           </p>
         </div>
-        <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:10,marginBottom:20 }}>
+        <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)",gap:10,marginBottom:20 }}>
           {paidPlans.map(p => <RCPlanCard key={p.id} plan={p} onSelect={handleUpgrade} loading={loadingPlan} />)}
         </div>
         <div style={{ display:"flex",justifyContent:"center",gap:24,flexWrap:"wrap" }}>
