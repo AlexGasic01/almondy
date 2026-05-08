@@ -191,8 +191,9 @@ const Nav = ({ page, setPage }) => {
 
         {isMobile ? (
           <button onClick={() => setMenuOpen(v => !v)} style={{ background:"none",border:"none",display:"flex",flexDirection:"column",gap:5,padding:6 }}>
-            <span style={{ display:"block",width:22,height:2,background:menuOpen?"transparent":"var(--white)",transition:"all 0.2s",transform:menuOpen?"rotate(45deg) translate(5px,5px)":"none" }} />
-            <span style={{ display:"block",width:22,height:2,background:"var(--white)",transition:"all 0.2s",transform:menuOpen?"rotate(-45deg)":"none" }} />
+            <span style={{ display:"block",width:22,height:2,background:"var(--white)",transition:"all 0.25s",transform:menuOpen?"rotate(45deg) translateY(7px)":"none" }} />
+            <span style={{ display:"block",width:22,height:2,background:"var(--white)",transition:"all 0.25s",opacity:menuOpen?0:1 }} />
+            <span style={{ display:"block",width:22,height:2,background:"var(--white)",transition:"all 0.25s",transform:menuOpen?"rotate(-45deg) translateY(-7px)":"none" }} />
           </button>
         ) : (
           <>
@@ -212,7 +213,7 @@ const Nav = ({ page, setPage }) => {
         <>
           <div className="mobile-overlay" onClick={() => setMenuOpen(false)} />
           <div style={{ position:"fixed",top:62,right:0,bottom:0,width:"75vw",maxWidth:300,background:"#0d0d0d",borderLeft:"1px solid var(--border)",zIndex:200,display:"flex",flexDirection:"column",padding:"24px 0",animation:"fadeRight 0.25s both" }}>
-            {links.map(l => (
+            {NAV_LINKS.map(l => (
               <button key={l.id} onClick={() => go(l.id)} style={{ background:"none",border:"none",borderBottom:"1px solid rgba(255,255,255,0.05)",padding:"18px 24px",fontSize:16,fontWeight:600,color:page===l.id?"var(--white)":"var(--gray)",textAlign:"left",transition:"color 0.15s" }}>
                 {l.label}
               </button>
