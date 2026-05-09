@@ -2881,7 +2881,14 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
 
   const handleFinish = async () => {
     setSaving(true);
-    await supabase.from("rc_profiles").upsert({ id:userId, email, biz_name:data.bizName.trim(), google_link:data.googleLink.trim(), plan:"trial", sends_used:0, trial_started_at:new Date().toISOString() });
+    try {
+      await Promise.race([
+        supabase.from("rc_profiles").upsert({ id:userId, email, biz_name:data.bizName.trim(), google_link:data.googleLink.trim(), plan:"trial", sends_used:0, trial_started_at:new Date().toISOString() }),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000)),
+      ]);
+    } catch (e) {
+      console.error("onboarding save error:", e);
+    }
     try { localStorage.removeItem(savedKey); } catch {}
     setSaving(false);
     onComplete({ bizName:data.bizName.trim(), googleLink:data.googleLink.trim(), plan:"trial", sends_used:0 }, true);
