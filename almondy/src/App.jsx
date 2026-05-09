@@ -3306,7 +3306,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const pct = Math.min(100, Math.round((sendsUsed / sendLimit) * 100));
   const atLimit = sendsUsed >= sendLimit;
 
-  const canCustomise = plan === "starter" || plan === "growth" || plan === "crew";
+  const canCustomise = (plan === "starter" && !isInStripeTrial(profile)) || plan === "growth" || plan === "crew";
 
   const activeTemplate = RC_MESSAGE_TEMPLATES.find(t => t.id === settingsData.templateId) ?? RC_MESSAGE_TEMPLATES[0];
   const livePreview = activeTemplate.id === "custom"
@@ -3607,11 +3607,11 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                         </div>
                         <div>
                           <label style={{ fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 }}>Google Review link</label>
-                          <input className="rc-input" style={RC_INPUT} value={settingsData.googleLink} onChange={e => setSettingsData(d => ({ ...d, googleLink: e.target.value }))} onFocus={e => e.target.closest("div").querySelector(".google-link-warning").style.display = "flex"} onBlur={e => { if (e.target.value === (profile?.google_link ?? "")) e.target.closest("div").querySelector(".google-link-warning").style.display = "none"; }} placeholder="https://g.page/r/..." />
-                          <div className="google-link-warning" style={{ display: "none", alignItems: "flex-start", gap: 8, marginTop: 8, background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "9px 12px", fontSize: 12, color: "#d97706", lineHeight: 1.55 }}>
-                            <span style={{ flexShrink: 0, fontSize: 14 }}>⚠️</span>
-                            <span>Changing this link will affect all future SMS sends. Make sure it's the correct Google Review URL for your business.</span>
+                          <div style={{ ...RC_INPUT, display: "flex", alignItems: "center", gap: 8, cursor: "default", userSelect: "text", overflow: "hidden" }}>
+                            <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#bbb", fontSize: 13 }}>{settingsData.googleLink || "—"}</span>
+                            <span style={{ color: "#383838", fontSize: 12, flexShrink: 0 }}>🔒</span>
                           </div>
+                          <p style={{ fontSize: 11, color: "#383838", marginTop: 6 }}>Contact support to update your Google Review link.</p>
                         </div>
                       </div>
                     </div>
