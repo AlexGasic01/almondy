@@ -3317,6 +3317,24 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
     fn(userId).then(setSendsUsed).catch(() => {});
   }, [userId, sent, plan, profile]);
 
+  // Auto-sync Stripe trial status for starter users so the 25-send cap applies immediately
+  useEffect(() => {
+    if (plan !== "starter" || profile?.stripe_trial_ends_at) return;
+    let mounted = true;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session || !mounted) return;
+      fetch("/api/sync-rc-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+      }).then(r => r.json()).then(json => {
+        if (mounted && json.trial_ends_at) {
+          setProfile(p => ({ ...p, stripe_trial_ends_at: json.trial_ends_at }));
+        }
+      }).catch(() => {});
+    });
+    return () => { mounted = false; };
+  }, [userId, plan]);
+
   const loadHistory = useCallback(async () => {
     setHistoryLoading(true);
     try {
