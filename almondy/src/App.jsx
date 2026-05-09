@@ -3578,7 +3578,11 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                         </div>
                         <div>
                           <label style={{ fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 }}>Google Review link</label>
-                          <input className="rc-input" style={RC_INPUT} value={settingsData.googleLink} onChange={e => setSettingsData(d => ({ ...d, googleLink: e.target.value }))} placeholder="https://g.page/r/..." />
+                          <input className="rc-input" style={RC_INPUT} value={settingsData.googleLink} onChange={e => setSettingsData(d => ({ ...d, googleLink: e.target.value }))} onFocus={e => e.target.closest("div").querySelector(".google-link-warning").style.display = "flex"} onBlur={e => { if (e.target.value === (profile?.google_link ?? "")) e.target.closest("div").querySelector(".google-link-warning").style.display = "none"; }} placeholder="https://g.page/r/..." />
+                          <div className="google-link-warning" style={{ display: "none", alignItems: "flex-start", gap: 8, marginTop: 8, background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "9px 12px", fontSize: 12, color: "#d97706", lineHeight: 1.55 }}>
+                            <span style={{ flexShrink: 0, fontSize: 14 }}>⚠️</span>
+                            <span>Changing this link will affect all future SMS sends. Make sure it's the correct Google Review URL for your business.</span>
+                          </div>
                         </div>
                       </div>
                     </div>
