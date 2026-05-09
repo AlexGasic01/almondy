@@ -3672,7 +3672,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                           <div>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                               <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{planConfig.label}</span>
-                              <span style={{ fontSize: 10, fontWeight: 700, color: planConfig.color, background: `${planConfig.color}18`, border: `1px solid ${planConfig.color}38`, borderRadius: 999, padding: "2px 8px", fontFamily: "var(--mono)" }}>{planConfig.label.toUpperCase()}</span>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: planConfig.color, background: `${planConfig.color}18`, border: `1px solid ${planConfig.color}38`, borderRadius: 999, padding: "2px 8px", fontFamily: "var(--mono)" }}>{isInStripeTrial(profile) ? "TRIAL" : "ACTIVE"}</span>
                             </div>
                             <div style={{ fontSize: 12, color: "#555", fontFamily: "var(--mono)" }}>{sendsUsed} / {sendLimit} sends used this month</div>
                           </div>
