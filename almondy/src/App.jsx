@@ -3402,12 +3402,15 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const handleSaveSettings = async () => {
     setSettingsSaving(true);
     try {
-      await supabase.from("rc_profiles").update({
-        biz_name: settingsData.bizName.trim(),
-        google_link: settingsData.googleLink.trim(),
-        template_id: settingsData.templateId,
-        custom_msg: settingsData.customMsg.trim(),
-      }).eq("id", userId);
+      await Promise.race([
+        supabase.from("rc_profiles").update({
+          biz_name: settingsData.bizName.trim(),
+          google_link: settingsData.googleLink.trim(),
+          template_id: settingsData.templateId,
+          custom_msg: settingsData.customMsg.trim(),
+        }).eq("id", userId),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000)),
+      ]);
       setProfile(p => ({ ...p, biz_name: settingsData.bizName.trim(), google_link: settingsData.googleLink.trim() }));
       setSettingsSaved(true);
       setTimeout(() => setSettingsSaved(false), 2500);
@@ -3420,17 +3423,23 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
 
   const handleCancelPlan = async () => {
     setCancelLoading(true);
+    const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000));
     try {
       if (plan === "trial") {
-        await supabase.from("rc_profiles").update({ plan: "expired" }).eq("id", userId);
+        await Promise.race([
+          supabase.from("rc_profiles").update({ plan: "expired" }).eq("id", userId),
+          timeout,
+        ]);
       } else {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error("Not signed in");
-        const res = await fetch("/api/cancel-rc-subscription", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
-        });
-        if (!res.ok) throw new Error("Cancel failed");
+        await Promise.race([
+          fetch("/api/cancel-rc-subscription", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
+          }).then(res => { if (!res.ok) throw new Error("Cancel failed"); }),
+          timeout,
+        ]);
       }
       setProfile(p => ({ ...p, plan: "expired" }));
       setCancelStep("done");
@@ -3441,11 +3450,14 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const handleContactSupport = async () => {
     if (!contactMsg.trim()) return;
     try {
-      await fetch("https://formspree.io/f/mlgzbpng", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ "💬 Support request": contactMsg, "📧 Email": profile?.email ?? "unknown", "📦 Plan": plan }),
-      });
+      await Promise.race([
+        fetch("https://formspree.io/f/mlgzbpng", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ "💬 Support request": contactMsg, "📧 Email": profile?.email ?? "unknown", "📦 Plan": plan }),
+        }),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000)),
+      ]);
     } catch (e) { console.error(e); }
     setContactSent(true); setContactMsg("");
     setTimeout(() => setContactSent(false), 3500);
