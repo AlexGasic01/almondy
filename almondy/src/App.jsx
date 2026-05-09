@@ -3277,6 +3277,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const [history, setHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [sendsUsed, setSendsUsed] = useState(0);
+  const [trialSyncing, setTrialSyncing] = useState(() => initialProfile?.plan === "starter" && !initialProfile?.stripe_trial_ends_at);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [activeToast, setActiveToast] = useState(null);
@@ -3319,18 +3320,18 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
 
   // Auto-sync Stripe trial status for starter users so the 25-send cap applies immediately
   useEffect(() => {
-    if (plan !== "starter" || profile?.stripe_trial_ends_at) return;
+    if (plan !== "starter" || profile?.stripe_trial_ends_at) { setTrialSyncing(false); return; }
     let mounted = true;
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session || !mounted) return;
+      if (!session || !mounted) { setTrialSyncing(false); return; }
       fetch("/api/sync-rc-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
       }).then(r => r.json()).then(json => {
-        if (mounted && json.trial_ends_at) {
-          setProfile(p => ({ ...p, stripe_trial_ends_at: json.trial_ends_at }));
-        }
-      }).catch(() => {});
+        if (!mounted) return;
+        if (json.trial_ends_at) setProfile(p => ({ ...p, stripe_trial_ends_at: json.trial_ends_at }));
+        setTrialSyncing(false);
+      }).catch(() => { if (mounted) setTrialSyncing(false); });
     });
     return () => { mounted = false; };
   }, [userId, plan]);
@@ -3474,7 +3475,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {plan === "trial" && <button onClick={() => setShowPaywall(true)} style={{ padding: isMobile ? "6px 12px" : "7px 16px", background: "#22c55e", color: "#000", border: "none", borderRadius: 7, fontSize: isMobile ? 11 : 12.5, fontWeight: 700, cursor: "pointer" }}>Upgrade</button>}
             {(plan === "starter" || plan === "growth" || plan === "crew") && <button onClick={() => setShowUpgradeModal(true)} style={{ padding: isMobile ? "6px 12px" : "7px 16px", background: "transparent", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 7, fontSize: isMobile ? 11 : 12.5, fontWeight: 700, cursor: "pointer" }}>Upgrade Plan</button>}
-            <div style={{ fontSize: 12, color: "#656565", fontFamily: "var(--mono)", display: isMobile ? "none" : "block" }}>{sendsUsed}/{sendLimit}</div>
+            <div style={{ fontSize: 12, color: "#656565", fontFamily: "var(--mono)", display: isMobile ? "none" : "flex", alignItems: "center" }}>{trialSyncing ? <Spinner size={12} /> : `${sendsUsed}/${sendLimit}`}</div>
             <button onClick={() => { setTab(t => t === "settings" ? "send" : "settings"); setCancelStep(null); }} style={{ width: 32, height: 32, borderRadius: "50%", background: tab === "settings" ? "rgba(34,197,94,0.15)" : "linear-gradient(135deg,#22c55e,#16a34a)", border: tab === "settings" ? "2px solid #22c55e" : "none", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: tab === "settings" ? "#22c55e" : "#000", cursor: "pointer" }}>
               {(profile?.biz_name || "R")[0].toUpperCase()}
             </button>
@@ -3485,22 +3486,32 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
           <div style={{ padding: isMobile ? "0 16px" : 0 }}>
 
             {/* ── STATS ── */}
-            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr 1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 16 }}>
-              {[{ label: "Sent this month", val: sendsUsed, green: false }, { label: "Remaining", val: Math.max(0, sendLimit - sendsUsed), green: true }, { label: "Monthly cap", val: sendLimit, green: false }].map(({ label, val, green }) => (
-                <div key={label} style={{ background: green ? "rgba(34,197,94,0.04)" : "rgba(255,255,255,0.025)", border: `1px solid ${green ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.06)"}`, borderRadius: 12, padding: isMobile ? "12px 14px" : "18px 20px" }}>
-                  <div style={{ fontSize: 9.5, color: "#383838", fontFamily: "var(--mono)", letterSpacing: "1.2px", textTransform: "uppercase", marginBottom: 6, fontWeight: 600 }}>{label}</div>
-                  <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, letterSpacing: "-1px", color: green ? "#22c55e" : "#fff", lineHeight: 1 }}>{val}</div>
-                </div>
-              ))}
-            </div>
+            {trialSyncing ? (
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr 1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 16 }}>
+                {[0,1,2].map(i => (
+                  <div key={i} style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: isMobile ? "12px 14px" : "18px 20px", display: "flex", alignItems: "center", justifyContent: "center", minHeight: isMobile ? 64 : 80 }}>
+                    <Spinner size={16} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr 1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 16 }}>
+                {[{ label: "Sent this month", val: sendsUsed, green: false }, { label: "Remaining", val: Math.max(0, sendLimit - sendsUsed), green: true }, { label: "Monthly cap", val: sendLimit, green: false }].map(({ label, val, green }) => (
+                  <div key={label} style={{ background: green ? "rgba(34,197,94,0.04)" : "rgba(255,255,255,0.025)", border: `1px solid ${green ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.06)"}`, borderRadius: 12, padding: isMobile ? "12px 14px" : "18px 20px" }}>
+                    <div style={{ fontSize: 9.5, color: "#383838", fontFamily: "var(--mono)", letterSpacing: "1.2px", textTransform: "uppercase", marginBottom: 6, fontWeight: 600 }}>{label}</div>
+                    <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, letterSpacing: "-1px", color: green ? "#22c55e" : "#fff", lineHeight: 1 }}>{val}</div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Progress */}
             <div style={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ flex: 1, height: 5, background: "rgba(255,255,255,0.05)", borderRadius: 999, overflow: "hidden" }}>
-                <div style={{ width: `${pct}%`, height: "100%", background: pct >= 90 ? "#ef4444" : pct >= 75 ? "#f59e0b" : "#22c55e", borderRadius: 999, transition: "width 0.5s" }} />
+                <div style={{ width: `${trialSyncing ? 0 : pct}%`, height: "100%", background: pct >= 90 ? "#ef4444" : pct >= 75 ? "#f59e0b" : "#22c55e", borderRadius: 999, transition: "width 0.5s" }} />
               </div>
-              <div style={{ fontSize: 12, color: pct >= 90 ? "#f87171" : pct >= 75 ? "#f59e0b" : "#444", fontFamily: "var(--mono)", flexShrink: 0 }}>{pct}% used</div>
-              {pct >= 80 && <button onClick={() => setShowPaywall(true)} style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 999, padding: "3px 9px", cursor: "pointer", flexShrink: 0 }}>Upgrade</button>}
+              <div style={{ fontSize: 12, color: pct >= 90 ? "#f87171" : pct >= 75 ? "#f59e0b" : "#444", fontFamily: "var(--mono)", flexShrink: 0 }}>{trialSyncing ? "—" : `${pct}% used`}</div>
+              {pct >= 80 && !trialSyncing && <button onClick={() => setShowPaywall(true)} style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 999, padding: "3px 9px", cursor: "pointer", flexShrink: 0 }}>Upgrade</button>}
             </div>
 
             {plan === "trial" && !trialExpired && (
