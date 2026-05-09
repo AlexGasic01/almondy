@@ -479,7 +479,7 @@ const SystemsPage = ({ setPage }) => {
   return (
     <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
       <div style={{ maxWidth:1280,margin:"0 auto",padding:isMobile?"80px 20px 48px":"140px 64px 72px",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both" }}>
-        <button onClick={() => setPage("home")} style={{ position:"fixed",top:74,right:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
+        <button onClick={() => setPage("home")} style={{ position:"fixed",top:68,left:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Our Systems</p>
         <h1 style={{ fontSize:isMobile?"clamp(32px,10vw,52px)":"clamp(40px,5vw,72px)",fontWeight:800,letterSpacing:"-2.5px",lineHeight:1.05,color:"var(--white)",marginBottom:16 }}>
           Tools that get things done.
@@ -1343,7 +1343,7 @@ const PaychaserPage = ({ setPage }) => {
       <div style={{ position:"relative",overflow:"hidden" }}>
         <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
         <div style={{ position:"relative",zIndex:1,maxWidth:900,margin:"0 auto",padding:isMobile?"64px 20px 48px":"96px 48px 72px",textAlign:"center",animation:"fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
-          <button onClick={() => setPage("home")} style={{ position:"fixed",top:74,right:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
+          <button onClick={() => setPage("home")} style={{ position:"fixed",top:68,left:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:24,fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> Live Now
           </div>
@@ -1531,7 +1531,7 @@ const PricingPage = ({ setPage }) => {
       <div style={{ position:"relative",overflow:"hidden" }}>
         <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
         <div style={{ position:"relative",zIndex:1,textAlign:"center",padding:isMobile?"64px 20px 48px":"88px 48px 64px",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both" }}>
-          <button onClick={() => setPage("home")} style={{ position:"fixed",top:74,right:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
+          <button onClick={() => setPage("home")} style={{ position:"fixed",top:68,left:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:22,fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> PayChaser Pricing
           </div>
@@ -2005,7 +2005,7 @@ const WebDevPage = ({ setPage }) => {
       <div style={{ position:"relative",overflow:"hidden" }}>
         <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
         <div style={{ position:"relative",zIndex:1,maxWidth:900,margin:"0 auto",padding:isMobile?"64px 20px 48px":"96px 48px 80px",textAlign:"center",animation:"fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
-          <button onClick={() => setPage("home")} style={{ position:"fixed",top:74,right:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
+          <button onClick={() => setPage("home")} style={{ position:"fixed",top:68,left:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:24,fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> Taking on clients
           </div>
@@ -2079,7 +2079,7 @@ const ContactPage = ({ setPage }) => {
   return (
     <div style={{ paddingTop:62,minHeight:"100vh",display:"flex",flexDirection:"column" }}>
       <div style={{ maxWidth:580,margin:"0 auto",padding:isMobile?"60px 20px 80px":"100px 48px",flex:1 }}>
-        <button onClick={() => setPage("home")} style={{ position:"fixed",top:74,right:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
+        <button onClick={() => setPage("home")} style={{ position:"fixed",top:68,left:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Get in Touch</p>
         <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,48px)":"clamp(36px,4vw,56px)",fontWeight:800,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:12,lineHeight:1.05 }}>Let's build something.</h1>
         <p style={{ fontSize:15,color:"#858585",lineHeight:1.75,marginBottom:40 }}>Tell us what you need. We'll get back to you within 24 hours.</p>
@@ -2108,7 +2108,7 @@ const TestimonialsPage = ({ setPage }) => {
   return (
     <div style={{ paddingTop:62,minHeight:"100vh",display:"flex",flexDirection:"column" }}>
       <div style={{ maxWidth:900,margin:"0 auto",padding:isMobile?"80px 20px":"140px 48px",textAlign:"center",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both",flex:1 }}>
-        <button onClick={() => setPage("home")} style={{ position:"fixed",top:74,right:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
+        <button onClick={() => setPage("home")} style={{ position:"fixed",top:68,left:20,zIndex:100,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Testimonials</p>
         <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,52px)":"clamp(40px,5vw,68px)",fontWeight:800,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:16 }}>Coming soon.</h1>
         <p style={{ fontSize:15,color:"#858585" }}>Reviews are being collected. Check back shortly.</p>
