@@ -2718,23 +2718,13 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
 
 // ── Email Collection (post-login, optional) ───────────────────────
 const RCEmailCollectScreen = ({ isMobile, userId, onComplete }) => {
-  const [email, setEmail]   = useState("");
-  const [saving, setSaving] = useState(false);
-  const [err, setErr]       = useState("");
+  const [email, setEmail] = useState("");
 
   const valid = email.includes("@") && email.includes(".");
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!valid) return;
-    setSaving(true); setErr("");
-    try {
-      await supabase.from("rc_profiles").update({ billing_email: email }).eq("id", userId);
-    } catch (e) {
-      console.error("billing email save error:", e);
-      setErr("Couldn't save. You can update this later in Settings.");
-    } finally {
-      setSaving(false);
-    }
+    supabase.from("rc_profiles").update({ billing_email: email }).eq("id", userId).catch(console.error);
     onComplete();
   };
 
@@ -2753,21 +2743,20 @@ const RCEmailCollectScreen = ({ isMobile, userId, onComplete }) => {
           <input
             type="email"
             value={email}
-            onChange={e => { setEmail(e.target.value); setErr(""); }}
+            onChange={e => setEmail(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handleSave()}
             placeholder="your@email.com"
             autoFocus
             className="rc-input"
             style={{ ...RC_INPUT, padding:"13px 16px" }}
           />
-          {err && <p style={{ fontSize:12, color:"#f87171", margin:0 }}>{err}</p>}
           <button
             onClick={handleSave}
-            disabled={!valid || saving}
+            disabled={!valid}
             className="rc-btn-primary"
-            style={{ width:"100%", padding:14, background:saving?"rgba(255,255,255,0.5)":"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:!valid?0.5:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, cursor:!valid||saving?"default":"pointer" }}
+            style={{ width:"100%", padding:14, background:"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:!valid?0.5:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, cursor:!valid?"default":"pointer" }}
           >
-            {saving ? <><Spinner size={14} dark />Saving…</> : "Save email →"}
+            Save email →
           </button>
           <button
             onClick={onComplete}
