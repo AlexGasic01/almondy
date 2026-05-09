@@ -3299,6 +3299,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const [cancelLoading, setCancelLoading] = useState(false);
   const [contactSent, setContactSent] = useState(false);
   const [contactMsg, setContactMsg] = useState("");
+  const [customLockedMsg, setCustomLockedMsg] = useState(false);
 
   const plan = profile?.plan ?? "trial";
   const sendLimit = getSendLimit(plan, profile);
@@ -3609,7 +3610,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                           <label style={{ fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 8 }}>Google Review link</label>
                           <div style={{ ...RC_INPUT, display: "flex", alignItems: "center", gap: 8, cursor: "default", userSelect: "text", overflow: "hidden" }}>
                             <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#bbb", fontSize: 13 }}>{settingsData.googleLink || "—"}</span>
-                            <span style={{ color: "#383838", fontSize: 12, flexShrink: 0 }}>🔒</span>
+                            <div style={{ width: 16, height: 16, flexShrink: 0 }}><LockSVG /></div>
                           </div>
                           <p style={{ fontSize: 11, color: "#383838", marginTop: 6 }}>Contact support to update your Google Review link.</p>
                         </div>
@@ -3621,21 +3622,27 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                     {/* Message template */}
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 700, color: "#383838", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: 12 }}>
-                        Message template {!canCustomise && <span style={{ color: "#f59e0b", fontSize: 10 }}>(Growth & Crew only)</span>}
+                        Message template
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
                         {RC_MESSAGE_TEMPLATES.map(t => {
                           const locked = t.id === "custom" && !canCustomise;
                           const active = settingsData.templateId === t.id;
                           return (
-                            <button key={t.id} onClick={() => !locked && setSettingsData(d => ({ ...d, templateId: t.id }))} style={{ background: active ? "rgba(34,197,94,0.07)" : "#080808", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "11px 14px", cursor: locked ? "default" : "pointer", display: "flex", alignItems: "center", gap: 10, textAlign: "left", opacity: locked ? 0.4 : 1 }}>
+                            <button key={t.id} onClick={() => { if (locked) { setCustomLockedMsg(true); setTimeout(() => setCustomLockedMsg(false), 4000); return; } setSettingsData(d => ({ ...d, templateId: t.id })); }} style={{ background: active ? "rgba(34,197,94,0.07)" : "#080808", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "11px 14px", cursor: locked ? "pointer" : "pointer", display: "flex", alignItems: "center", gap: 10, textAlign: "left", opacity: locked ? 0.4 : 1 }}>
                               <div style={{ width: 14, height: 14, borderRadius: "50%", border: `1px solid ${active ? "rgba(34,197,94,0.5)" : "#383838"}`, background: active ? "#22c55e" : "transparent", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: "#000", fontWeight: 900 }}>{active ? "✓" : ""}</div>
                               <span style={{ fontSize: 13, fontWeight: 600, color: active ? "#22c55e" : "#666" }}>{t.label}</span>
-                              {locked && <span style={{ fontSize: 10, color: "#f59e0b", marginLeft: "auto" }}>🔒</span>}
+                              {locked && <div style={{ width: 14, height: 14, marginLeft: "auto", flexShrink: 0 }}><LockSVG /></div>}
                             </button>
                           );
                         })}
                       </div>
+                      {customLockedMsg && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "10px 12px", background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.18)", borderRadius: 9, fontSize: 12, color: "#a16207", lineHeight: 1.5, animation: "rc-fadeIn 0.2s both" }}>
+                          <div style={{ width: 14, height: 14, flexShrink: 0 }}><LockSVG /></div>
+                          <span>This feature is only available on paid plans. <button onClick={() => { setCustomLockedMsg(false); setShowUpgradeModal(true); }} style={{ background: "none", border: "none", color: "#f59e0b", cursor: "pointer", fontWeight: 700, padding: 0, fontSize: 12 }}>Upgrade →</button></span>
+                        </div>
+                      )}
                       {settingsData.templateId === "custom" && canCustomise && (
                         <div>
                           <textarea className="rc-input" style={{ ...RC_INPUT, minHeight: 80, resize: "vertical" }} placeholder={`Hi! Thanks for choosing ${settingsData.bizName || "Your Business"}...`} value={settingsData.customMsg} onChange={e => setSettingsData(d => ({ ...d, customMsg: e.target.value }))} />
