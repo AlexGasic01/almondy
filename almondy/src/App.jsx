@@ -2131,7 +2131,7 @@ const STRIPE_PRICES = {
 
 // ── Plan config ──────────────────────────────────────────────────
 const PLAN_CONFIG = {
-  trial:   { label:"Free Trial",  sends: 20,  color:"#888" },
+  trial:   { label:"Free Trial",  sends: 25,  color:"#888" },
   expired: { label:"Trial Ended", sends: 0,   color:"#ef4444" },
   starter: { label:"Starter",     sends: 75,  color:"#60a5fa" },
   growth:  { label:"Growth",      sends: 220, color:"#22c55e" },
@@ -2173,6 +2173,11 @@ async function getOrCreateRCProfile(userId, email, phone) {
 async function getRCSendsThisMonth(userId) {
   const start = new Date(); start.setDate(1); start.setHours(0,0,0,0);
   const { data } = await supabase.from("rc_sends").select("id").eq("user_id", userId).gte("sent_at", start.toISOString());
+  return data?.length ?? 0;
+}
+
+async function getRCTrialSendsTotal(userId) {
+  const { data } = await supabase.from("rc_sends").select("id").eq("user_id", userId);
   return data?.length ?? 0;
 }
 
@@ -2237,7 +2242,7 @@ const RC_INPUT = {
 
 // ── Plan data ─────────────────────────────────────────────────────
 const PLANS_DATA = [
-  { id:"trial",   name:"Free Trial", price:"0",  priceLabel:"Free", period:"7 days, then cancel or upgrade", sends:20,  desc:"Try ReviewChaser risk-free for 7 days with 20 sends included.", cta:"Start Free Trial →", solid:false, badge:null, features:[[true,"20 review requests"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Basic send dashboard"],[false,"Send history"],[false,"Custom SMS message"],[false,"Priority support"]] },
+  { id:"trial",   name:"Free Trial", price:"0",  priceLabel:"Free", period:"7 days, then cancel or upgrade", sends:25,  desc:"Try ReviewChaser risk-free for 7 days with 25 sends included.", cta:"Start Free Trial →", solid:false, badge:null, features:[[true,"25 review requests"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Basic send dashboard"],[false,"Send history"],[false,"Custom SMS message"],[false,"Priority support"]] },
   { id:"starter", name:"Starter",    price:"29", priceLabel:"29",   period:"per month AUD",                  sends:75,  desc:"For sole operators just getting started with review collection.", cta:"Start 7-Day Free Trial →", solid:true, badge:null, features:[[true,"<strong>75 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
   { id:"growth",  name:"Growth",     price:"49", priceLabel:"49",   period:"per month AUD",                  sends:220, desc:"For small businesses building their reputation at scale.", cta:"Get Growth →", solid:false, badge:"⚡ Most Popular", features:[[true,"<strong>220 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history"],[true,"Analytics dashboard"],[true,"Custom SMS message"],[false,"Priority support"]] },
   { id:"crew",    name:"Crew",       price:"79", priceLabel:"79",   period:"per month AUD",                  sends:400, desc:"For multi-van operators, agencies, and businesses scaling fast.", cta:"Get Crew →", solid:false, badge:"Enterprise", features:[[true,"<strong>400 sends / month</strong>"],[true,"Real Australian SMS number"],[true,"Your Google Review link"],[true,"Full send history & exports"],[true,"Advanced analytics"],[true,"Custom SMS message"],[true,"Priority support"]] },
@@ -3293,7 +3298,10 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
     ? settingsData.customMsg
     : activeTemplate.preview(settingsData.bizName || "Your Business", shortLink(settingsData.googleLink) || "your-link");
 
-  useEffect(() => { getRCSendsThisMonth(userId).then(setSendsUsed).catch(() => {}); }, [userId, sent]);
+  useEffect(() => {
+    const fn = plan === "trial" ? getRCTrialSendsTotal : getRCSendsThisMonth;
+    fn(userId).then(setSendsUsed).catch(() => {});
+  }, [userId, sent, plan]);
 
   const loadHistory = useCallback(async () => {
     setHistoryLoading(true);
