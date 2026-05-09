@@ -35,6 +35,8 @@ export default async function handler(req, res) {
     const customers = await stripe.customers.list({ email: profile.email, limit: 5 });
     let newPlan = null;
 
+    let trialEndsAt = null;
+
     outer:
     for (const customer of customers.data) {
       for (const status of ["trialing", "active"]) {
@@ -43,6 +45,9 @@ export default async function handler(req, res) {
           const priceId = sub.items.data[0]?.price?.id;
           if (RC_PRICE_TO_PLAN[priceId]) {
             newPlan = RC_PRICE_TO_PLAN[priceId];
+            if (status === "trialing" && sub.trial_end) {
+              trialEndsAt = new Date(sub.trial_end * 1000).toISOString();
+            }
             break outer;
           }
         }
@@ -51,11 +56,15 @@ export default async function handler(req, res) {
 
     if (!newPlan) return res.json({ plan: profile.plan, updated: false });
 
-    if (newPlan !== profile.plan) {
-      await supabase.from("rc_profiles").update({ plan: newPlan }).eq("id", user.id);
+    const updateData = { plan: newPlan };
+    if (trialEndsAt) updateData.stripe_trial_ends_at = trialEndsAt;
+    else if (newPlan === profile.plan && !trialEndsAt) updateData.stripe_trial_ends_at = null;
+
+    if (newPlan !== profile.plan || trialEndsAt) {
+      await supabase.from("rc_profiles").update(updateData).eq("id", user.id).then(() => {}).catch(() => {});
     }
 
-    return res.json({ plan: newPlan, updated: newPlan !== profile.plan });
+    return res.json({ plan: newPlan, trial_ends_at: trialEndsAt, updated: newPlan !== profile.plan });
   } catch (e) {
     console.error("sync-rc-plan error:", e);
     return res.status(500).json({ error: "Failed to sync plan" });
