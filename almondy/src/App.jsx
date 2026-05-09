@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from "react";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
@@ -18,14 +18,14 @@ const useIsMobile = () => {
 };
 
 /* ─── SHARED ASSETS ─── */
-const AlmondLogo = ({ size = 24, fill = "#fff" }) => (
+const AlmondLogo = memo(({ size = 24, fill = "#fff" }) => (
   <svg viewBox="0 0 214 410" xmlns="http://www.w3.org/2000/svg" style={{ height: size, width: "auto", fill }}>
     <path d="M.95,217.78c2.4,18.11,9.13,33.98,19.75,46.86.13-6.65.66-13.44,1.61-20.36,7.4-53.46,38.56-106.25,85.49-144.84,27.01-22.2,55.67-38.66,83.49-49.08-40.13-22.13-108,3.65-155,60.07C9.13,143.06-3.76,182.19.95,217.78Z"/>
     <path d="M109.47,294c34.95-7.73,67.2-33.26,88.48-70.03,31.29-54.09,36.64-114.84,16.34-150.41-3.1,19.29-9.45,38.76-18.95,57.49-16.8,33.11-39.36,60.41-63.61,79.41-2.92,2.29-6.27-2.77-3.55-5.35,20.58-19.54,39.51-44.84,54.33-74.32,10.74-21.37,17.81-43.51,21.1-65.29-10.25,12.43-21.31,23.27-32.75,32.23-2.9,2.27-6.23-2.75-3.52-5.31,10.32-9.8,20.22-21.07,29.38-33.58-25.4,11.43-51.22,27.45-75.81,47.81-51.6,42.74-85.71,100.34-93.6,158.04-.29,2.13-.54,4.24-.76,6.34,3.49,3.45,7.3,6.64,11.43,9.54,20.72,14.55,45.44,19.18,71.49,13.43Z"/>
   </svg>
-);
+));
 
-const WordmarkSVG = ({ height = 20 }) => (
+const WordmarkSVG = memo(({ height = 20 }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 1650 380" style={{ height, width: "auto", fill: "var(--white)" }}>
     <text style={{ fontFamily: "Inter, sans-serif", fontSize: "306.1px", fontWeight: 600 }} transform="translate(221.25 264.4)"><tspan x="0" y="0">Almondy</tspan></text>
     <g>
@@ -33,7 +33,7 @@ const WordmarkSVG = ({ height = 20 }) => (
       <path d="M100.11,262.21c31.96-7.07,61.45-30.41,80.91-64.04,28.62-49.46,33.51-105.02,14.94-137.54-2.84,17.64-8.64,35.45-17.33,52.57-15.36,30.27-35.99,55.25-58.17,72.61-2.67,2.09-5.74-2.53-3.25-4.89,18.82-17.86,36.13-41,49.68-67.97,9.82-19.54,16.28-39.79,19.3-59.7-9.37,11.37-19.49,21.28-29.95,29.48-2.65,2.08-5.69-2.51-3.22-4.86,9.44-8.96,18.49-19.26,26.87-30.71-23.22,10.45-46.83,25.1-69.32,43.73-47.19,39.08-78.38,91.76-85.59,144.52-.27,1.95-.49,3.88-.69,5.8,3.19,3.16,6.67,6.07,10.45,8.72,18.94,13.3,41.55,17.54,65.37,12.28Z"/>
     </g>
   </svg>
-);
+));
 
 const SplashScreen = ({ onDone }) => {
   const [phase, setPhase] = useState("hidden");
@@ -101,7 +101,6 @@ const MobileWarningPopup = ({ onDismiss }) => {
 /* ─── GLOBAL STYLES ─── */
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&display=swap');
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --black: #080808; --surface: #111111; --surface2: #1a1a1a;
@@ -161,7 +160,7 @@ const NAV_LINKS = [
   { id: "testimonials", label: "Testimonials" },
 ];
 
-const Nav = ({ page, setPage }) => {
+const Nav = memo(({ page, setPage }) => {
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
   const [rcSession, setRcSession] = useState(null);
@@ -226,10 +225,10 @@ const Nav = ({ page, setPage }) => {
       )}
     </>
   );
-};
+});
 
 /* ─── FOOTER ─── */
-const Footer = ({ setPage }) => {
+const Footer = memo(({ setPage }) => {
   const isMobile = useIsMobile();
   return (
     <>
@@ -260,7 +259,7 @@ const Footer = ({ setPage }) => {
       </footer>
     </>
   );
-};
+});
 
 /* ─── LOCKED CARD ─── */
 const LockedCard = ({ style }) => {
@@ -2143,9 +2142,9 @@ const Divider = () => (
   <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.055)" }} />
 );
 
-const Spinner = ({ size=16, dark=false }) => (
+const Spinner = memo(({ size=16, dark=false }) => (
   <div style={{ width:size, height:size, border:`2px solid ${dark?"rgba(0,0,0,0.15)":"rgba(255,255,255,0.1)"}`, borderTop:`2px solid ${dark?"#000":"#fff"}`, borderRadius:"50%", animation:"rc-spin 0.7s linear infinite", flexShrink:0 }} />
-);
+));
 
 // ── Supabase helpers ─────────────────────────────────────────────
 async function getOrCreateRCProfile(userId, email, phone) {
@@ -3912,7 +3911,7 @@ export default function App() {
     }
   }, [user]);
 
-  const handleSetPage = (p) => {
+  const handleSetPage = useCallback((p) => {
     setPage(p);
     window.scrollTo(0,0);
     const appPages = ["auth","onboarding","dashboard","paywall"];
@@ -3920,7 +3919,7 @@ export default function App() {
       const slug = p==="home"?"/":"/"+p;
       window.history.pushState({ page:p },"",slug);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const path = window.location.pathname.replace("/","") || "home";
