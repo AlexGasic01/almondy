@@ -2208,7 +2208,15 @@ function isTrialExpired(profile) {
   return (new Date() - new Date(profile.trial_started_at)) / (1000*60*60*24) >= 7;
 }
 
-function getSendLimit(plan) { return PLAN_CONFIG[plan]?.sends ?? 20; }
+function isInStripeTrial(profile) {
+  if (!profile?.stripe_trial_ends_at) return false;
+  return new Date() < new Date(profile.stripe_trial_ends_at);
+}
+
+function getSendLimit(plan, profile) {
+  if (plan === "starter" && isInStripeTrial(profile)) return 25;
+  return PLAN_CONFIG[plan]?.sends ?? 20;
+}
 
 // ── Styles ────────────────────────────────────────────────────────
 const RCStyles = () => (
@@ -3003,12 +3011,11 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
       case 1: return (
         <div>
           <label style={{ fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 }}>Google Review URL</label>
-          <input style={RC_INPUT} className="rc-input" value={data.googleLink} onChange={e => set("googleLink", e.target.value)} placeholder="https://search.google.com/local/writereview?placeid=..." />
-          {data.googleLink && (
-            <div style={{ marginTop:10, background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.15)", borderRadius:9, padding:"10px 14px", fontSize:12, color:"#555", lineHeight:1.6 }}>
-              <span style={{ color:"#22c55e" }}>✓</span> Link auto-filled from your Google listing. Edit if needed.
-            </div>
-          )}
+          <div style={{ ...RC_INPUT, display:"flex", alignItems:"center", gap:8, cursor:"default", userSelect:"text", overflow:"hidden" }}>
+            <span style={{ flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"#bbb" }}>{data.googleLink || "—"}</span>
+            <span style={{ color:"#22c55e", fontSize:11, flexShrink:0 }}>✓</span>
+          </div>
+          <p style={{ fontSize:12, color:"#555", marginTop:8, lineHeight:1.6 }}>Auto-filled from your Google listing.</p>
         </div>
       );
       case 2: return (
@@ -3293,7 +3300,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const [contactMsg, setContactMsg] = useState("");
 
   const plan = profile?.plan ?? "trial";
-  const sendLimit = getSendLimit(plan);
+  const sendLimit = getSendLimit(plan, profile);
   const trialExpired = isTrialExpired(profile);
   const pct = Math.min(100, Math.round((sendsUsed / sendLimit) * 100));
   const atLimit = sendsUsed >= sendLimit;
@@ -3306,9 +3313,9 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
     : activeTemplate.preview(settingsData.bizName || "Your Business", shortLink(settingsData.googleLink) || "your-link");
 
   useEffect(() => {
-    const fn = plan === "trial" ? getRCTrialSendsTotal : getRCSendsThisMonth;
+    const fn = (plan === "trial" || isInStripeTrial(profile)) ? getRCTrialSendsTotal : getRCSendsThisMonth;
     fn(userId).then(setSendsUsed).catch(() => {});
-  }, [userId, sent, plan]);
+  }, [userId, sent, plan, profile]);
 
   const loadHistory = useCallback(async () => {
     setHistoryLoading(true);

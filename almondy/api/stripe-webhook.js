@@ -56,12 +56,19 @@ export default async function handler(req, res) {
 
       // Find user by userId in metadata, or fall back to email
       const metaUserId = sub.metadata?.userId;
+      const rcUpdate = { plan: rcPlan };
+      if (status === "trialing" && sub.trial_end) {
+        rcUpdate.stripe_trial_ends_at = new Date(sub.trial_end * 1000).toISOString();
+      } else if (status === "active") {
+        rcUpdate.stripe_trial_ends_at = null;
+      }
+
       if (metaUserId) {
-        await supabase.from("rc_profiles").update({ plan: rcPlan }).eq("id", metaUserId);
+        await supabase.from("rc_profiles").update(rcUpdate).eq("id", metaUserId);
       } else {
         const customer = await stripe.customers.retrieve(customerId);
         if (customer.email) {
-          await supabase.from("rc_profiles").update({ plan: rcPlan }).eq("email", customer.email);
+          await supabase.from("rc_profiles").update(rcUpdate).eq("email", customer.email);
         }
       }
     } else {
