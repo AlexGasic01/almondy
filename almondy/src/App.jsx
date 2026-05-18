@@ -107,7 +107,7 @@ const GlobalStyle = () => (
       --border: rgba(255,255,255,0.07); --border-bright: rgba(255,255,255,0.18);
       --white: #ffffff; --gray: #888; --muted: #444;
       --green: #22c55e; --green-dim: rgba(34,197,94,0.12);
-      --font: 'Inter', sans-serif; --mono: 'Inter', sans-serif;
+      --font: 'Satoshi', sans-serif; --mono: 'Satoshi', sans-serif;
     }
     html { scroll-behavior: smooth; scrollbar-gutter: stable; }
     body { background: var(--black); color: var(--white); font-family: var(--font); line-height: 1.6; overflow-x: hidden; }
