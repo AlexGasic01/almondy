@@ -3235,6 +3235,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
   const [settingsSaved, setSettingsSaved] = useState(false);
   const [cancelStep, setCancelStep] = useState(null); // null | "confirm" | "done"
   const [cancelLoading, setCancelLoading] = useState(false);
+  const [cancelErr, setCancelErr] = useState("");
   const [contactSent, setContactSent] = useState(false);
   const [contactMsg, setContactMsg] = useState("");
   const [customLockedMsg, setCustomLockedMsg] = useState(false);
@@ -3361,28 +3362,38 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
 
   const handleCancelPlan = async () => {
     setCancelLoading(true);
-    const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000));
+    setCancelErr("");
+    const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("Request timed out. Please try again.")), 12000));
     try {
       if (plan === "trial") {
-        await Promise.race([
+        const { error } = await Promise.race([
           supabase.from("rc_profiles").update({ plan: "expired" }).eq("id", userId),
           timeout,
         ]);
+        if (error) throw new Error(error.message);
       } else {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) throw new Error("Not signed in");
-        await Promise.race([
+        if (!session) throw new Error("Not signed in. Please refresh and try again.");
+        const res = await Promise.race([
           fetch("/api/cancel-rc-subscription", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
-          }).then(res => { if (!res.ok) throw new Error("Cancel failed"); }),
+          }),
           timeout,
         ]);
+        if (!res.ok) {
+          const json = await res.json().catch(() => ({}));
+          throw new Error(json.error || `Cancel failed (${res.status})`);
+        }
       }
       setProfile(p => ({ ...p, plan: "expired" }));
       setCancelStep("done");
-    } catch (e) { console.error(e); }
-    finally { setCancelLoading(false); }
+    } catch (e) {
+      console.error("Cancel plan error:", e);
+      setCancelErr(e.message || "Something went wrong. Please try again.");
+    } finally {
+      setCancelLoading(false);
+    }
   };
 
   const handleContactSupport = async () => {
@@ -3668,8 +3679,9 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                       <div style={{ fontSize: 15, fontWeight: 700, color: "#f87171", marginBottom: 8 }}>{plan === "trial" ? "Cancel your trial?" : "Cancel your plan?"}</div>
                       <p style={{ fontSize: 13, color: "#666", lineHeight: 1.7, margin: 0 }}>{plan === "trial" ? "Cancelling your free trial will end it immediately and move your account to expired status." : <>You're on the <strong style={{ color: "#aaa" }}>{planConfig.label}</strong> plan. Cancelling will stop your sends immediately and your account will move to expired status.</>}</p>
                     </div>
+                    {cancelErr && <p style={{ fontSize: 12, color: "#f87171", margin: 0, textAlign: "center" }}>{cancelErr}</p>}
                     <div style={{ display: "flex", gap: 10 }}>
-                      <button onClick={() => setCancelStep(null)} style={{ flex: 1, padding: "11px 16px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Keep my plan</button>
+                      <button onClick={() => { setCancelStep(null); setCancelErr(""); }} style={{ flex: 1, padding: "11px 16px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Keep my plan</button>
                       <button onClick={handleCancelPlan} disabled={cancelLoading} style={{ flex: 1, padding: "11px 16px", background: "rgba(239,68,68,0.1)", color: "#f87171", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: cancelLoading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
                         {cancelLoading ? <><Spinner size={13} />Cancelling…</> : "Confirm cancel"}
                       </button>
@@ -3683,7 +3695,7 @@ const RCDashboardApp = ({ isMobile, profile: initialProfile, userId, onSignOut }
                     <div style={{ fontSize: 32, marginBottom: 12 }}>👋</div>
                     <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 8 }}>Plan cancelled</div>
                     <p style={{ fontSize: 13, color: "#555", lineHeight: 1.7, marginBottom: 18 }}>Your account has been downgraded. You can re-subscribe any time.</p>
-                    <button onClick={() => { setTab("send"); setCancelStep(null); }} style={{ padding: "10px 20px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Done</button>
+                    <button onClick={() => window.location.reload()} style={{ padding: "10px 20px", background: "#fff", color: "#000", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Done</button>
                   </div>
                 )}
               </div>
