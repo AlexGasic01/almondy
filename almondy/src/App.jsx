@@ -2514,70 +2514,37 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
 };
 
 // ── Auth Screen ───────────────────────────────────────────────────
-const COUNTRY_CODES = [
-  { code: "+61", label: "🇦🇺  +61" },
-  { code: "+64", label: "🇳🇿  +64" },
-  { code: "+1",  label: "🇺🇸  +1"  },
-  { code: "+44", label: "🇬🇧  +44" },
-  { code: "+65", label: "🇸🇬  +65" },
-];
-
-function normalizeToE164(raw, countryCode) {
-  const digits = raw.replace(/\D/g, "");
-  const prefix = countryCode.replace("+", "");
-  if (digits.startsWith(prefix)) return `+${digits}`;
-  if (digits.startsWith("0")) return `${countryCode}${digits.slice(1)}`;
-  return `${countryCode}${digits}`;
-}
-
-function isValidPhone(raw, countryCode) {
-  const n = normalizeToE164(raw, countryCode);
-  const digits = n.replace(/\D/g, "");
-  return /^\+[1-9]/.test(n) && digits.length >= 9 && digits.length <= 15;
-}
-
 const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
-  const [step, setStep]           = useState("phone"); // "phone" | "otp"
-  const [countryCode, setCountryCode] = useState("+61");
-  const [rawPhone, setRawPhone]   = useState("");
-  const [phoneErr, setPhoneErr]   = useState("");
-  const [sending, setSending]     = useState(false);
-  const [verifiedPhone, setVerifiedPhone] = useState("");
-  const [digits, setDigits]       = useState("");
+  const [step, setStep]     = useState("email"); // "email" | "otp"
+  const [email, setEmail]   = useState("");
+  const [emailErr, setEmailErr] = useState("");
+  const [sending, setSending]   = useState(false);
+  const [digits, setDigits]     = useState("");
   const [verifying, setVerifying] = useState(false);
-  const [otpErr, setOtpErr]       = useState("");
-  const [locked, setLocked]       = useState(false);
+  const [otpErr, setOtpErr]     = useState("");
   const [resendTimer, setResendTimer] = useState(30);
-  const [resending, setResending] = useState(false);
+  const [resending, setResending]     = useState(false);
 
-  // Countdown timer for resend button
   useEffect(() => {
     if (step !== "otp" || resendTimer <= 0) return;
     const t = setTimeout(() => setResendTimer(n => n - 1), 1000);
     return () => clearTimeout(t);
   }, [step, resendTimer]);
 
-  const handleSendOTP = async (phoneOverride) => {
-    const phone = phoneOverride ?? normalizeToE164(rawPhone, countryCode);
-    if (!isValidPhone(rawPhone, countryCode) && !phoneOverride) {
-      setPhoneErr("Please enter a valid mobile number.");
+  const handleSendOTP = async () => {
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+      setEmailErr("Please enter a valid email address.");
       return;
     }
-    setSending(true); setPhoneErr(""); setOtpErr(""); setLocked(false);
+    setSending(true); setEmailErr(""); setOtpErr("");
     try {
-      const res = await fetch("/api/send-phone-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Failed to send code.");
-      setVerifiedPhone(phone);
+      const { error } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: true } });
+      if (error) throw error;
       setDigits("");
       setResendTimer(30);
       setStep("otp");
     } catch (e) {
-      setPhoneErr(e.message || "Something went wrong. Please try again.");
+      setEmailErr(e.message || "Failed to send code. Please try again.");
     } finally {
       setSending(false);
     }
@@ -2588,27 +2555,11 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
     if (code.length !== 6) return;
     setVerifying(true); setOtpErr("");
     try {
-      const res = await fetch("/api/verify-phone-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: verifiedPhone, code }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        if (json.code === "too_many_attempts") setLocked(true);
-        setOtpErr(json.error || "Incorrect code.");
-        setVerifying(false);
-        return;
-      }
-      // Establish Supabase session — onAuthStateChange in ReviewChaserPage takes it from here
-      const { error: verifyErr } = await supabase.auth.verifyOtp({
-        token_hash: json.tokenHash,
-        type: "magiclink",
-      });
-      if (verifyErr) throw verifyErr;
-      // View will be changed by onAuthStateChange; no further action needed here
+      const { error } = await supabase.auth.verifyOtp({ email: email.trim(), token: code, type: "email" });
+      if (error) throw error;
+      // onAuthStateChange in ReviewChaserPage takes it from here
     } catch (e) {
-      setOtpErr("Verification failed. Please try again.");
+      setOtpErr("Incorrect code. Please try again.");
       setVerifying(false);
     }
   };
@@ -2616,7 +2567,10 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
   const handleResend = async () => {
     if (resendTimer > 0 || resending) return;
     setResending(true);
-    await handleSendOTP(verifiedPhone);
+    try {
+      await supabase.auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: true } });
+      setResendTimer(30);
+    } catch {}
     setResending(false);
   };
 
@@ -2624,42 +2578,33 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
     <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
   );
 
-  if (step === "phone") return (
+  if (step === "email") return (
     <div style={{ minHeight:"100vh", background:"#080808", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24, position:"relative", overflow:"hidden" }}>
       {BG}
       <button onClick={onBack} style={{ position:"absolute", top:24, left:20, background:"none", border:"none", color:"#555", fontSize:13, fontWeight:600, cursor:"pointer" }}>← Back</button>
       <div style={{ position:"relative", zIndex:1, width:"100%", maxWidth:400, animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ textAlign:"center", marginBottom:32 }}>
-          <div style={{ width:52, height:52, background:"#111", border:"1px solid #2a2a2a", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>📱</div>
+          <div style={{ width:52, height:52, background:"#111", border:"1px solid #2a2a2a", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>✉️</div>
           <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Sign in to ReviewChaser</h1>
-          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>Enter your mobile number, we'll text you a code.</p>
+          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>Enter your email — we'll send you a 6-digit code.</p>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <div style={{ display:"flex", gap:8 }}>
-            <select
-              value={countryCode}
-              onChange={e => setCountryCode(e.target.value)}
-              style={{ background:"#0f0f0f", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, color:"#fff", fontSize:14, padding:"13px 10px", fontFamily:"var(--font)", flexShrink:0, outline:"none" }}
-            >
-              {COUNTRY_CODES.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
-            </select>
-            <input
-              type="tel"
-              value={rawPhone}
-              onChange={e => { setRawPhone(e.target.value); setPhoneErr(""); }}
-              onKeyDown={e => e.key === "Enter" && handleSendOTP()}
-              placeholder="0412 345 678"
-              autoFocus
-              className="rc-input"
-              style={{ ...RC_INPUT, padding:"13px 16px", flex:1 }}
-            />
-          </div>
-          {phoneErr && <p style={{ fontSize:12, color:"#f87171", margin:0 }}>{phoneErr}</p>}
+          <input
+            type="email"
+            value={email}
+            onChange={e => { setEmail(e.target.value); setEmailErr(""); }}
+            onKeyDown={e => e.key === "Enter" && handleSendOTP()}
+            placeholder="you@example.com"
+            autoFocus
+            className="rc-input"
+            style={{ ...RC_INPUT, padding:"13px 16px" }}
+          />
+          {emailErr && <p style={{ fontSize:12, color:"#f87171", margin:0 }}>{emailErr}</p>}
           <button
-            onClick={() => handleSendOTP()}
-            disabled={!rawPhone.trim() || sending}
+            onClick={handleSendOTP}
+            disabled={!email.trim() || sending}
             className="rc-btn-primary"
-            style={{ width:"100%", padding:14, background:sending?"rgba(255,255,255,0.5)":"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:!rawPhone.trim()?0.4:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, cursor:sending||!rawPhone.trim()?"default":"pointer" }}
+            style={{ width:"100%", padding:14, background:sending?"rgba(255,255,255,0.5)":"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:!email.trim()?0.4:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, cursor:sending||!email.trim()?"default":"pointer" }}
           >
             {sending ? <><Spinner size={14} dark />Sending code…</> : "Send code →"}
           </button>
@@ -2672,12 +2617,12 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
   return (
     <div style={{ minHeight:"100vh", background:"#080808", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24, position:"relative", overflow:"hidden" }}>
       {BG}
-      <button onClick={() => setStep("phone")} style={{ position:"absolute", top:24, left:20, background:"none", border:"none", color:"#555", fontSize:13, fontWeight:600, cursor:"pointer" }}>← Back</button>
+      <button onClick={() => setStep("email")} style={{ position:"absolute", top:24, left:20, background:"none", border:"none", color:"#555", fontSize:13, fontWeight:600, cursor:"pointer" }}>← Back</button>
       <div style={{ position:"relative", zIndex:1, width:"100%", maxWidth:400, animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ textAlign:"center", marginBottom:32 }}>
-          <div style={{ width:52, height:52, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>💬</div>
-          <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Enter your code</h1>
-          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>We texted a 6-digit code to<br /><strong style={{ color:"#999" }}>{verifiedPhone}</strong></p>
+          <div style={{ width:52, height:52, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>✉️</div>
+          <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Check your email</h1>
+          <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>We sent a 6-digit code to<br /><strong style={{ color:"#999" }}>{email}</strong></p>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
           <input
@@ -2686,7 +2631,6 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
             pattern="[0-9]*"
             value={digits}
             onChange={e => {
-              if (locked) return;
               const val = e.target.value.replace(/\D/g, "").slice(0, 6);
               setDigits(val);
               setOtpErr("");
@@ -2695,27 +2639,21 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
             autoFocus
             maxLength={6}
             placeholder="000000"
-            disabled={locked || verifying}
+            disabled={verifying}
             className="rc-input"
             style={{ ...RC_INPUT, fontSize:30, letterSpacing:"0.5em", textAlign:"center", padding:"16px 12px", fontFamily:"monospace" }}
           />
           {otpErr && <p style={{ fontSize:12, color:"#f87171", margin:0, textAlign:"center" }}>{otpErr}</p>}
-          {!locked && (
-            <button
-              onClick={() => handleVerifyOTP()}
-              disabled={digits.length !== 6 || verifying}
-              className="rc-btn-primary"
-              style={{ width:"100%", padding:14, background:verifying?"rgba(255,255,255,0.5)":"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:digits.length!==6?0.4:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, cursor:digits.length!==6||verifying?"default":"pointer" }}
-            >
-              {verifying ? <><Spinner size={14} dark />Verifying…</> : "Verify code →"}
-            </button>
-          )}
+          <button
+            onClick={() => handleVerifyOTP()}
+            disabled={digits.length !== 6 || verifying}
+            className="rc-btn-primary"
+            style={{ width:"100%", padding:14, background:verifying?"rgba(255,255,255,0.5)":"#fff", color:"#000", border:"none", borderRadius:10, fontSize:15, fontWeight:700, opacity:digits.length!==6?0.4:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, cursor:digits.length!==6||verifying?"default":"pointer" }}
+          >
+            {verifying ? <><Spinner size={14} dark />Verifying…</> : "Verify code →"}
+          </button>
           <div style={{ textAlign:"center", marginTop:4 }}>
-            {locked ? (
-              <button onClick={handleResend} style={{ fontSize:13, color:"#22c55e", background:"none", border:"none", cursor:"pointer", fontWeight:600 }}>
-                Request a new code
-              </button>
-            ) : resendTimer > 0 ? (
+            {resendTimer > 0 ? (
               <span style={{ fontSize:12, color:"#555" }}>Resend code in {resendTimer}s</span>
             ) : (
               <button onClick={handleResend} disabled={resending} style={{ fontSize:13, color:"#22c55e", background:"none", border:"none", cursor:resending?"default":"pointer", fontWeight:600 }}>
