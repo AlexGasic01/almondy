@@ -34,16 +34,37 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "No active subscription to cancel" });
     }
 
-    // Find and cancel all active RC subscriptions for this email
-    const customers = await stripe.customers.list({ email: profile.email, limit: 10 });
-    for (const customer of customers.data) {
-      for (const status of ["active", "trialing"]) {
-        const subs = await stripe.subscriptions.list({ customer: customer.id, status, limit: 10 });
-        for (const sub of subs.data) {
-          const isRC = sub.items.data.some(item => RC_PRICE_IDS.has(item.price.id));
-          if (isRC) await stripe.subscriptions.cancel(sub.id);
+    // Find all RC subscriptions — search by userId in metadata first, fall back to email
+    const subsToCancel = [];
+
+    // Method 1: search subscriptions by userId metadata directly
+    for (const status of ["active", "trialing"]) {
+      const subs = await stripe.subscriptions.search({
+        query: `status:"${status}" AND metadata["userId"]:"${user.id}"`,
+        limit: 10,
+      }).catch(() => ({ data: [] }));
+      for (const sub of subs.data) {
+        const isRC = sub.items.data.some(item => RC_PRICE_IDS.has(item.price.id));
+        if (isRC) subsToCancel.push(sub.id);
+      }
+    }
+
+    // Method 2: fall back to email lookup if none found via metadata
+    if (subsToCancel.length === 0) {
+      const customers = await stripe.customers.list({ email: profile.email, limit: 10 });
+      for (const customer of customers.data) {
+        for (const status of ["active", "trialing"]) {
+          const subs = await stripe.subscriptions.list({ customer: customer.id, status, limit: 10 });
+          for (const sub of subs.data) {
+            const isRC = sub.items.data.some(item => RC_PRICE_IDS.has(item.price.id));
+            if (isRC) subsToCancel.push(sub.id);
+          }
         }
       }
+    }
+
+    for (const subId of subsToCancel) {
+      await stripe.subscriptions.cancel(subId);
     }
 
     // Mark expired in Supabase (webhook will also do this, but cover immediate UI)
