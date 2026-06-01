@@ -4134,7 +4134,7 @@ const LanderPage = () => {
 
   useEffect(() => {
     /* Cal.com inline embed — update CAL_LINK to your Cal.com username/event-type */
-    const CAL_LINK = "alexgasic/strategy-call";
+    const CAL_LINK = "alexg009/30min-discovery";
     const script = document.createElement("script");
     script.src = "https://app.cal.com/embed/embed.js";
     script.async = true;
@@ -4158,7 +4158,7 @@ const LanderPage = () => {
           Thanks! The system determined we don't work with anyone in your area!
         </h1>
         <p style={{ fontSize:isMobile?14:16, fontWeight:600, letterSpacing:"-0.4px", color:"var(--green)" }}>
-          Schedule Your Free Strategy Call below ↓
+          Schedule Your Free Discovery Call below ↓
         </p>
       </div>
 
