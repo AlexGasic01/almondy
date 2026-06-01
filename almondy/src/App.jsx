@@ -157,6 +157,8 @@ const NAV_LINKS = [
   { id: "systems",      label: "Systems" },
   { id: "webdev",       label: "Web Development" },
   { id: "reviewchaser", label: "ReviewChaser" },
+  { id: "lead-heater",  label: "Lead Heater" },
+  { id: "call-catch",   label: "CallCatch" },
   { id: "testimonials", label: "Testimonials" },
 ];
 
@@ -243,7 +245,9 @@ const Footer = memo(({ setPage }) => {
             ["Privacy", null],
             ["Terms", null],
             ["Systems", "systems"],
-            ["ReviewChaser", "reviewchaser"], // ← ADDED
+            ["ReviewChaser", "reviewchaser"],
+            ["Lead Heater", "lead-heater"],
+            ["CallCatch", "call-catch"],
             ["Contact", "contact"],
           ].map(([label, pageId]) => (
             <li key={label}>
@@ -3848,6 +3852,217 @@ function ReviewChaserPage({ setPage, user, setUser }) {
 }
 
 /* ════════════════════════════════════════════
+   LEAD HEATER PAGE
+════════════════════════════════════════════ */
+const LeadHeaterPage = ({ setPage }) => {
+  const isMobile = useIsMobile();
+  const steps = [
+    {
+      num: "01",
+      title: "Customer fills your form",
+      body: "A lead submits your quote or booking form — from a Google Ad, Meta Ad, or your website.",
+    },
+    {
+      num: "02",
+      title: "AI texts them within 60 seconds",
+      body: "Before they've even opened another tab, your AI agent is already having a conversation — qualifying service, location, vehicle, and preferred date.",
+    },
+    {
+      num: "03",
+      title: "Booked and summarised",
+      body: "The appointment is locked in automatically. You get a full summary notification with everything you need before you even show up.",
+    },
+  ];
+  return (
+    <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
+      {/* Hero */}
+      <div style={{ position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
+        <div style={{ position:"relative", zIndex:1, maxWidth:900, margin:"0 auto", padding:isMobile?"64px 20px 48px":"96px 48px 72px", textAlign:"center", animation:"fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"var(--green-dim)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"var(--green)", marginBottom:24, fontFamily:"var(--mono)" }}>
+            <span className="badge-dot" /> AI-Powered
+          </div>
+          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)", fontWeight:800, letterSpacing:"-3px", lineHeight:1.02, color:"var(--white)", marginBottom:18 }}>Never let a warm<br />lead go cold.</h1>
+          <p style={{ fontSize:isMobile?14.5:16, color:"#858585", lineHeight:1.8, maxWidth:540, margin:"0 auto 32px" }}>You're running ads. Leads are coming in. But if you don't reply fast, they book someone else. <strong style={{ color:"#888" }}>Lead Heater responds in under 60 seconds — qualifies, books, and notifies you.</strong></p>
+          <button onClick={() => setPage("contact")} style={{ background:"var(--white)", color:"var(--black)", padding:"13px 24px", fontSize:14, fontWeight:700, borderRadius:8, border:"none", cursor:"pointer", fontFamily:"var(--font)" }}>Book a Free Strategy Call →</button>
+        </div>
+      </div>
+
+      <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.055)" }} />
+
+      {/* How it works */}
+      <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px 120px", width:"100%" }}>
+        <div style={{ textAlign:"center", marginBottom:isMobile?40:72 }}>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)" }}>How It Works</p>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)", fontWeight:800, letterSpacing:"-2px", lineHeight:1.05, color:"var(--white)" }}>From form fill to booked job.</h2>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:isMobile?16:20 }}>
+          {steps.map((s) => (
+            <div key={s.num} style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:isMobile?24:28 }}>
+              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--green)", fontFamily:"var(--mono)", marginBottom:16 }}>{s.num}</div>
+              <h3 style={{ fontSize:isMobile?17:19, fontWeight:700, letterSpacing:"-0.8px", color:"var(--white)", marginBottom:10, lineHeight:1.2 }}>{s.title}</h3>
+              <p style={{ fontSize:13.5, color:"#858585", lineHeight:1.75 }}>{s.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Who it's for */}
+      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", background:"#0a0a0a", padding:isMobile?"48px 20px":"72px 48px" }}>
+        <div style={{ maxWidth:900, margin:"0 auto" }}>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)", textAlign:"center" }}>Who It's For</p>
+          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)", fontWeight:800, letterSpacing:"-2px", color:"var(--white)", marginBottom:isMobile?32:48, textAlign:"center" }}>Built for detailers running ads.</h2>
+          <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)", gap:isMobile?12:16 }}>
+            {[
+              ["Running Google or Meta ads", "You're paying for every click. Don't let slow replies throw that money away."],
+              ["Using a quote or booking form", "Any lead source with a form submission gets an instant AI follow-up."],
+              ["Missing out on jobs to faster competitors", "Speed is your biggest conversion lever. Lead Heater makes you the fastest."],
+              ["Tired of chasing unqualified leads", "The AI pre-qualifies service, location, and timing before you even know the lead exists."],
+            ].map(([title, desc]) => (
+              <div key={title} style={{ display:"flex", gap:14, padding:isMobile?"16px 0":"20px 0", borderBottom:"1px solid rgba(255,255,255,0.055)" }}>
+                <span style={{ color:"var(--green)", fontSize:16, flexShrink:0, marginTop:2 }}>✓</span>
+                <div>
+                  <div style={{ fontSize:14, fontWeight:700, color:"var(--white)", marginBottom:4 }}>{title}</div>
+                  <div style={{ fontSize:13, color:"#858585", lineHeight:1.65 }}>{desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom CTA */}
+      <div style={{ maxWidth:900, margin:"0 auto", padding:isMobile?"60px 20px":"96px 48px", textAlign:"center" }}>
+        <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,4vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"var(--white)", marginBottom:16, lineHeight:1.05 }}>Stop losing leads to slow response times.</h2>
+        <p style={{ fontSize:isMobile?14:15, color:"#555", marginBottom:28, maxWidth:480, margin:"0 auto 28px" }}>Book a free strategy call and we'll show you exactly how Lead Heater would work for your business.</p>
+        <button onClick={() => setPage("contact")} style={{ background:"var(--white)", color:"var(--black)", padding:"14px 28px", fontSize:14, fontWeight:700, borderRadius:8, border:"none", cursor:"pointer", fontFamily:"var(--font)" }}>Book a Free Strategy Call →</button>
+      </div>
+
+      <Footer setPage={setPage} />
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════════
+   CALL CATCH PAGE
+════════════════════════════════════════════ */
+const CallCatchPage = ({ setPage }) => {
+  const isMobile = useIsMobile();
+  const steps = [
+    {
+      num: "01",
+      title: "You miss a call mid-job",
+      body: "You're under a bonnet or mid-detail. Your phone rings. You can't answer. The caller hangs up — and normally that's the end of it.",
+    },
+    {
+      num: "02",
+      title: "CallCatch texts them within 30 seconds",
+      body: "Before they've called the next detailer, your AI sends a friendly SMS — acknowledging the missed call and starting a conversation.",
+    },
+    {
+      num: "03",
+      title: "Qualified, booked, and you're notified",
+      body: "The AI handles the back-and-forth or sends a booking link depending on your mode. You finish the job, then check the notification.",
+    },
+  ];
+  const modes = [
+    {
+      label: "Mode 1 — AI Conversation",
+      desc: "The AI texts back, qualifies the lead (service, location, date), books the appointment in your calendar, and sends you a full summary. Fully hands-free.",
+      icon: "🤖",
+    },
+    {
+      label: "Mode 2 — Simple Message",
+      desc: "A warm, pre-written SMS goes out instantly with your booking link attached. The customer books themselves. Simple, fast, no AI required.",
+      icon: "💬",
+    },
+  ];
+  return (
+    <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
+      {/* Hero */}
+      <div style={{ position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
+        <div style={{ position:"relative", zIndex:1, maxWidth:900, margin:"0 auto", padding:isMobile?"64px 20px 48px":"96px 48px 72px", textAlign:"center", animation:"fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"var(--green-dim)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"var(--green)", marginBottom:24, fontFamily:"var(--mono)" }}>
+            <span className="badge-dot" /> AI-Powered
+          </div>
+          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)", fontWeight:800, letterSpacing:"-3px", lineHeight:1.02, color:"var(--white)", marginBottom:18 }}>Every missed call is a<br />booking waiting to happen.</h1>
+          <p style={{ fontSize:isMobile?14.5:16, color:"#858585", lineHeight:1.8, maxWidth:540, margin:"0 auto 32px" }}>You can't answer every call when you're hands-on. <strong style={{ color:"#888" }}>CallCatch texts every missed caller within 30 seconds — so you never lose a job to voicemail again.</strong></p>
+          <button onClick={() => setPage("contact")} style={{ background:"var(--white)", color:"var(--black)", padding:"13px 24px", fontSize:14, fontWeight:700, borderRadius:8, border:"none", cursor:"pointer", fontFamily:"var(--font)" }}>Book a Free Strategy Call →</button>
+        </div>
+      </div>
+
+      <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.055)" }} />
+
+      {/* How it works */}
+      <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px 80px", width:"100%" }}>
+        <div style={{ textAlign:"center", marginBottom:isMobile?40:72 }}>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)" }}>How It Works</p>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)", fontWeight:800, letterSpacing:"-2px", lineHeight:1.05, color:"var(--white)" }}>Missed call. Booked job.</h2>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:isMobile?16:20, marginBottom:isMobile?40:60 }}>
+          {steps.map((s) => (
+            <div key={s.num} style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:isMobile?24:28 }}>
+              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--green)", fontFamily:"var(--mono)", marginBottom:16 }}>{s.num}</div>
+              <h3 style={{ fontSize:isMobile?17:19, fontWeight:700, letterSpacing:"-0.8px", color:"var(--white)", marginBottom:10, lineHeight:1.2 }}>{s.title}</h3>
+              <p style={{ fontSize:13.5, color:"#858585", lineHeight:1.75 }}>{s.body}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Two modes */}
+        <div style={{ textAlign:"center", marginBottom:isMobile?28:40 }}>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)" }}>Two Modes</p>
+          <h3 style={{ fontSize:isMobile?"clamp(22px,6vw,32px)":"clamp(24px,3vw,36px)", fontWeight:800, letterSpacing:"-1.5px", color:"var(--white)" }}>Choose how hands-free you want to be.</h3>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)", gap:isMobile?16:20 }}>
+          {modes.map((m) => (
+            <div key={m.label} style={{ background:"#0c0c0c", border:"1px solid rgba(34,197,94,0.18)", borderRadius:14, padding:isMobile?24:32 }}>
+              <div style={{ fontSize:28, marginBottom:14 }}>{m.icon}</div>
+              <div style={{ fontSize:13, fontWeight:700, letterSpacing:"1px", textTransform:"uppercase", color:"var(--green)", fontFamily:"var(--mono)", marginBottom:10 }}>{m.label}</div>
+              <p style={{ fontSize:14, color:"#858585", lineHeight:1.75 }}>{m.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Who it's for */}
+      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", background:"#0a0a0a", padding:isMobile?"48px 20px":"72px 48px" }}>
+        <div style={{ maxWidth:900, margin:"0 auto" }}>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)", textAlign:"center" }}>Who It's For</p>
+          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)", fontWeight:800, letterSpacing:"-2px", color:"var(--white)", marginBottom:isMobile?32:48, textAlign:"center" }}>For detailers who are always hands-on.</h2>
+          <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)", gap:isMobile?12:16 }}>
+            {[
+              ["Solo operators mid-job", "One person, two hands busy. You can't be on the phone and under a car at the same time."],
+              ["Anyone who's lost a job to voicemail", "If a customer hangs up and books someone else, CallCatch is the fix."],
+              ["Detailers with a booking link or calendar", "CallCatch works with your existing booking tool — no new software required."],
+              ["Businesses wanting a hands-free follow-up system", "Set it once. Every missed call gets followed up, automatically, forever."],
+            ].map(([title, desc]) => (
+              <div key={title} style={{ display:"flex", gap:14, padding:isMobile?"16px 0":"20px 0", borderBottom:"1px solid rgba(255,255,255,0.055)" }}>
+                <span style={{ color:"var(--green)", fontSize:16, flexShrink:0, marginTop:2 }}>✓</span>
+                <div>
+                  <div style={{ fontSize:14, fontWeight:700, color:"var(--white)", marginBottom:4 }}>{title}</div>
+                  <div style={{ fontSize:13, color:"#858585", lineHeight:1.65 }}>{desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom CTA */}
+      <div style={{ maxWidth:900, margin:"0 auto", padding:isMobile?"60px 20px":"96px 48px", textAlign:"center" }}>
+        <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,4vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"var(--white)", marginBottom:16, lineHeight:1.05 }}>Stop letting missed calls become missed jobs.</h2>
+        <p style={{ fontSize:isMobile?14:15, color:"#555", marginBottom:28, maxWidth:480, margin:"0 auto 28px" }}>Book a free strategy call and we'll set up CallCatch for your business.</p>
+        <button onClick={() => setPage("contact")} style={{ background:"var(--white)", color:"var(--black)", padding:"14px 28px", fontSize:14, fontWeight:700, borderRadius:8, border:"none", cursor:"pointer", fontFamily:"var(--font)" }}>Book a Free Strategy Call →</button>
+      </div>
+
+      <Footer setPage={setPage} />
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════════
    ROOT APP
 ════════════════════════════════════════════ */
 export default function App() {
@@ -3874,7 +4089,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact"];
+    const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact","lead-heater","call-catch"];
 
     const handleSession = async (session, redirect) => {
       try {
@@ -3938,7 +4153,7 @@ export default function App() {
     const path = window.location.pathname.replace("/","") || "home";
     const params = new URLSearchParams(window.location.search);
     const pageParam = params.get("page");
-    const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact"];
+    const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact","lead-heater","call-catch"];
     if (params.get("rc_session") === "success") {
       sessionStorage.setItem("rc_post_checkout", "1");
       setPage("reviewchaser");
@@ -3976,7 +4191,7 @@ export default function App() {
       {!isAppPage && <Nav page={page} setPage={handleSetPage} />}
 
       {/* Single back button rendered outside all page containers so fixed positioning is always viewport-relative */}
-      {["systems","webdev","paychaser","pricing","contact","testimonials"].includes(page) && (
+      {["systems","webdev","paychaser","pricing","contact","testimonials","lead-heater","call-catch"].includes(page) && (
         <button onClick={() => handleSetPage("home")} style={{ position:"fixed",top:74,left:20,zIndex:201,display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer" }}>← Back</button>
       )}
 
@@ -3989,6 +4204,8 @@ export default function App() {
       {page==="pricing"           && <PricingPage           setPage={handleSetPage} />}
       {page==="contact"           && <ContactPage           setPage={handleSetPage} />}
       {page==="reviewchaser"      && <ReviewChaserPage      setPage={handleSetPage} user={user} setUser={setUser} />}
+      {page==="lead-heater"       && <LeadHeaterPage        setPage={handleSetPage} />}
+      {page==="call-catch"        && <CallCatchPage         setPage={handleSetPage} />}
 
       {page==="auth"              && <AuthPage              setPage={handleSetPage} setUser={setUser} />}
       {page==="onboarding"        && <OnboardingPage        setPage={handleSetPage} user={user} setUser={setUser} />}
