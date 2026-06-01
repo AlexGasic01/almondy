@@ -4127,7 +4127,7 @@ const CallCatchPage = ({ setPage }) => {
 };
 
 /* ════════════════════════════════════════════
-   PAGE: LANDER — BookingWidget removed, using Calendly iframe
+   BOOKING WIDGET  (used by LanderPage)
 ════════════════════════════════════════════ */
 const TIME_SLOTS = [
   "9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM",
@@ -4135,8 +4135,27 @@ const TIME_SLOTS = [
   "3:00 PM","3:30 PM","4:00 PM","4:30 PM",
 ];
 
+const COUNTRY_CODES = [
+  { code:"+61", flag:"🇦🇺", label:"AU" },
+  { code:"+64", flag:"🇳🇿", label:"NZ" },
+  { code:"+1",  flag:"🇺🇸", label:"US/CA" },
+  { code:"+44", flag:"🇬🇧", label:"UK" },
+  { code:"+353",flag:"🇮🇪", label:"IE" },
+  { code:"+27", flag:"🇿🇦", label:"ZA" },
+];
+
+/* Deterministic fake-booking: ~40% of slots appear taken per day */
+const isSlotBooked = (date, idx) => {
+  const seed = date.getFullYear() * 1000000 + (date.getMonth()+1) * 10000 + date.getDate() * 100 + idx;
+  const x = Math.sin(seed * 9301 + 49297) * 233280;
+  return (x - Math.floor(x)) < 0.40;
+};
+
 const BookingWidget = () => {
   const isMobile = useIsMobile();
+
+  const timezone   = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
+  const isAU       = useMemo(() => timezone.toLowerCase().includes("australia"), [timezone]);
 
   const todayBase = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d; }, []);
 
@@ -4150,10 +4169,10 @@ const BookingWidget = () => {
   const [selectedDate, setSelectedDate]  = useState(firstAvailable);
   const [selectedTime, setSelectedTime]  = useState(null);
   const [step, setStep]                  = useState(1);
+  const [countryCode, setCountryCode]    = useState(() => isAU ? "+61" : "+1");
   const [form, setForm]                  = useState({ name:"", email:"", phone:"" });
   const [submitting, setSubmitting]      = useState(false);
 
-  const timezone   = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const monthLabel = currentMonth.toLocaleDateString("en-US", { month:"long", year:"numeric" });
 
   const calDays = useMemo(() => {
@@ -4173,8 +4192,12 @@ const BookingWidget = () => {
     return d.getDay() !== 0 && d.getDay() !== 6;
   };
 
-  const fmtShort    = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric", year:"numeric" }) : "";
-  const fmtSlotHdr  = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric" }) : "";
+  const slots = useMemo(() =>
+    selectedDate ? TIME_SLOTS.map((t, i) => ({ time:t, booked: isSlotBooked(selectedDate, i) })) : [],
+  [selectedDate]);
+
+  const fmtShort   = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric", year:"numeric" }) : "";
+  const fmtSlotHdr = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric" }) : "";
 
   const handleBook = async () => {
     if (!form.name || !form.email) return;
@@ -4189,7 +4212,8 @@ const BookingWidget = () => {
           "⏰ Time":    selectedTime,
           "👤 Name":    form.name,
           "📧 Email":   form.email,
-          "📱 Phone":   form.phone || "—",
+          "📱 Phone":   form.phone ? `${countryCode} ${form.phone}` : "—",
+          "🌐 Timezone": timezone,
         }),
       });
     } catch(_) {}
@@ -4200,12 +4224,10 @@ const BookingWidget = () => {
   const INP = { width:"100%", padding:"11px 14px", background:"var(--input-bg)", border:"1px solid var(--input-border)", borderRadius:8, fontSize:14, color:"var(--input-text)", outline:"none", fontFamily:"var(--font)", boxSizing:"border-box" };
   const LBL = { fontSize:12, fontWeight:600, color:"var(--gray)", display:"block", marginBottom:6 };
 
-  /* ── Info panel (left column, all steps) ── */
+  /* ── Info panel ── */
   const InfoPanel = () => (
-    <div style={{ width:isMobile?"100%":270, minWidth:isMobile?undefined:220, padding:isMobile?"24px 24px 20px":"36px 28px", borderRight:isMobile?"none":"1px solid var(--border)", borderBottom:isMobile?"1px solid var(--border)":"none", background:"var(--surface)" }}>
-      <div style={{ fontSize:19, fontWeight:700, color:"var(--white)", marginBottom:14 }}>
-        📞 Discovery Call
-      </div>
+    <div style={{ width:isMobile?"100%":270, minWidth:isMobile?undefined:230, padding:isMobile?"24px 24px 20px":"36px 28px", borderRight:isMobile?"none":"1px solid var(--border)", borderBottom:isMobile?"1px solid var(--border)":"none", background:"var(--surface)" }}>
+      <div style={{ fontSize:19, fontWeight:700, color:"var(--white)", marginBottom:14 }}>Discovery Call</div>
       <div style={{ fontSize:13, color:"var(--gray)", display:"flex", alignItems:"center", gap:7, marginBottom:8 }}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         30 min
@@ -4222,8 +4244,8 @@ const BookingWidget = () => {
       </p>
       <p style={{ fontSize:12, color:"var(--muted)", lineHeight:1.6, marginTop:16 }}>
         If our schedule is fully booked, reach out to{" "}
-        <a href="mailto:alex@almondy.com" style={{ color:"var(--gray)", textDecoration:"underline" }}>alex@almondy.com</a>{" "}
-        to be added to our waitlist.
+        <a href="mailto:alex@almondy.com" style={{ color:"var(--gray)", textDecoration:"underline" }}>alex@almondy.com</a>
+        {" "}to be added to our waitlist.
       </p>
     </div>
   );
@@ -4263,7 +4285,24 @@ const BookingWidget = () => {
           </div>
           <div>
             <label style={LBL}>Phone number (optional)</label>
-            <input type="tel" value={form.phone} onChange={e => setForm(f => ({...f, phone:e.target.value}))} placeholder="+1 (555) 000-0000" style={INP} />
+            <div style={{ display:"flex", gap:8 }}>
+              <select
+                value={countryCode}
+                onChange={e => setCountryCode(e.target.value)}
+                style={{ padding:"11px 10px", background:"var(--input-bg)", border:"1px solid var(--input-border)", borderRadius:8, fontSize:14, color:"var(--input-text)", outline:"none", fontFamily:"var(--font)", cursor:"pointer", flexShrink:0 }}
+              >
+                {COUNTRY_CODES.map(c => (
+                  <option key={c.label} value={c.code}>{c.flag} {c.label} ({c.code})</option>
+                ))}
+              </select>
+              <input
+                type="tel"
+                value={form.phone}
+                onChange={e => setForm(f => ({...f, phone:e.target.value}))}
+                placeholder={isAU ? "04XX XXX XXX" : "555 000 0000"}
+                style={INP}
+              />
+            </div>
           </div>
         </div>
         <button
@@ -4277,102 +4316,79 @@ const BookingWidget = () => {
     </div>
   );
 
-  /* ── Step 1: Calendar + time slots (Cal.com layout) ── */
+  /* ── Step 1: Cal.com-style calendar + time slots ── */
   return (
     <div style={{ display:"flex", flexDirection:isMobile?"column":"row" }}>
       <InfoPanel />
 
-      {/* ── Calendar ── */}
-      <div style={{ flex:1, padding:isMobile?"24px":"36px 32px", background:"var(--card-bg)", borderRight:(!isMobile && selectedDate)?"1px solid var(--border)":"none" }}>
+      {/* Calendar */}
+      <div style={{ flex:1, padding:isMobile?"24px":"36px 32px", background:"var(--card-bg)", borderRight:(!isMobile&&selectedDate)?"1px solid var(--border)":"none" }}>
         <h3 style={{ fontSize:16, fontWeight:600, color:"var(--white)", marginBottom:24 }}>Select Date &amp; Time</h3>
 
         {/* Month nav */}
         <div style={{ display:"flex", alignItems:"center", marginBottom:20 }}>
-          <button
-            onClick={() => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth()-1, 1))}
-            style={{ background:"none", border:"1px solid var(--border)", borderRadius:8, width:34, height:34, cursor:"pointer", color:"var(--gray)", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}
-          >‹</button>
+          <button onClick={() => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth()-1, 1))} style={{ background:"none", border:"1px solid var(--border)", borderRadius:8, width:34, height:34, cursor:"pointer", color:"var(--gray)", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}>‹</button>
           <span style={{ flex:1, textAlign:"center", fontWeight:600, color:"var(--white)", fontSize:15 }}>{monthLabel}</span>
-          <button
-            onClick={() => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth()+1, 1))}
-            style={{ background:"none", border:"1px solid var(--border)", borderRadius:8, width:34, height:34, cursor:"pointer", color:"var(--gray)", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}
-          >›</button>
+          <button onClick={() => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth()+1, 1))} style={{ background:"none", border:"1px solid var(--border)", borderRadius:8, width:34, height:34, cursor:"pointer", color:"var(--gray)", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}>›</button>
         </div>
 
-        {/* Day-of-week headers */}
+        {/* Day headers */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", marginBottom:8 }}>
           {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(h => (
             <div key={h} style={{ textAlign:"center", fontSize:11, fontWeight:600, color:"var(--muted)", paddingBottom:6 }}>{h}</div>
           ))}
         </div>
 
-        {/* Day cells — circular like Cal.com */}
+        {/* Day cells — circular, filled when selected */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)" }}>
           {calDays.map((date, i) => {
             if (!date) return <div key={i} />;
             const avail   = isAvailable(date);
             const isSel   = selectedDate && date.toDateString() === selectedDate.toDateString();
             const isToday = date.toDateString() === todayBase.toDateString();
+            /* count available slots for this day to show scarcity hint */
+            const freeCount = avail ? TIME_SLOTS.filter((_,idx) => !isSlotBooked(date, idx)).length : 0;
+            const almostFull = avail && freeCount > 0 && freeCount <= 4;
             return (
-              <div key={i} style={{ display:"flex", justifyContent:"center", padding:"3px 0" }}>
+              <div key={i} style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"3px 0" }}>
                 <div
                   onClick={() => { if (avail) { setSelectedDate(date); setSelectedTime(null); } }}
-                  style={{
-                    width:38, height:38, borderRadius:"50%",
-                    display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-                    fontSize:13,
-                    fontWeight: isSel ? 700 : 400,
-                    background: isSel ? "var(--white)" : "none",
-                    color: isSel ? "var(--black)" : avail ? "var(--white)" : "var(--muted)",
-                    cursor: avail ? "pointer" : "default",
-                    position:"relative",
-                    transition:"background 0.1s",
-                    userSelect:"none",
-                  }}
+                  style={{ width:38, height:38, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:isSel?700:400, background:isSel?"var(--white)":"none", color:isSel?"var(--black)":avail?"var(--white)":"var(--muted)", cursor:avail?"pointer":"default", position:"relative", transition:"background 0.1s", userSelect:"none" }}
                 >
                   {date.getDate()}
-                  {isToday && !isSel && (
-                    <span style={{ position:"absolute", bottom:4, width:4, height:4, borderRadius:"50%", background:"var(--white)" }} />
-                  )}
+                  {isToday && !isSel && <span style={{ position:"absolute", bottom:3, width:4, height:4, borderRadius:"50%", background:"var(--white)" }} />}
                 </div>
+                {/* amber dot = only a few slots left */}
+                {almostFull && !isSel && <span style={{ width:4, height:4, borderRadius:"50%", background:"#f59e0b", marginTop:2 }} />}
               </div>
             );
           })}
         </div>
 
         {/* Timezone */}
-        <div style={{ marginTop:24, display:"flex", flexDirection:"column", gap:2 }}>
-          <div style={{ fontSize:11, fontWeight:600, color:"var(--muted)", textTransform:"uppercase", letterSpacing:"0.5px" }}>Time zone</div>
-          <div style={{ fontSize:13, color:"var(--gray)" }}>
-            {timezone.replace(/_/g," ")}
-          </div>
+        <div style={{ marginTop:24 }}>
+          <div style={{ fontSize:11, fontWeight:600, color:"var(--muted)", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>Time zone</div>
+          <div style={{ fontSize:13, color:"var(--gray)" }}>{timezone.replace(/_/g," ")}</div>
         </div>
       </div>
 
-      {/* ── Time slots (visible once date is selected) ── */}
+      {/* Time slots — visible once a date is selected */}
       {selectedDate && (
-        <div style={{
-          width: isMobile?"100%":190,
-          padding: isMobile?"16px 24px":"36px 16px",
-          background:"var(--card-bg)",
-          borderTop: isMobile?"1px solid var(--border)":"none",
-          borderLeft: isMobile?"none":"1px solid var(--border)",
-          overflowY:"auto",
-          maxHeight: isMobile?260:600,
-        }}>
+        <div style={{ width:isMobile?"100%":190, padding:isMobile?"16px 24px":"36px 16px", background:"var(--card-bg)", borderTop:isMobile?"1px solid var(--border)":"none", borderLeft:isMobile?"none":"1px solid var(--border)", overflowY:"auto", maxHeight:isMobile?300:600 }}>
           <div style={{ fontSize:13, fontWeight:600, color:"var(--gray)", marginBottom:12, textAlign:"center" }}>
             {fmtSlotHdr(selectedDate)}
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-            {TIME_SLOTS.map(t => (
+            {slots.map(({ time, booked }) => (
               <button
-                key={t}
-                onClick={() => { setSelectedTime(t); setTimeout(() => setStep(2), 160); }}
-                style={{ padding:"11px 8px", border:"1px solid var(--border)", borderRadius:8, background:"var(--card-bg)", color:"var(--white)", fontSize:14, fontWeight:500, cursor:"pointer", textAlign:"center", fontFamily:"var(--font)", transition:"border-color 0.1s, background 0.1s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor="var(--white)"; e.currentTarget.style.background="var(--surface)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--card-bg)"; }}
+                key={time}
+                disabled={booked}
+                onClick={() => { if (!booked) { setSelectedTime(time); setTimeout(() => setStep(2), 160); } }}
+                style={{ padding:"11px 8px", border:"1px solid var(--border)", borderRadius:8, background:booked?"var(--surface)":"var(--card-bg)", color:booked?"var(--muted)":"var(--white)", fontSize:13, fontWeight:500, cursor:booked?"default":"pointer", textAlign:"center", fontFamily:"var(--font)", transition:"border-color 0.1s, background 0.1s", opacity:booked?0.55:1 }}
+                onMouseEnter={e => { if (!booked) { e.currentTarget.style.borderColor="var(--white)"; e.currentTarget.style.background="var(--surface)"; } }}
+                onMouseLeave={e => { if (!booked) { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--card-bg)"; } }}
               >
-                {t}
+                {booked ? <s style={{ opacity:0.6 }}>{time}</s> : time}
               </button>
             ))}
           </div>
@@ -4403,17 +4419,13 @@ const LanderPage = () => {
         </p>
       </div>
 
-      {/* Calendly booking */}
-      <div style={{ maxWidth:1100, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
+      {/* Booking widget */}
+      <div style={{ maxWidth:1060, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
         <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
-          <iframe
-            src="https://calendly.com/alex-digital200/30min?embed_type=Inline&hide_event_type_details=0&hide_gdpr_banner=1&background_color=ffffff&text_color=0d0d0d&primary_color=0d0d0d"
-            style={{ width:"100%", height:isMobile?900:800, border:"none", display:"block" }}
-            title="Schedule a Discovery Call"
-          />
+          <BookingWidget />
         </div>
         <p style={{ textAlign:"center", marginTop:14, fontSize:13, color:"var(--muted)" }}>
-          Calendar not loading?{" "}
+          Having trouble?{" "}
           <button onClick={() => window.location.reload()} style={{ background:"none", border:"none", padding:0, fontSize:13, color:"var(--gray)", textDecoration:"underline", cursor:"pointer", fontFamily:"var(--font)" }}>
             Refresh Page
           </button>
