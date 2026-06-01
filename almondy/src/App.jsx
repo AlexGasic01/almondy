@@ -4127,7 +4127,7 @@ const CallCatchPage = ({ setPage }) => {
 };
 
 /* ════════════════════════════════════════════
-   BOOKING WIDGET (used by LanderPage)
+   PAGE: LANDER — BookingWidget removed, using Calendly iframe
 ════════════════════════════════════════════ */
 const TIME_SLOTS = [
   "9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM",
@@ -4137,18 +4137,26 @@ const TIME_SLOTS = [
 
 const BookingWidget = () => {
   const isMobile = useIsMobile();
-  const todayBase = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
 
-  const [currentMonth, setCurrentMonth] = useState(() => new Date(todayBase.getFullYear(), todayBase.getMonth(), 1));
-  const [selectedDate, setSelectedDate]  = useState(null);
+  const todayBase = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d; }, []);
+
+  const firstAvailable = useMemo(() => {
+    const d = new Date(todayBase);
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    return d;
+  }, [todayBase]);
+
+  const [currentMonth, setCurrentMonth] = useState(() => new Date(firstAvailable.getFullYear(), firstAvailable.getMonth(), 1));
+  const [selectedDate, setSelectedDate]  = useState(firstAvailable);
   const [selectedTime, setSelectedTime]  = useState(null);
   const [step, setStep]                  = useState(1);
   const [form, setForm]                  = useState({ name:"", email:"", phone:"" });
   const [submitting, setSubmitting]      = useState(false);
 
+  const timezone   = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const monthLabel = currentMonth.toLocaleDateString("en-US", { month:"long", year:"numeric" });
 
-  const calDays = (() => {
+  const calDays = useMemo(() => {
     const yr = currentMonth.getFullYear(), mo = currentMonth.getMonth();
     const startDow = new Date(yr, mo, 1).getDay();
     const total    = new Date(yr, mo + 1, 0).getDate();
@@ -4156,16 +4164,17 @@ const BookingWidget = () => {
     for (let i = 0; i < startDow; i++) cells.push(null);
     for (let d = 1; d <= total; d++) cells.push(new Date(yr, mo, d));
     return cells;
-  })();
+  }, [currentMonth]);
 
   const isAvailable = d => {
-    if (!d || d < todayBase) return false;
-    const dow = d.getDay();
-    return dow !== 0 && dow !== 6;
+    if (!d) return false;
+    const cmp = new Date(d); cmp.setHours(0,0,0,0);
+    if (cmp < todayBase) return false;
+    return d.getDay() !== 0 && d.getDay() !== 6;
   };
 
-  const fmtLong  = d => d ? d.toLocaleDateString("en-US", { weekday:"long",  month:"long",  day:"numeric", year:"numeric" }) : "";
-  const fmtShort = d => d ? d.toLocaleDateString("en-US", { weekday:"short",  month:"short", day:"numeric", year:"numeric" }) : "";
+  const fmtShort    = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric", year:"numeric" }) : "";
+  const fmtSlotHdr  = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric" }) : "";
 
   const handleBook = async () => {
     if (!form.name || !form.email) return;
@@ -4175,12 +4184,12 @@ const BookingWidget = () => {
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
-          "📅 Booking":  "30 Min Discovery Call",
-          "📆 Date":     fmtShort(selectedDate),
-          "⏰ Time":     selectedTime,
-          "👤 Name":     form.name,
-          "📧 Email":    form.email,
-          "📱 Phone":    form.phone || "—",
+          "📅 Booking": "30 Min Discovery Call",
+          "📆 Date":    fmtShort(selectedDate),
+          "⏰ Time":    selectedTime,
+          "👤 Name":    form.name,
+          "📧 Email":   form.email,
+          "📱 Phone":   form.phone || "—",
         }),
       });
     } catch(_) {}
@@ -4188,42 +4197,47 @@ const BookingWidget = () => {
     setStep(3);
   };
 
-  /* shared input style */
   const INP = { width:"100%", padding:"11px 14px", background:"var(--input-bg)", border:"1px solid var(--input-border)", borderRadius:8, fontSize:14, color:"var(--input-text)", outline:"none", fontFamily:"var(--font)", boxSizing:"border-box" };
   const LBL = { fontSize:12, fontWeight:600, color:"var(--gray)", display:"block", marginBottom:6 };
 
-  /* Left info panel */
+  /* ── Info panel (left column, all steps) ── */
   const InfoPanel = () => (
-    <div style={{ width:isMobile?"100%":256, minWidth:isMobile?undefined:220, padding:isMobile?"24px 24px 20px":"32px 28px", borderRight:isMobile?"none":"1px solid var(--border)", borderBottom:isMobile?"1px solid var(--border)":"none", background:"var(--card-bg)" }}>
-      <div style={{ fontSize:20, fontWeight:700, color:"var(--white)", marginBottom:12 }}>Discovery Call</div>
-      <div style={{ fontSize:13, color:"var(--gray)", display:"flex", alignItems:"center", gap:6, marginBottom:6 }}>
-        <span>🕐</span> 30 minutes
+    <div style={{ width:isMobile?"100%":270, minWidth:isMobile?undefined:220, padding:isMobile?"24px 24px 20px":"36px 28px", borderRight:isMobile?"none":"1px solid var(--border)", borderBottom:isMobile?"1px solid var(--border)":"none", background:"var(--surface)" }}>
+      <div style={{ fontSize:19, fontWeight:700, color:"var(--white)", marginBottom:14 }}>
+        📞 Discovery Call
+      </div>
+      <div style={{ fontSize:13, color:"var(--gray)", display:"flex", alignItems:"center", gap:7, marginBottom:8 }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        30 min
       </div>
       {selectedDate && (
-        <div style={{ fontSize:13, color:"var(--gray)", display:"flex", alignItems:"center", gap:6, marginBottom:6 }}>
-          <span>📅</span> {fmtShort(selectedDate)}{selectedTime ? ` · ${selectedTime}` : ""}
+        <div style={{ fontSize:13, color:"var(--gray)", display:"flex", alignItems:"center", gap:7, marginBottom:8 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          {fmtShort(selectedDate)}{selectedTime ? ` · ${selectedTime}` : ""}
         </div>
       )}
-      <div style={{ marginTop:16, fontSize:13, color:"var(--muted)", lineHeight:1.65 }}>
-        Let's talk about your business and see if our AI systems are the right fit.
-      </div>
-      <div style={{ marginTop:16, fontSize:12, color:"var(--muted)", lineHeight:1.6 }}>
-        Fully booked? Email us at{" "}
-        <a href="mailto:alex@almondy.com" style={{ color:"var(--gray)", textDecoration:"underline" }}>alex@almondy.com</a>
-      </div>
+      <div style={{ height:1, background:"var(--divider)", margin:"16px 0" }} />
+      <p style={{ fontSize:13, color:"var(--muted)", lineHeight:1.65, margin:0 }}>
+        Let's talk about your business and see if our AI systems are the right fit for you.
+      </p>
+      <p style={{ fontSize:12, color:"var(--muted)", lineHeight:1.6, marginTop:16 }}>
+        If our schedule is fully booked, reach out to{" "}
+        <a href="mailto:alex@almondy.com" style={{ color:"var(--gray)", textDecoration:"underline" }}>alex@almondy.com</a>{" "}
+        to be added to our waitlist.
+      </p>
     </div>
   );
 
   /* ── Step 3: Confirmed ── */
   if (step === 3) return (
-    <div style={{ display:"flex", flexDirection:isMobile?"column":"row", minHeight:480 }}>
+    <div style={{ display:"flex", flexDirection:isMobile?"column":"row" }}>
       <InfoPanel />
-      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:isMobile?"32px 24px":"48px", textAlign:"center", background:"var(--card-bg)" }}>
-        <div style={{ fontSize:52, marginBottom:16 }}>✅</div>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:isMobile?"40px 24px":"64px", textAlign:"center", background:"var(--card-bg)" }}>
+        <div style={{ width:64, height:64, borderRadius:"50%", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, marginBottom:20 }}>✓</div>
         <h2 style={{ fontSize:22, fontWeight:700, color:"var(--white)", marginBottom:8 }}>You're booked!</h2>
-        <p style={{ color:"var(--gray)", fontSize:14, marginBottom:4 }}>{fmtShort(selectedDate)} · {selectedTime}</p>
-        <p style={{ color:"var(--muted)", fontSize:13, marginTop:8 }}>
-          A confirmation will be sent to <strong style={{ color:"var(--gray)" }}>{form.email}</strong>.
+        <p style={{ color:"var(--gray)", fontSize:14 }}>{fmtShort(selectedDate)} · {selectedTime}</p>
+        <p style={{ color:"var(--muted)", fontSize:13, marginTop:12 }}>
+          Confirmation sent to <strong style={{ color:"var(--gray)" }}>{form.email}</strong>
         </p>
       </div>
     </div>
@@ -4231,7 +4245,7 @@ const BookingWidget = () => {
 
   /* ── Step 2: Details form ── */
   if (step === 2) return (
-    <div style={{ display:"flex", flexDirection:isMobile?"column":"row", minHeight:480 }}>
+    <div style={{ display:"flex", flexDirection:isMobile?"column":"row" }}>
       <InfoPanel />
       <div style={{ flex:1, padding:isMobile?"24px":"40px 48px", background:"var(--card-bg)" }}>
         <button onClick={() => setStep(1)} style={{ background:"none", border:"none", color:"var(--gray)", fontSize:13, cursor:"pointer", padding:0, marginBottom:20, display:"flex", alignItems:"center", gap:6, fontFamily:"var(--font)" }}>
@@ -4263,56 +4277,105 @@ const BookingWidget = () => {
     </div>
   );
 
-  /* ── Step 1: Calendar + time slots ── */
+  /* ── Step 1: Calendar + time slots (Cal.com layout) ── */
   return (
-    <div style={{ display:"flex", flexDirection:isMobile?"column":"row", minHeight:480 }}>
+    <div style={{ display:"flex", flexDirection:isMobile?"column":"row" }}>
       <InfoPanel />
 
-      {/* Calendar */}
-      <div style={{ flex:1, padding:isMobile?"24px":"32px", borderRight:(!isMobile && selectedDate)?"1px solid var(--border)":"none", background:"var(--card-bg)" }}>
-        <h3 style={{ fontSize:16, fontWeight:700, color:"var(--white)", marginBottom:20 }}>Select Date &amp; Time</h3>
+      {/* ── Calendar ── */}
+      <div style={{ flex:1, padding:isMobile?"24px":"36px 32px", background:"var(--card-bg)", borderRight:(!isMobile && selectedDate)?"1px solid var(--border)":"none" }}>
+        <h3 style={{ fontSize:16, fontWeight:600, color:"var(--white)", marginBottom:24 }}>Select Date &amp; Time</h3>
+
         {/* Month nav */}
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:12, marginBottom:16 }}>
-          <button onClick={() => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth()-1, 1))} style={{ background:"var(--surface)", border:"1px solid var(--border)", borderRadius:8, width:32, height:32, cursor:"pointer", color:"var(--gray)", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"var(--font)" }}>‹</button>
-          <span style={{ fontWeight:600, color:"var(--white)", fontSize:15, minWidth:160, textAlign:"center" }}>{monthLabel}</span>
-          <button onClick={() => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth()+1, 1))} style={{ background:"var(--surface)", border:"1px solid var(--border)", borderRadius:8, width:32, height:32, cursor:"pointer", color:"var(--gray)", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"var(--font)" }}>›</button>
+        <div style={{ display:"flex", alignItems:"center", marginBottom:20 }}>
+          <button
+            onClick={() => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth()-1, 1))}
+            style={{ background:"none", border:"1px solid var(--border)", borderRadius:8, width:34, height:34, cursor:"pointer", color:"var(--gray)", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}
+          >‹</button>
+          <span style={{ flex:1, textAlign:"center", fontWeight:600, color:"var(--white)", fontSize:15 }}>{monthLabel}</span>
+          <button
+            onClick={() => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth()+1, 1))}
+            style={{ background:"none", border:"1px solid var(--border)", borderRadius:8, width:34, height:34, cursor:"pointer", color:"var(--gray)", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}
+          >›</button>
         </div>
+
         {/* Day-of-week headers */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2, marginBottom:4 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", marginBottom:8 }}>
           {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(h => (
-            <div key={h} style={{ textAlign:"center", fontSize:11, fontWeight:600, color:"var(--muted)", padding:"4px 0" }}>{h}</div>
+            <div key={h} style={{ textAlign:"center", fontSize:11, fontWeight:600, color:"var(--muted)", paddingBottom:6 }}>{h}</div>
           ))}
         </div>
-        {/* Day cells */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2 }}>
+
+        {/* Day cells — circular like Cal.com */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)" }}>
           {calDays.map((date, i) => {
             if (!date) return <div key={i} />;
-            const avail  = isAvailable(date);
-            const isSel  = selectedDate && date.toDateString() === selectedDate.toDateString();
+            const avail   = isAvailable(date);
+            const isSel   = selectedDate && date.toDateString() === selectedDate.toDateString();
             const isToday = date.toDateString() === todayBase.toDateString();
             return (
-              <button key={i} onClick={() => { if (avail) { setSelectedDate(date); setSelectedTime(null); } }}
-                style={{ aspectRatio:"1", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:isSel?700:400, borderRadius:8, border:isSel?"2px solid #22c55e":isToday?"1px solid var(--border)":"1px solid transparent", background:isSel?"rgba(34,197,94,0.12)":avail?"var(--surface)":"none", color:isSel?"#22c55e":avail?"var(--white)":"var(--muted)", cursor:avail?"pointer":"default", transition:"background 0.1s" }}
-              >
-                {date.getDate()}
-              </button>
+              <div key={i} style={{ display:"flex", justifyContent:"center", padding:"3px 0" }}>
+                <div
+                  onClick={() => { if (avail) { setSelectedDate(date); setSelectedTime(null); } }}
+                  style={{
+                    width:38, height:38, borderRadius:"50%",
+                    display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+                    fontSize:13,
+                    fontWeight: isSel ? 700 : 400,
+                    background: isSel ? "var(--white)" : "none",
+                    color: isSel ? "var(--black)" : avail ? "var(--white)" : "var(--muted)",
+                    cursor: avail ? "pointer" : "default",
+                    position:"relative",
+                    transition:"background 0.1s",
+                    userSelect:"none",
+                  }}
+                >
+                  {date.getDate()}
+                  {isToday && !isSel && (
+                    <span style={{ position:"absolute", bottom:4, width:4, height:4, borderRadius:"50%", background:"var(--white)" }} />
+                  )}
+                </div>
+              </div>
             );
           })}
         </div>
-        <div style={{ marginTop:14, fontSize:12, color:"var(--muted)" }}>All times in your local timezone · Mon – Fri</div>
+
+        {/* Timezone */}
+        <div style={{ marginTop:24, display:"flex", flexDirection:"column", gap:2 }}>
+          <div style={{ fontSize:11, fontWeight:600, color:"var(--muted)", textTransform:"uppercase", letterSpacing:"0.5px" }}>Time zone</div>
+          <div style={{ fontSize:13, color:"var(--gray)" }}>
+            {timezone.replace(/_/g," ")}
+          </div>
+        </div>
       </div>
 
-      {/* Time slots — revealed once a date is picked */}
+      {/* ── Time slots (visible once date is selected) ── */}
       {selectedDate && (
-        <div style={{ width:isMobile?"100%":168, padding:isMobile?"16px 24px":"28px 16px", background:"var(--card-bg)", borderTop:isMobile?"1px solid var(--border)":"none", borderLeft:isMobile?"none":"1px solid var(--border)", display:"flex", flexDirection:"column", gap:6, overflowY:"auto", maxHeight:isMobile?240:560 }}>
-          <div style={{ fontSize:12, fontWeight:600, color:"var(--muted)", marginBottom:4, textAlign:"center" }}>{fmtShort(selectedDate)}</div>
-          {TIME_SLOTS.map(t => (
-            <button key={t} onClick={() => { setSelectedTime(t); setTimeout(() => setStep(2), 160); }}
-              style={{ padding:"9px 8px", border:selectedTime===t?"2px solid #22c55e":"1px solid var(--border)", borderRadius:8, background:selectedTime===t?"rgba(34,197,94,0.09)":"var(--surface)", color:selectedTime===t?"#22c55e":"var(--white)", fontSize:13, fontWeight:600, cursor:"pointer", textAlign:"center", transition:"all 0.1s", fontFamily:"var(--font)" }}
-            >
-              {t}
-            </button>
-          ))}
+        <div style={{
+          width: isMobile?"100%":190,
+          padding: isMobile?"16px 24px":"36px 16px",
+          background:"var(--card-bg)",
+          borderTop: isMobile?"1px solid var(--border)":"none",
+          borderLeft: isMobile?"none":"1px solid var(--border)",
+          overflowY:"auto",
+          maxHeight: isMobile?260:600,
+        }}>
+          <div style={{ fontSize:13, fontWeight:600, color:"var(--gray)", marginBottom:12, textAlign:"center" }}>
+            {fmtSlotHdr(selectedDate)}
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            {TIME_SLOTS.map(t => (
+              <button
+                key={t}
+                onClick={() => { setSelectedTime(t); setTimeout(() => setStep(2), 160); }}
+                style={{ padding:"11px 8px", border:"1px solid var(--border)", borderRadius:8, background:"var(--card-bg)", color:"var(--white)", fontSize:14, fontWeight:500, cursor:"pointer", textAlign:"center", fontFamily:"var(--font)", transition:"border-color 0.1s, background 0.1s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor="var(--white)"; e.currentTarget.style.background="var(--surface)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--card-bg)"; }}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -4340,11 +4403,21 @@ const LanderPage = () => {
         </p>
       </div>
 
-      {/* Booking widget */}
-      <div style={{ maxWidth:1000, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
+      {/* Calendly booking */}
+      <div style={{ maxWidth:1100, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
         <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
-          <BookingWidget />
+          <iframe
+            src="https://calendly.com/alex-digital200/30min?embed_type=Inline&hide_event_type_details=0&hide_gdpr_banner=1&primary_color=22c55e"
+            style={{ width:"100%", height:isMobile?700:750, border:"none", display:"block" }}
+            title="Schedule a Discovery Call"
+          />
         </div>
+        <p style={{ textAlign:"center", marginTop:14, fontSize:13, color:"var(--muted)" }}>
+          Calendar not loading?{" "}
+          <button onClick={() => window.location.reload()} style={{ background:"none", border:"none", padding:0, fontSize:13, color:"var(--gray)", textDecoration:"underline", cursor:"pointer", fontFamily:"var(--font)" }}>
+            Refresh Page
+          </button>
+        </p>
       </div>
     </div>
   );
