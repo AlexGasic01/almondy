@@ -420,29 +420,25 @@ const HomePage = ({ setPage }) => {
           Systems that get things done.
         </h2>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
-  {/* PayChaser */}
-  <button onClick={() => setPage("paychaser")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"var(--card-bg)",cursor:"pointer",textAlign:"left" }}>
-    <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
-      <span className="badge-dot" style={{ width:6,height:6 }} /> In Development
-    </div>
-    <div style={{ fontSize:isMobile?36:48,fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>PayChaser</div>
-    <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>Track invoices, chase payments, and collect faster, all in one place.</p>
-    <span style={{ fontSize:20,color:"var(--muted)" }}>↗</span>
-  </button>
-
-  {/* ReviewChaser */}
-  <button onClick={() => setPage("reviewchaser")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"var(--card-bg)",cursor:"pointer",textAlign:"left" }}>
+  {/* Lead Heater */}
+  <button onClick={() => setPage("lead-heater")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"var(--card-bg)",cursor:"pointer",textAlign:"left" }}>
     <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--green)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
       <span className="badge-dot" style={{ width:6,height:6 }} /> Live Now
     </div>
-    <div style={{ fontSize:isMobile?36:48,fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>ReviewChaser</div>
-    <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>Send SMS review requests in seconds. Get more Google reviews without the awkwardness.</p>
+    <div style={{ fontSize:isMobile?36:48,fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>Lead Heater</div>
+    <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>AI agent that follows up ad leads within 60 seconds — qualifies, books, and notifies you.</p>
     <span style={{ fontSize:20,color:"var(--muted)" }}>↗</span>
   </button>
 
-  {!isMobile && <LockedCard />}
-
-      
+  {/* CallCatch */}
+  <button onClick={() => setPage("call-catch")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"var(--card-bg)",cursor:"pointer",textAlign:"left" }}>
+    <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--green)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
+      <span className="badge-dot" style={{ width:6,height:6 }} /> Live Now
+    </div>
+    <div style={{ fontSize:isMobile?36:48,fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>CallCatch</div>
+    <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>AI agent that texts every missed caller within 30 seconds so you never lose a job to voicemail.</p>
+    <span style={{ fontSize:20,color:"var(--muted)" }}>↗</span>
+  </button>
         </div>
       </div>
 
