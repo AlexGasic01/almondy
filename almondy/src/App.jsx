@@ -4133,18 +4133,26 @@ const LanderPage = () => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    /* Cal.com inline embed — update CAL_LINK to your Cal.com username/event-type */
+    const CAL_NS   = "30min-discovery";
     const CAL_LINK = "alexg009/30min-discovery";
     const script = document.createElement("script");
     script.src = "https://app.cal.com/embed/embed.js";
     script.async = true;
     script.onload = () => {
-      window.Cal("init", { origin: "https://cal.com" });
-      window.Cal("inline", { elementOrSelector: "#cal-inline", calLink: CAL_LINK, layout: "month_view" });
-      window.Cal("ui", { styles: { branding: { brandColor: "#22c55e" } }, hideEventTypeDetails: false, layout: "month_view" });
+      window.Cal("init", CAL_NS, { origin: "https://cal.com" });
+      window.Cal.ns[CAL_NS]("inline", {
+        elementOrSelector: "#cal-inline",
+        calLink: CAL_LINK,
+        config: { layout: "month_view" },
+      });
+      window.Cal.ns[CAL_NS]("ui", {
+        styles: { branding: { brandColor: "#22c55e" } },
+        hideEventTypeDetails: false,
+        layout: "month_view",
+      });
     };
     document.head.appendChild(script);
-    return () => { document.head.removeChild(script); };
+    return () => { if (document.head.contains(script)) document.head.removeChild(script); };
   }, []);
 
   return (
