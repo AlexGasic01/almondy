@@ -4407,8 +4407,8 @@ const LanderPage = () => {
       <div style={{ maxWidth:1100, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
         <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
           <iframe
-            src="https://calendly.com/alex-digital200/30min?embed_type=Inline&hide_event_type_details=0&hide_gdpr_banner=1&primary_color=22c55e"
-            style={{ width:"100%", height:isMobile?700:750, border:"none", display:"block" }}
+            src="https://calendly.com/alex-digital200/30min?embed_type=Inline&hide_event_type_details=0&hide_gdpr_banner=1&background_color=ffffff&text_color=0d0d0d&primary_color=0d0d0d"
+            style={{ width:"100%", height:isMobile?900:800, border:"none", display:"block" }}
             title="Schedule a Discovery Call"
           />
         </div>
