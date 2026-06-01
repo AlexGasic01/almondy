@@ -4127,6 +4127,52 @@ const CallCatchPage = ({ setPage }) => {
 };
 
 /* ════════════════════════════════════════════
+   PAGE: LANDER  (URL-only, not in nav)
+════════════════════════════════════════════ */
+const LanderPage = () => {
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    /* Cal.com inline embed — update CAL_LINK to your Cal.com username/event-type */
+    const CAL_LINK = "alexgasic/strategy-call";
+    const script = document.createElement("script");
+    script.src = "https://app.cal.com/embed/embed.js";
+    script.async = true;
+    script.onload = () => {
+      window.Cal("init", { origin: "https://cal.com" });
+      window.Cal("inline", { elementOrSelector: "#cal-inline", calLink: CAL_LINK, layout: "month_view" });
+      window.Cal("ui", { styles: { branding: { brandColor: "#22c55e" } }, hideEventTypeDetails: false, layout: "month_view" });
+    };
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, []);
+
+  return (
+    <div style={{ minHeight:"100vh", background:"var(--black)", display:"flex", flexDirection:"column" }}>
+      {/* Header */}
+      <div style={{ maxWidth:720, margin:"0 auto", padding:isMobile?"48px 20px 32px":"72px 48px 36px", textAlign:"center", animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both" }}>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"var(--green-dim)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"var(--green)", marginBottom:20, fontFamily:"var(--mono)" }}>
+          <span className="badge-dot" /> Step 2 / 2
+        </div>
+        <h1 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)", fontWeight:600, letterSpacing:"-2px", lineHeight:1.1, color:"var(--white)", marginBottom:16 }}>
+          Thanks! The system determined we don't work with anyone in your area!
+        </h1>
+        <p style={{ fontSize:isMobile?14:16, fontWeight:600, letterSpacing:"-0.4px", color:"var(--green)" }}>
+          Schedule Your Free Strategy Call below ↓
+        </p>
+      </div>
+
+      {/* Cal.com booking */}
+      <div style={{ flex:1, maxWidth:1000, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
+        <div style={{ background:"var(--card-bg)", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
+          <div id="cal-inline" style={{ width:"100%", minHeight:700 }} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════════
    ROOT APP
 ════════════════════════════════════════════ */
 export default function App() {
@@ -4153,7 +4199,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact","lead-heater","call-catch"];
+    const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact","lead-heater","call-catch","lander"];
 
     const handleSession = async (session, redirect) => {
       try {
@@ -4217,7 +4263,7 @@ export default function App() {
     const path = window.location.pathname.replace("/","") || "home";
     const params = new URLSearchParams(window.location.search);
     const pageParam = params.get("page");
-    const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact","lead-heater","call-catch"];
+    const publicPages = ["home","systems","webdev","webdev-onboarding","paychaser","reviewchaser","testimonials","pricing","contact","lead-heater","call-catch","lander"];
     if (params.get("rc_session") === "success") {
       sessionStorage.setItem("rc_post_checkout", "1");
       setPage("reviewchaser");
@@ -4251,8 +4297,8 @@ export default function App() {
       {showSplash && <SplashScreen onDone={()=>{ sessionStorage.setItem("splashSeen","1"); setShowSplash(false); }} />}
       {showMobileWarning && <MobileWarningPopup onDismiss={handleDismissWarning} />}
 
-      {/* Only show global Nav when NOT in an app page AND NOT in ReviewChaser (it has its own nav) */}
-      {!isAppPage && <Nav page={page} setPage={handleSetPage} />}
+      {/* Only show global Nav when NOT in an app page AND NOT in ReviewChaser (it has its own nav) AND NOT on the lander */}
+      {!isAppPage && page !== "lander" && <Nav page={page} setPage={handleSetPage} />}
 
       {/* Single back button rendered outside all page containers so fixed positioning is always viewport-relative */}
       {["systems","webdev","paychaser","pricing","contact","testimonials","lead-heater","call-catch"].includes(page) && (
@@ -4270,6 +4316,7 @@ export default function App() {
       {page==="reviewchaser"      && <ReviewChaserPage      setPage={handleSetPage} user={user} setUser={setUser} />}
       {page==="lead-heater"       && <LeadHeaterPage        setPage={handleSetPage} />}
       {page==="call-catch"        && <CallCatchPage         setPage={handleSetPage} />}
+      {page==="lander"            && <LanderPage />}
 
       {page==="auth"              && <AuthPage              setPage={handleSetPage} setUser={setUser} />}
       {page==="onboarding"        && <OnboardingPage        setPage={handleSetPage} user={user} setUser={setUser} />}
