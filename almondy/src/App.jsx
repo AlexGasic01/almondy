@@ -175,11 +175,11 @@ const GlobalStyle = () => (
 const NAV_LINKS = [
   { id: "home",         label: "Home" },
   { id: "systems",      label: "Systems" },
-  { id: "webdev",       label: "Web Development" },
+  { id: "webdev",       label: "Web Dev" },
   { id: "reviewchaser", label: "ReviewChaser" },
   { id: "lead-heater",  label: "Lead Heater" },
   { id: "call-catch",   label: "CallCatch" },
-  { id: "testimonials", label: "Testimonials" },
+  { id: "contact",      label: "Contact" },
 ];
 
 const Nav = memo(({ page, setPage }) => {
@@ -203,29 +203,34 @@ const Nav = memo(({ page, setPage }) => {
 
   const go = (id) => { setPage(id); setMenuOpen(false); };
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
   return (
     <>
       <nav style={{ position:"fixed",top:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"0 18px":"0 48px",height:62,background:"var(--nav-bg)",backdropFilter:"blur(20px) saturate(1.4)",borderBottom:"1px solid var(--border)" }}>
-        <button onClick={() => go("home")} style={{ display:"flex",alignItems:"center",gap:10,background:"none",border:"none" }}>
+        <button onClick={() => go("home")} style={{ display:"flex",alignItems:"center",gap:10,background:"none",border:"none",cursor:"pointer" }}>
           <WordmarkSVG height={isMobile ? 20 : 24} />
         </button>
 
         {isMobile ? (
-          <button onClick={() => setMenuOpen(v => !v)} style={{ background:"none",border:"none",display:"flex",flexDirection:"column",gap:5,padding:6 }}>
-            <span style={{ display:"block",width:22,height:2,background:"var(--white)",transition:"all 0.25s",transform:menuOpen?"rotate(45deg) translateY(7px)":"none" }} />
-            <span style={{ display:"block",width:22,height:2,background:"var(--white)",transition:"all 0.25s",opacity:menuOpen?0:1 }} />
-            <span style={{ display:"block",width:22,height:2,background:"var(--white)",transition:"all 0.25s",transform:menuOpen?"rotate(-45deg) translateY(-7px)":"none" }} />
+          <button onClick={() => setMenuOpen(v => !v)} style={{ background:"none",border:"none",display:"flex",flexDirection:"column",gap:5,padding:8,cursor:"pointer" }}>
+            <span style={{ display:"block",width:22,height:2,background:"var(--white)",borderRadius:2,transition:"all 0.25s",transform:menuOpen?"rotate(45deg) translateY(7px)":"none" }} />
+            <span style={{ display:"block",width:22,height:2,background:"var(--white)",borderRadius:2,transition:"all 0.25s",opacity:menuOpen?0:1 }} />
+            <span style={{ display:"block",width:22,height:2,background:"var(--white)",borderRadius:2,transition:"all 0.25s",transform:menuOpen?"rotate(-45deg) translateY(-7px)":"none" }} />
           </button>
         ) : (
           <>
-            <ul style={{ display:"flex",gap:28,listStyle:"none" }}>
+            <ul style={{ display:"flex",gap:20,listStyle:"none" }}>
               {NAV_LINKS.map(l => (
                 <li key={l.id}>
-                  <button onClick={() => go(l.id)} style={{ background:"none",border:"none",color:page===l.id?"var(--white)":"var(--gray)",fontSize:13,fontWeight:500,letterSpacing:"-0.1px",transition:"color 0.15s" }}>{l.label}</button>
+                  <button onClick={() => go(l.id)} style={{ background:"none",border:"none",color:page===l.id?"var(--white)":"var(--gray)",fontSize:13,fontWeight:500,letterSpacing:"-0.1px",transition:"color 0.15s",cursor:"pointer" }}>{l.label}</button>
                 </li>
               ))}
             </ul>
-            <button onClick={handleAuthBtn} style={{ background:"var(--white)",color:"var(--black)",border:"none",padding:"8px 20px",fontSize:13,fontWeight:700,borderRadius:7,letterSpacing:"-0.2px" }}>{rcSession ? "Log Out" : "Log In →"}</button>
+            <button onClick={handleAuthBtn} style={{ background:"var(--white)",color:"var(--black)",border:"none",padding:"8px 20px",fontSize:13,fontWeight:700,borderRadius:7,letterSpacing:"-0.2px",cursor:"pointer" }}>{rcSession ? "Log Out" : "Log In →"}</button>
           </>
         )}
       </nav>
@@ -233,14 +238,16 @@ const Nav = memo(({ page, setPage }) => {
       {isMobile && menuOpen && (
         <>
           <div className="mobile-overlay" onClick={() => setMenuOpen(false)} />
-          <div style={{ position:"fixed",top:62,right:0,bottom:0,width:"75vw",maxWidth:300,background:"var(--nav-bg-solid)",borderLeft:"1px solid var(--border)",zIndex:200,display:"flex",flexDirection:"column",padding:"24px 0",animation:"fadeRight 0.25s both" }}>
-            {NAV_LINKS.map(l => (
-              <button key={l.id} onClick={() => go(l.id)} style={{ background:"none",border:"none",borderBottom:"1px solid var(--border)",padding:"18px 24px",fontSize:16,fontWeight:600,color:page===l.id?"var(--white)":"var(--gray)",textAlign:"left",transition:"color 0.15s" }}>
-                {l.label}
-              </button>
-            ))}
-            <div style={{ padding:"20px 24px" }}>
-              <button onClick={handleAuthBtn} style={{ width:"100%",background:"var(--white)",color:"var(--black)",border:"none",padding:"12px 20px",fontSize:14,fontWeight:700,borderRadius:8 }}>{rcSession ? "Log Out" : "Log In →"}</button>
+          <div style={{ position:"fixed",top:62,right:0,bottom:0,width:"80vw",maxWidth:320,background:"var(--nav-bg-solid)",borderLeft:"1px solid var(--border)",zIndex:200,display:"flex",flexDirection:"column",overflowY:"auto",animation:"fadeRight 0.25s both" }}>
+            <div style={{ flex:1 }}>
+              {NAV_LINKS.map(l => (
+                <button key={l.id} onClick={() => go(l.id)} style={{ width:"100%",background:page===l.id?"var(--hover-glow)":"none",border:"none",borderBottom:"1px solid var(--border)",padding:"16px 24px",fontSize:15,fontWeight:600,color:page===l.id?"var(--white)":"var(--gray)",textAlign:"left",transition:"color 0.15s",cursor:"pointer",display:"block" }}>
+                  {l.label}
+                </button>
+              ))}
+            </div>
+            <div style={{ padding:"20px 24px",borderTop:"1px solid var(--border)" }}>
+              <button onClick={handleAuthBtn} style={{ width:"100%",background:"var(--white)",color:"var(--black)",border:"none",padding:"12px 20px",fontSize:14,fontWeight:700,borderRadius:8,cursor:"pointer" }}>{rcSession ? "Log Out" : "Log In →"}</button>
             </div>
           </div>
         </>
