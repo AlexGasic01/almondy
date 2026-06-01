@@ -3905,22 +3905,11 @@ function ReviewChaserPage({ setPage, user, setUser }) {
 ════════════════════════════════════════════ */
 const LeadHeaterPage = ({ setPage }) => {
   const isMobile = useIsMobile();
+  const [activeStep, setActiveStep] = useState(0);
   const steps = [
-    {
-      num: "01",
-      title: "Customer fills your form",
-      body: "A lead submits your quote or booking form — from a Google Ad, Meta Ad, or your website.",
-    },
-    {
-      num: "02",
-      title: "AI texts them within 60 seconds",
-      body: "Before they've even opened another tab, your AI agent is already having a conversation — qualifying service, location, vehicle, and preferred date.",
-    },
-    {
-      num: "03",
-      title: "Booked and summarised",
-      body: "The appointment is locked in automatically. You get a full summary notification with everything you need before you even show up.",
-    },
+    { step: "STEP 01", title: "Customer fills your form", desc: "A lead submits your quote or booking form — from a Google Ad, Meta Ad, or your website." },
+    { step: "STEP 02", title: "AI texts them within 60 seconds", desc: "Before they've even opened another tab, your AI agent is already having a conversation — qualifying service, location, vehicle, and preferred date." },
+    { step: "STEP 03", title: "Booked and summarised", desc: "The appointment is locked in automatically. You get a full summary notification with everything you need before you even show up." },
   ];
   return (
     <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
@@ -3941,18 +3930,31 @@ const LeadHeaterPage = ({ setPage }) => {
 
       {/* How it works */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px 120px", width:"100%" }}>
-        <div style={{ textAlign:"center", marginBottom:isMobile?40:72 }}>
+        <div style={{ textAlign:"center", marginBottom:isMobile?40:56 }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)" }}>How It Works</p>
           <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)", fontWeight:600, letterSpacing:"-2px", lineHeight:1.05, color:"var(--white)" }}>From form fill to booked job.</h2>
         </div>
-        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:isMobile?16:20 }}>
-          {steps.map((s) => (
-            <div key={s.num} style={{ background:"var(--card-bg)", border:"1px solid var(--border)", borderRadius:14, padding:isMobile?24:28 }}>
-              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--green)", fontFamily:"var(--mono)", marginBottom:16 }}>{s.num}</div>
-              <h3 style={{ fontSize:isMobile?17:19, fontWeight:600, letterSpacing:"-0.8px", color:"var(--white)", marginBottom:10, lineHeight:1.2 }}>{s.title}</h3>
-              <p style={{ fontSize:13.5, color:"var(--gray)", lineHeight:1.75 }}>{s.body}</p>
+        <div style={{ display:"flex", alignItems:"center", marginBottom:isMobile?28:40 }}>
+          {steps.map((_,i) => (
+            <div key={i} style={{ display:"contents" }}>
+              <button onClick={() => setActiveStep(i)} style={{ width:isMobile?28:32, height:isMobile?28:32, borderRadius:"50%", border:`1px solid ${i<=activeStep?"var(--green)":"var(--border)"}`, background:i===activeStep?"var(--green)":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)", color:i===activeStep?"var(--black)":i<activeStep?"var(--green)":"var(--gray)", fontSize:isMobile?10:11, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, zIndex:1, boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none", transition:"all 0.35s", cursor:"pointer" }}>{i+1}</button>
+              {i<steps.length-1 && <div style={{ flex:1, height:1, background:"var(--border)", position:"relative" }}><div style={{ position:"absolute", top:0, left:0, height:"100%", width:activeStep>i?"100%":"0%", background:"var(--green)", transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} /></div>}
             </div>
           ))}
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:10 }}>
+          {steps.map(({step,title,desc},i) => {
+            const isGold = i === 1;
+            return (
+              <div key={step} onClick={() => !isGold && setActiveStep(i)} style={{ background:isGold?"rgba(245,158,11,0.07)":i===activeStep?"rgba(34,197,94,0.07)":"var(--card-bg)", border:`1px solid ${isGold?"rgba(245,158,11,0.35)":i===activeStep?"rgba(34,197,94,0.35)":"var(--border)"}`, borderRadius:14, padding:"22px 18px", position:"relative", overflow:"hidden", cursor:isGold?"default":"pointer", transition:"all 0.3s" }}>
+                {isGold && <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:"linear-gradient(90deg,rgba(245,158,11,0.6),transparent)" }} />}
+                {!isGold && i===activeStep && <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:"linear-gradient(90deg,rgba(34,197,94,0.6),transparent)" }} />}
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2px", color:isGold?"#f59e0b":i===activeStep?"var(--green)":"var(--gray)", fontFamily:"var(--mono)", marginBottom:12 }}>{step}</div>
+                <div style={{ fontSize:14, fontWeight:700, color:isGold||i===activeStep?"var(--white)":"var(--gray)", marginBottom:6, letterSpacing:"-0.3px" }}>{title}</div>
+                <p style={{ fontSize:12.5, color:i===activeStep||isGold?"#858585":"var(--muted)", lineHeight:1.7, margin:0 }}>{desc}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -3997,22 +3999,11 @@ const LeadHeaterPage = ({ setPage }) => {
 ════════════════════════════════════════════ */
 const CallCatchPage = ({ setPage }) => {
   const isMobile = useIsMobile();
+  const [activeStep, setActiveStep] = useState(0);
   const steps = [
-    {
-      num: "01",
-      title: "You miss a call mid-job",
-      body: "You're under a bonnet or mid-detail. Your phone rings. You can't answer. The caller hangs up — and normally that's the end of it.",
-    },
-    {
-      num: "02",
-      title: "CallCatch texts them within 30 seconds",
-      body: "Before they've called the next detailer, your AI sends a friendly SMS — acknowledging the missed call and starting a conversation.",
-    },
-    {
-      num: "03",
-      title: "Qualified, booked, and you're notified",
-      body: "The AI handles the back-and-forth or sends a booking link depending on your mode. You finish the job, then check the notification.",
-    },
+    { step: "STEP 01", title: "You miss a call mid-job", desc: "You're under a bonnet or mid-detail. Your phone rings. You can't answer. The caller hangs up — and normally that's the end of it." },
+    { step: "STEP 02", title: "CallCatch texts them within 30 seconds", desc: "Before they've called the next detailer, your AI sends a friendly SMS — acknowledging the missed call and starting a conversation." },
+    { step: "STEP 03", title: "Qualified, booked, and you're notified", desc: "The AI handles the back-and-forth or sends a booking link depending on your mode. You finish the job, then check the notification." },
   ];
   const modes = [
     {
@@ -4045,18 +4036,31 @@ const CallCatchPage = ({ setPage }) => {
 
       {/* How it works */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px 80px", width:"100%" }}>
-        <div style={{ textAlign:"center", marginBottom:isMobile?40:72 }}>
+        <div style={{ textAlign:"center", marginBottom:isMobile?40:56 }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)" }}>How It Works</p>
           <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)", fontWeight:600, letterSpacing:"-2px", lineHeight:1.05, color:"var(--white)" }}>Missed call. Booked job.</h2>
         </div>
-        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:isMobile?16:20, marginBottom:isMobile?40:60 }}>
-          {steps.map((s) => (
-            <div key={s.num} style={{ background:"var(--card-bg)", border:"1px solid var(--border)", borderRadius:14, padding:isMobile?24:28 }}>
-              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--green)", fontFamily:"var(--mono)", marginBottom:16 }}>{s.num}</div>
-              <h3 style={{ fontSize:isMobile?17:19, fontWeight:600, letterSpacing:"-0.8px", color:"var(--white)", marginBottom:10, lineHeight:1.2 }}>{s.title}</h3>
-              <p style={{ fontSize:13.5, color:"var(--gray)", lineHeight:1.75 }}>{s.body}</p>
+        <div style={{ display:"flex", alignItems:"center", marginBottom:isMobile?28:40 }}>
+          {steps.map((_,i) => (
+            <div key={i} style={{ display:"contents" }}>
+              <button onClick={() => setActiveStep(i)} style={{ width:isMobile?28:32, height:isMobile?28:32, borderRadius:"50%", border:`1px solid ${i<=activeStep?"var(--green)":"var(--border)"}`, background:i===activeStep?"var(--green)":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)", color:i===activeStep?"var(--black)":i<activeStep?"var(--green)":"var(--gray)", fontSize:isMobile?10:11, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, zIndex:1, boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none", transition:"all 0.35s", cursor:"pointer" }}>{i+1}</button>
+              {i<steps.length-1 && <div style={{ flex:1, height:1, background:"var(--border)", position:"relative" }}><div style={{ position:"absolute", top:0, left:0, height:"100%", width:activeStep>i?"100%":"0%", background:"var(--green)", transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} /></div>}
             </div>
           ))}
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:10, marginBottom:isMobile?40:60 }}>
+          {steps.map(({step,title,desc},i) => {
+            const isGold = i === 1;
+            return (
+              <div key={step} onClick={() => !isGold && setActiveStep(i)} style={{ background:isGold?"rgba(245,158,11,0.07)":i===activeStep?"rgba(34,197,94,0.07)":"var(--card-bg)", border:`1px solid ${isGold?"rgba(245,158,11,0.35)":i===activeStep?"rgba(34,197,94,0.35)":"var(--border)"}`, borderRadius:14, padding:"22px 18px", position:"relative", overflow:"hidden", cursor:isGold?"default":"pointer", transition:"all 0.3s" }}>
+                {isGold && <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:"linear-gradient(90deg,rgba(245,158,11,0.6),transparent)" }} />}
+                {!isGold && i===activeStep && <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:"linear-gradient(90deg,rgba(34,197,94,0.6),transparent)" }} />}
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2px", color:isGold?"#f59e0b":i===activeStep?"var(--green)":"var(--gray)", fontFamily:"var(--mono)", marginBottom:12 }}>{step}</div>
+                <div style={{ fontSize:14, fontWeight:700, color:isGold||i===activeStep?"var(--white)":"var(--gray)", marginBottom:6, letterSpacing:"-0.3px" }}>{title}</div>
+                <p style={{ fontSize:12.5, color:i===activeStep||isGold?"#858585":"var(--muted)", lineHeight:1.7, margin:0 }}>{desc}</p>
+              </div>
+            );
+          })}
         </div>
 
         {/* Two modes */}
