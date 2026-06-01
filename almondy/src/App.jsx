@@ -410,7 +410,7 @@ const HomePage = ({ setPage }) => {
       <div style={{ maxWidth:1180,margin:"0 auto",padding:isMobile?"60px 20px":"100px 48px" }}>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Our Systems</p>
         <h2 style={{ fontSize:isMobile?"clamp(28px,8vw,40px)":"clamp(32px,3.5vw,52px)",fontWeight:600,letterSpacing:"-2px",lineHeight:1.05,color:"var(--white)",marginBottom:36 }}>
-          Tools that get things done.
+          Systems that get things done.
         </h2>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
   {/* PayChaser */}
@@ -527,17 +527,16 @@ const SystemsPage = ({ setPage }) => {
 
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Our Systems</p>
         <h1 style={{ fontSize:isMobile?"clamp(32px,10vw,52px)":"clamp(40px,5vw,72px)",fontWeight:600,letterSpacing:"-2.5px",lineHeight:1.05,color:"var(--white)",marginBottom:16 }}>
-          Tools that get things done.
+          Systems that get things done.
         </h1>
         <p style={{ fontSize:15.5,color:"#858585",maxWidth:480,lineHeight:1.75 }}>Software built for the real world. Each system solves one problem, and solves it well.</p>
       </div>
       <div style={{ maxWidth:1280,margin:"0 auto",padding:isMobile?"0 20px 48px":"0 64px 72px", flex:1 }}>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
-            <SysCard onClick={() => setPage("reviewchaser")} live name="ReviewChaser" desc="Send SMS review requests in seconds. More Google reviews, zero awkwardness." />
-          {/* ReviewChaser — ADDED */}
-            <SysCard onClick={null} live={false} name="PayChaser" desc="Automated invoice reminders and payment tracking. Coming soon." />
-          <LockedCard />
-          {!isMobile && <LockedCard />}
+          <SysCard onClick={() => setPage("reviewchaser")} live name="ReviewChaser" desc="Send SMS review requests in seconds. More Google reviews, zero awkwardness." />
+          <SysCard onClick={null} live={false} name="PayChaser" desc="Automated invoice reminders and payment tracking. Coming soon." />
+          <SysCard onClick={() => setPage("lead-heater")} live name="Lead Heater" desc="AI agent that follows up ad leads within 60 seconds — qualifies, books, and notifies you." />
+          <SysCard onClick={() => setPage("call-catch")} live name="CallCatch" desc="AI agent that texts every missed caller within 30 seconds so you never lose a job to voicemail." />
         </div>
       </div>
       <Footer setPage={setPage} />
