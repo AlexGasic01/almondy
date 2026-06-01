@@ -4132,28 +4132,6 @@ const CallCatchPage = ({ setPage }) => {
 const LanderPage = () => {
   const isMobile = useIsMobile();
 
-  useEffect(() => {
-    const CAL_NS   = "30min-discovery";
-    const CAL_LINK = "alexg009/30min-discovery";
-    const script = document.createElement("script");
-    script.src = "https://app.cal.com/embed/embed.js";
-    script.async = true;
-    script.onload = () => {
-      window.Cal("init", CAL_NS, { origin: "https://cal.com" });
-      window.Cal.ns[CAL_NS]("inline", {
-        elementOrSelector: "#cal-inline",
-        calLink: CAL_LINK,
-        config: { layout: "month_view" },
-      });
-      window.Cal.ns[CAL_NS]("ui", {
-        styles: { branding: { brandColor: "#22c55e" } },
-        hideEventTypeDetails: false,
-        layout: "month_view",
-      });
-    };
-    document.head.appendChild(script);
-    return () => { if (document.head.contains(script)) document.head.removeChild(script); };
-  }, []);
 
   return (
     <div style={{ minHeight:"100vh", background:"var(--black)", display:"flex", flexDirection:"column" }}>
@@ -4172,8 +4150,12 @@ const LanderPage = () => {
 
       {/* Cal.com booking */}
       <div style={{ flex:1, maxWidth:1000, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
-        <div style={{ background:"var(--card-bg)", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
-          <div id="cal-inline" style={{ width:"100%", minHeight:700 }} />
+        <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
+          <iframe
+            src="https://cal.com/alexg009/30min-discovery?embed=true&theme=dark&layout=month_view"
+            style={{ width:"100%", height:700, border:"none", display:"block" }}
+            title="Schedule a Discovery Call"
+          />
         </div>
       </div>
     </div>
