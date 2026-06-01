@@ -4129,11 +4129,29 @@ const CallCatchPage = ({ setPage }) => {
 /* ════════════════════════════════════════════
    BOOKING WIDGET  (used by LanderPage)
 ════════════════════════════════════════════ */
-const TIME_SLOTS = [
-  "9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM",
-  "12:00 PM","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM",
-  "3:00 PM","3:30 PM","4:00 PM","4:30 PM",
+/* Slots by day — Mon–Thu 4:15pm–8pm, Fri 3pm–8pm, Sat–Sun 8am–8pm */
+const SLOTS_MON_THU = [
+  "4:15 PM","4:45 PM","5:15 PM","5:45 PM",
+  "6:15 PM","6:45 PM","7:15 PM","7:30 PM",
 ];
+const SLOTS_FRI = [
+  "3:00 PM","3:30 PM","4:00 PM","4:30 PM",
+  "5:00 PM","5:30 PM","6:00 PM","6:30 PM",
+  "7:00 PM","7:30 PM",
+];
+const SLOTS_WEEKEND = [
+  "8:00 AM","8:30 AM","9:00 AM","9:30 AM","10:00 AM","10:30 AM",
+  "11:00 AM","11:30 AM","12:00 PM","12:30 PM","1:00 PM","1:30 PM",
+  "2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM","4:30 PM",
+  "5:00 PM","5:30 PM","6:00 PM","6:30 PM","7:00 PM","7:30 PM",
+];
+const getSlotsForDate = d => {
+  if (!d) return [];
+  const dow = d.getDay();
+  if (dow === 5) return SLOTS_FRI;
+  if (dow === 0 || dow === 6) return SLOTS_WEEKEND;
+  return SLOTS_MON_THU;
+};
 
 const COUNTRY_CODES = [
   { code:"+61", flag:"🇦🇺", label:"AU" },
@@ -4188,13 +4206,13 @@ const BookingWidget = () => {
   const isAvailable = d => {
     if (!d) return false;
     const cmp = new Date(d); cmp.setHours(0,0,0,0);
-    if (cmp < todayBase) return false;
-    return d.getDay() !== 0 && d.getDay() !== 6;
+    return cmp >= todayBase;
   };
 
-  const slots = useMemo(() =>
-    selectedDate ? TIME_SLOTS.map((t, i) => ({ time:t, booked: isSlotBooked(selectedDate, i) })) : [],
-  [selectedDate]);
+  const slots = useMemo(() => {
+    if (!selectedDate) return [];
+    return getSlotsForDate(selectedDate).map((t, i) => ({ time:t, booked: isSlotBooked(selectedDate, i) }));
+  }, [selectedDate]);
 
   const fmtShort   = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric", year:"numeric" }) : "";
   const fmtSlotHdr = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric" }) : "";
@@ -4347,7 +4365,7 @@ const BookingWidget = () => {
             const isSel   = selectedDate && date.toDateString() === selectedDate.toDateString();
             const isToday = date.toDateString() === todayBase.toDateString();
             /* count available slots for this day to show scarcity hint */
-            const freeCount = avail ? TIME_SLOTS.filter((_,idx) => !isSlotBooked(date, idx)).length : 0;
+            const freeCount = avail ? getSlotsForDate(date).filter((_,idx) => !isSlotBooked(date, idx)).length : 0;
             const almostFull = avail && freeCount > 0 && freeCount <= 4;
             return (
               <div key={i} style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"3px 0" }}>
