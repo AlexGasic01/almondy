@@ -710,18 +710,18 @@ const STEPS_ONBOARDING = [
 
 // ── WebDev onboarding shared styles (module-level to prevent per-render recreation) ──
 const WD_INPUT_STYLE = {
-  width:"100%", padding:"12px 16px", background:"#0f0f0f",
-  border:"1px solid rgba(255,255,255,0.1)", borderRadius:10,
-  fontSize:15, color:"#fff", outline:"none", fontFamily:"var(--font)", boxSizing:"border-box",
+  width:"100%", padding:"12px 16px", background:"var(--input-bg)",
+  border:"1px solid var(--input-border)", borderRadius:10,
+  fontSize:15, color:"var(--input-text)", outline:"none", fontFamily:"var(--font)", boxSizing:"border-box",
 };
 const WD_TEXTAREA_STYLE = { ...WD_INPUT_STYLE, resize:"vertical", minHeight:90 };
-const WD_LABEL_STYLE = { fontSize:12, fontWeight:600, color:"#555", display:"block", marginBottom:8 };
+const WD_LABEL_STYLE = { fontSize:12, fontWeight:600, color:"var(--gray)", display:"block", marginBottom:8 };
 const WD_OPT_STYLE = (active) => ({
-  background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c",
-  border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`,
+  background: active ? "rgba(34,197,94,0.07)" : "var(--card-bg)",
+  border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "var(--border)"}`,
   borderRadius:9, padding:"11px 14px", cursor:"pointer",
   display:"flex", alignItems:"flex-start", gap:9,
-  fontSize:13, fontWeight:600, color: active ? "#22c55e" : "#666", textAlign:"left",
+  fontSize:13, fontWeight:600, color: active ? "#22c55e" : "var(--gray)", textAlign:"left",
 });
 
 // ── Sub-components defined at module level (prevents remount on parent re-render) ──
@@ -748,7 +748,7 @@ const WDToggleGrid = ({ options, value, onChange, multi = true, cols = 2 }) => (
           <WDTick active={active} round={!multi} />
           <div>
             <div>{opt.label}</div>
-            {opt.desc && <div style={{ fontSize:10, color:"#444", fontWeight:400, marginTop:2 }}>{opt.desc}</div>}
+            {opt.desc && <div style={{ fontSize:10, color:"var(--muted)", fontWeight:400, marginTop:2 }}>{opt.desc}</div>}
           </div>
         </button>
       );
@@ -766,10 +766,10 @@ const WDYesNo = ({ value, onChange, label }) => (
         return (
           <button key={v} onClick={() => onChange(v)} style={{
             flex:1, padding:"11px",
-            background: active ? (isYes ? "rgba(34,197,94,0.07)" : "rgba(239,68,68,0.07)") : "#0c0c0c",
-            border:`1px solid ${active ? (isYes ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)") : "rgba(255,255,255,0.07)"}`,
+            background: active ? (isYes ? "rgba(34,197,94,0.07)" : "rgba(239,68,68,0.07)") : "var(--card-bg)",
+            border:`1px solid ${active ? (isYes ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)") : "var(--border)"}`,
             borderRadius:9, cursor:"pointer", fontSize:13, fontWeight:600,
-            color: active ? (isYes ? "#22c55e" : "#f87171") : "#666",
+            color: active ? (isYes ? "#22c55e" : "#f87171") : "var(--gray)",
           }}>{isYes ? "Yes" : "No"}</button>
         );
       })}
@@ -842,15 +842,15 @@ const WebDevOnboardingPage = ({ setPage }) => {
               onKeyDown={e => e.key === "Enter" && data.bizDesc.trim() && go(1)} />
           </div>
           <div>
-            <label style={WD_LABEL_STYLE}>What do you do? <span style={{ color: "#383838", fontWeight: 400 }}>(brief)</span></label>
+            <label style={WD_LABEL_STYLE}>What do you do? <span style={{ color: "var(--muted)", fontWeight: 400 }}>(brief)</span></label>
             <textarea style={WD_TEXTAREA_STYLE} placeholder="e.g. We install solar panels for residential homes in Brisbane." value={data.bizDesc} onChange={e => set("bizDesc", e.target.value)} />
           </div>
           <div>
-            <label style={WD_LABEL_STYLE}>Location <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Location <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <input style={WD_INPUT_STYLE} placeholder="e.g. Brisbane, QLD" value={data.bizLocation} onChange={e => set("bizLocation", e.target.value)} />
           </div>
           <div>
-            <label style={WD_LABEL_STYLE}>Who is your ideal customer? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Who is your ideal customer? <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <input style={WD_INPUT_STYLE} placeholder="e.g. Homeowners aged 35-60 in Brisbane suburbs" value={data.idealCustomer} onChange={e => set("idealCustomer", e.target.value)} />
           </div>
         </div>
@@ -859,7 +859,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <WDToggleGrid options={VIBE_OPTIONS} value={data.vibe} onChange={v => set("vibe", v)} multi={false} cols={2} />
           <div>
-            <label style={WD_LABEL_STYLE}>Any sites you love? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Any sites you love? <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 76 }} placeholder="Paste URLs or describe what you like about them..." value={data.vibeInspo} onChange={e => set("vibeInspo", e.target.value)} />
           </div>
         </div>
@@ -870,28 +870,28 @@ const WebDevOnboardingPage = ({ setPage }) => {
             {PALETTE_OPTIONS.map(p => {
               const active = data.palette === p.id;
               return (
-                <button key={p.id} onClick={() => set("palette", p.id)} style={{ background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c", border: `1px solid ${active ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "12px 14px", cursor: "pointer", textAlign: "left" }}>
+                <button key={p.id} onClick={() => set("palette", p.id)} style={{ background: active ? "rgba(34,197,94,0.07)" : "var(--card-bg)", border: `1px solid ${active ? "rgba(34,197,94,0.4)" : "var(--border)"}`, borderRadius: 10, padding: "12px 14px", cursor: "pointer", textAlign: "left" }}>
                   <div style={{ display: "flex", gap: 5, marginBottom: 8 }}>
-                    {p.colors.length > 0 ? p.colors.map(c => <div key={c} style={{ width: 16, height: 16, borderRadius: "50%", background: c, border: "1px solid rgba(255,255,255,0.1)" }} />) : <div style={{ width: 16, height: 16, borderRadius: "50%", background: "conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)", flexShrink: 0 }} />}
+                    {p.colors.length > 0 ? p.colors.map(c => <div key={c} style={{ width: 16, height: 16, borderRadius: "50%", background: c, border: "1px solid var(--border)" }} />) : <div style={{ width: 16, height: 16, borderRadius: "50%", background: "conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)", flexShrink: 0 }} />}
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: active ? "#22c55e" : "#888" }}>{p.label}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: active ? "#22c55e" : "var(--gray)" }}>{p.label}</div>
                 </button>
               );
             })}
           </div>
           {data.palette === "custom" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16, background: "#0c0c0c", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: 20 }}>
-              <p style={{ fontSize: 12, color: "#555", margin: 0 }}>Pick your two brand colours:</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16, background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}>
+              <p style={{ fontSize: 12, color: "var(--gray)", margin: 0 }}>Pick your two brand colours:</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "#555", display: "block", marginBottom: 10, letterSpacing: "1px", textTransform: "uppercase" }}>Primary</label>
-                  <div style={{ width: 86, height: 86, borderRadius: "50%", overflow: "hidden", border: "2px solid rgba(255,255,255,0.12)", cursor: "pointer" }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "var(--gray)", display: "block", marginBottom: 10, letterSpacing: "1px", textTransform: "uppercase" }}>Primary</label>
+                  <div style={{ width: 86, height: 86, borderRadius: "50%", overflow: "hidden", border: "2px solid var(--border)", cursor: "pointer" }}>
                     <input type="color" value={data.paletteCustom?.split("|")[0] || "#6366f1"} onChange={e => { const s = data.paletteCustom?.split("|")[1] || "#ffffff"; set("paletteCustom", e.target.value + "|" + s); }} style={{ width: "150%", height: "150%", marginTop: "-25%", marginLeft: "-25%", border: "none", padding: 0, cursor: "pointer" }} />
                   </div>
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "#555", display: "block", marginBottom: 10, letterSpacing: "1px", textTransform: "uppercase" }}>Secondary</label>
-                  <div style={{ width: 86, height: 86, borderRadius: "50%", overflow: "hidden", border: "2px solid rgba(255,255,255,0.12)", cursor: "pointer" }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "var(--gray)", display: "block", marginBottom: 10, letterSpacing: "1px", textTransform: "uppercase" }}>Secondary</label>
+                  <div style={{ width: 86, height: 86, borderRadius: "50%", overflow: "hidden", border: "2px solid var(--border)", cursor: "pointer" }}>
                     <input type="color" value={data.paletteCustom?.split("|")[1] || "#ffffff"} onChange={e => { const p = data.paletteCustom?.split("|")[0] || "#6366f1"; set("paletteCustom", p + "|" + e.target.value); }} style={{ width: "150%", height: "150%", marginTop: "-25%", marginLeft: "-25%", border: "none", padding: 0, cursor: "pointer" }} />
                   </div>
                 </div>
@@ -899,7 +899,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
             </div>
           )}
           <div>
-            <label style={WD_LABEL_STYLE}>Colour notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Colour notes <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <input style={WD_INPUT_STYLE} placeholder='e.g. "Must use our brand red #E63946"' value={data.colourNotes} onChange={e => set("colourNotes", e.target.value)} />
           </div>
         </div>
@@ -909,9 +909,9 @@ const WebDevOnboardingPage = ({ setPage }) => {
           {FONT_OPTIONS.map(f => {
             const active = data.font === f.id;
             return (
-              <button key={f.id} onClick={() => set("font", f.id)} style={{ background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c", border: `1px solid ${active ? "rgba(34,197,94,0.4)" : "rgba(255,255,255,0.07)"}`, borderRadius: 10, padding: "14px 18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                <span style={{ font: f.style, color: active ? "#22c55e" : "#ccc", fontSize: 16 }}>Aa / {f.label}</span>
-                <span style={{ fontSize: 12, color: "#444" }}>{f.desc}</span>
+              <button key={f.id} onClick={() => set("font", f.id)} style={{ background: active ? "rgba(34,197,94,0.07)" : "var(--card-bg)", border: `1px solid ${active ? "rgba(34,197,94,0.4)" : "var(--border)"}`, borderRadius: 10, padding: "14px 18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                <span style={{ font: f.style, color: active ? "#22c55e" : "var(--gray)", fontSize: 16 }}>Aa / {f.label}</span>
+                <span style={{ fontSize: 12, color: "var(--muted)" }}>{f.desc}</span>
               </button>
             );
           })}
@@ -925,7 +925,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
           <WDYesNo value={data.hasHeadshot} onChange={v => set("hasHeadshot", v)} label="Do you have a headshot / team photo?" />
           <WDYesNo value={data.needsLogo}   onChange={v => set("needsLogo", v)}   label="Do you need a logo designed?" />
           <div>
-            <label style={WD_LABEL_STYLE}>Asset notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Asset notes <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="e.g. Logo is in .AI format, photos coming next week..." value={data.assetNotes} onChange={e => set("assetNotes", e.target.value)} />
           </div>
         </div>
@@ -936,20 +936,20 @@ const WebDevOnboardingPage = ({ setPage }) => {
             {HERO_LAYOUT_OPTIONS.map(h => {
               const active = data.heroLayout === h.id;
               return (
-                <button key={h.id} onClick={() => set("heroLayout", h.id)} style={{ background: "transparent", border: `2px solid ${active ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.07)"}`, borderRadius: 12, padding: 0, cursor: "pointer", textAlign: "left", overflow: "hidden" }}>
+                <button key={h.id} onClick={() => set("heroLayout", h.id)} style={{ background: "transparent", border: `2px solid ${active ? "rgba(34,197,94,0.5)" : "var(--border)"}`, borderRadius: 12, padding: 0, cursor: "pointer", textAlign: "left", overflow: "hidden" }}>
                   <div style={{ pointerEvents: "none" }}>{h.preview}</div>
-                  <div style={{ padding: "10px 12px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: active ? "#22c55e" : "#888", marginBottom: 3 }}>{h.label}</div>
-                    <div style={{ fontSize: 11, color: "#444", lineHeight: 1.5 }}>{h.desc}</div>
+                  <div style={{ padding: "10px 12px", borderTop: "1px solid var(--border)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: active ? "#22c55e" : "var(--gray)", marginBottom: 3 }}>{h.label}</div>
+                    <div style={{ fontSize: 11, color: "var(--muted)", lineHeight: 1.5 }}>{h.desc}</div>
                   </div>
                 </button>
               );
             })}
           </div>
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 14 }}>
-            <p style={{ fontSize: 12, color: "#555", marginBottom: 10 }}>Have a site you love? Upload a screenshot or paste a URL.</p>
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 14 }}>
+            <p style={{ fontSize: 12, color: "var(--gray)", marginBottom: 10 }}>Have a site you love? Upload a screenshot or paste a URL.</p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <label style={{ flex: 1, minWidth: 140, background: "#0c0c0c", border: "1px dashed rgba(255,255,255,0.12)", borderRadius: 10, padding: "13px 16px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: data.heroUploadName ? "#22c55e" : "#555" }}>
+              <label style={{ flex: 1, minWidth: 140, background: "var(--card-bg)", border: "1px dashed var(--border)", borderRadius: 10, padding: "13px 16px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: data.heroUploadName ? "#22c55e" : "var(--gray)" }}>
                 <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) set("heroUploadName", f.name); }} />
                 {data.heroUploadName ? `✓ ${data.heroUploadName}` : "Upload image reference"}
               </label>
@@ -965,11 +965,11 @@ const WebDevOnboardingPage = ({ setPage }) => {
             <input autoFocus style={WD_INPUT_STYLE} placeholder='"Solar done right. Every time."' value={data.heroHeadline} onChange={e => set("heroHeadline", e.target.value)} />
           </div>
           <div>
-            <label style={WD_LABEL_STYLE}>Subheadline <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Subheadline <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <textarea style={WD_TEXTAREA_STYLE} placeholder="A short supporting line." value={data.heroSubline} onChange={e => set("heroSubline", e.target.value)} />
           </div>
           <div>
-            <label style={WD_LABEL_STYLE}>CTA button text <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>CTA button text <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <input style={WD_INPUT_STYLE} placeholder='"Get a free quote"' value={data.heroCta} onChange={e => set("heroCta", e.target.value)} />
           </div>
           <div>
@@ -978,7 +978,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
               {["solid", "photo", "gradient", "video"].map(bg => {
                 const active = data.heroBackground === bg;
                 return (
-                  <button key={bg} onClick={() => set("heroBackground", bg)} style={{ flex: 1, padding: "10px 6px", background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 8, cursor: "pointer", fontSize: 11, fontWeight: 600, color: active ? "#22c55e" : "#666" }}>
+                  <button key={bg} onClick={() => set("heroBackground", bg)} style={{ flex: 1, padding: "10px 6px", background: active ? "rgba(34,197,94,0.07)" : "var(--card-bg)", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "var(--border)"}`, borderRadius: 8, cursor: "pointer", fontSize: 11, fontWeight: 600, color: active ? "#22c55e" : "var(--gray)" }}>
                     {bg.charAt(0).toUpperCase() + bg.slice(1)}
                   </button>
                 );
@@ -986,10 +986,10 @@ const WebDevOnboardingPage = ({ setPage }) => {
             </div>
           </div>
           {data.heroHeadline && (
-            <div style={{ background: "#0c0c0c", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: 20 }}>
-              <div style={{ fontSize: 9, color: "#383838", fontFamily: "var(--mono)", letterSpacing: 2, marginBottom: 10 }}>PREVIEW</div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: "-0.8px", lineHeight: 1.1, marginBottom: 6 }}>{data.heroHeadline}</div>
-              {data.heroSubline && <div style={{ fontSize: 13, color: "#666", lineHeight: 1.7, marginBottom: 12 }}>{data.heroSubline}</div>}
+            <div style={{ background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 10, padding: 20 }}>
+              <div style={{ fontSize: 9, color: "var(--muted)", fontFamily: "var(--mono)", letterSpacing: 2, marginBottom: 10 }}>PREVIEW</div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: "var(--white)", letterSpacing: "-0.8px", lineHeight: 1.1, marginBottom: 6 }}>{data.heroHeadline}</div>
+              {data.heroSubline && <div style={{ fontSize: 13, color: "var(--gray)", lineHeight: 1.7, marginBottom: 12 }}>{data.heroSubline}</div>}
               {data.heroCta && <div style={{ display: "inline-block", background: "#fff", color: "#000", borderRadius: 7, padding: "8px 16px", fontSize: 12, fontWeight: 700 }}>{data.heroCta} →</div>}
             </div>
           )}
@@ -999,7 +999,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <WDToggleGrid options={SOCIAL_PROOF_OPTIONS} value={data.socialProof} onChange={v => set("socialProof", v)} multi={true} cols={2} />
           <div>
-            <label style={WD_LABEL_STYLE}>Notes <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Notes <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="e.g. We have 80+ Google reviews, 4.9 stars..." value={data.socialProofNotes} onChange={e => set("socialProofNotes", e.target.value)} />
           </div>
         </div>
@@ -1008,20 +1008,20 @@ const WebDevOnboardingPage = ({ setPage }) => {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <WDToggleGrid options={LEAD_OPTIONS} value={data.leadMethod} onChange={v => set("leadMethod", v)} multi={true} cols={2} />
           <div>
-            <label style={WD_LABEL_STYLE}>What info do you need from leads? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>What info do you need from leads? <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="e.g. Name, phone, address, type of job, preferred time..." value={data.formFields} onChange={e => set("formFields", e.target.value)} />
           </div>
         </div>
       );
       case 9: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <p style={{ fontSize: 13, color: "#666", marginBottom: 4 }}>Select all pages you need:</p>
+          <p style={{ fontSize: 13, color: "var(--gray)", marginBottom: 4 }}>Select all pages you need:</p>
           <WDToggleGrid options={PAGE_OPTIONS} value={data.pages} onChange={v => set("pages", v)} multi={true} cols={2} />
         </div>
       );
       case 10: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <p style={{ fontSize: 13, color: "#666", marginBottom: 4 }}>Select any features you need: <span style={{ color: "#383838" }}>(all optional)</span></p>
+          <p style={{ fontSize: 13, color: "var(--gray)", marginBottom: 4 }}>Select any features you need: <span style={{ color: "var(--muted)" }}>(all optional)</span></p>
           <WDToggleGrid options={FEATURE_OPTIONS} value={data.features} onChange={v => set("features", v)} multi={true} cols={2} />
         </div>
       );
@@ -1033,7 +1033,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
           </WDConditionalInput>
           <WDYesNo value={data.hasHosting} onChange={v => set("hasHosting", v)} label="Do you have existing hosting?" />
           <div>
-            <label style={WD_LABEL_STYLE}>Current website URL <span style={{ color: "#383838", fontWeight: 400 }}>(if you have one)</span></label>
+            <label style={WD_LABEL_STYLE}>Current website URL <span style={{ color: "var(--muted)", fontWeight: 400 }}>(if you have one)</span></label>
             <input style={WD_INPUT_STYLE} placeholder="https://..." value={data.existingSite} onChange={e => set("existingSite", e.target.value)} />
           </div>
           <WDYesNo value={data.needsCms} onChange={v => set("needsCms", v)} label="Do you want to be able to edit the site yourself?" />
@@ -1042,19 +1042,19 @@ const WebDevOnboardingPage = ({ setPage }) => {
       case 12: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <label style={WD_LABEL_STYLE}>Top 2-3 local competitor URLs <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Top 2-3 local competitor URLs <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder={"e.g. https://smithelectrical.com.au\nhttps://brisbaneelectrics.com.au"} value={data.competitors} onChange={e => set("competitors", e.target.value)} />
           </div>
           <div>
-            <label style={WD_LABEL_STYLE}>Sites you love — any industry <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Sites you love — any industry <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="Paste URLs or describe what you like..." value={data.inspiration} onChange={e => set("inspiration", e.target.value)} />
           </div>
           <div>
-            <label style={WD_LABEL_STYLE}>Anything you hate the look of? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Anything you hate the look of? <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="Styles, colours, trends you want to avoid..." value={data.antiInspo} onChange={e => set("antiInspo", e.target.value)} />
           </div>
           <div>
-            <label style={WD_LABEL_STYLE}>One word to describe how you want the site to feel <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>One word to describe how you want the site to feel <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <input style={WD_INPUT_STYLE} placeholder='"trustworthy" / "premium" / "energetic"' value={data.oneFeelingWord} onChange={e => set("oneFeelingWord", e.target.value)} />
           </div>
         </div>
@@ -1062,7 +1062,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
       case 13: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <label style={WD_LABEL_STYLE}>When do you need it live? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>When do you need it live? <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <input style={WD_INPUT_STYLE} placeholder="e.g. End of July, or ASAP" value={data.deadline} onChange={e => set("deadline", e.target.value)} />
           </div>
           <WDYesNo value={data.hardDeadline} onChange={v => set("hardDeadline", v)} label="Is this a hard deadline?" />
@@ -1072,7 +1072,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
               {["Under $500/month", "$500-$1000/month", "$1000+/month", "Not sure"].map(b => {
                 const active = data.budget === b;
                 return (
-                  <button key={b} onClick={() => set("budget", b)} style={{ padding: "11px 14px", background: active ? "rgba(34,197,94,0.07)" : "#0c0c0c", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius: 9, cursor: "pointer", fontSize: 13, fontWeight: 600, color: active ? "#22c55e" : "#666", textAlign: "left", display: "flex", alignItems: "center", gap: 9 }}>
+                  <button key={b} onClick={() => set("budget", b)} style={{ padding: "11px 14px", background: active ? "rgba(34,197,94,0.07)" : "var(--card-bg)", border: `1px solid ${active ? "rgba(34,197,94,0.35)" : "var(--border)"}`, borderRadius: 9, cursor: "pointer", fontSize: 13, fontWeight: 600, color: active ? "#22c55e" : "var(--gray)", textAlign: "left", display: "flex", alignItems: "center", gap: 9 }}>
                     <WDTick active={active} round={true} />
                     {b}
                   </button>
@@ -1081,14 +1081,14 @@ const WebDevOnboardingPage = ({ setPage }) => {
             </div>
           </div>
           <div>
-            <label style={WD_LABEL_STYLE}>Any concerns or questions? <span style={{ color: "#383838", fontWeight: 400 }}>(optional)</span></label>
+            <label style={WD_LABEL_STYLE}>Any concerns or questions? <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
             <textarea style={{ ...WD_TEXTAREA_STYLE, minHeight: 70 }} placeholder="Anything on your mind..." value={data.concerns} onChange={e => set("concerns", e.target.value)} />
           </div>
         </div>
       );
       case 14: return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ background: "#0c0c0c", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, display: "flex", flexDirection: "column", gap: 10 }}>
             {[
               ["Business",      data.bizName],
               ["Description",   data.bizDesc],
@@ -1116,16 +1116,16 @@ const WebDevOnboardingPage = ({ setPage }) => {
               ["Budget",        data.budget],
               ["Deadline",      data.deadline + (data.hardDeadline ? ` (hard: ${data.hardDeadline})` : "")],
             ].filter(([, v]) => v).map(([k, v]) => (
-              <div key={k} style={{ display: "flex", gap: 12, alignItems: "flex-start", borderBottom: "1px solid rgba(255,255,255,0.04)", paddingBottom: 8 }}>
-                <div style={{ fontSize: 11, color: "#444", fontFamily: "var(--mono)", minWidth: 110, paddingTop: 2 }}>{k}</div>
-                <div style={{ fontSize: 13, color: "#aaa", lineHeight: 1.5, flex: 1 }}>{v}</div>
+              <div key={k} style={{ display: "flex", gap: 12, alignItems: "flex-start", borderBottom: "1px solid var(--border)", paddingBottom: 8 }}>
+                <div style={{ fontSize: 11, color: "var(--muted)", fontFamily: "var(--mono)", minWidth: 110, paddingTop: 2 }}>{k}</div>
+                <div style={{ fontSize: 13, color: "var(--white)", lineHeight: 1.5, flex: 1 }}>{v}</div>
               </div>
             ))}
           </div>
           <div>
-            <label style={{ ...WD_LABEL_STYLE, color: "#666" }}>Your email <span style={{ color: "#22c55e" }}>*</span></label>
+            <label style={WD_LABEL_STYLE}>Your email <span style={{ color: "#22c55e" }}>*</span></label>
             <input autoFocus style={WD_INPUT_STYLE} type="email" placeholder="yourname@domain.com" value={data.email} onChange={e => set("email", e.target.value)} />
-            <p style={{ fontSize: 11.5, color: "#383838", marginTop: 8 }}>We'll get back to you within 24 hours with a quote.</p>
+            <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 8 }}>We'll get back to you within 24 hours with a quote.</p>
           </div>
         </div>
       );
@@ -1209,7 +1209,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
 
   return (
     <div style={{ paddingTop: 62, minHeight: "100vh" }}>
-      <div style={{ position: "fixed", top: 62, left: 0, right: 0, height: 2, background: "rgba(255,255,255,0.05)", zIndex: 100 }}>
+      <div style={{ position: "fixed", top: 62, left: 0, right: 0, height: 2, background: "var(--border)", zIndex: 100 }}>
         <div style={{ height: "100%", width: `${((step + 1) / STEPS_ONBOARDING.length) * 100}%`, background: "var(--green)", transition: "width 0.4s cubic-bezier(0.22,1,0.36,1)" }} />
       </div>
 
@@ -1228,7 +1228,7 @@ const WebDevOnboardingPage = ({ setPage }) => {
       <div style={{ maxWidth: 640, margin: "0 auto", padding: isMobile ? "40px 20px 80px" : "80px 48px 100px" }}>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 32 }}>
           {STEPS_ONBOARDING.map((s, i) => (
-            <div key={s} style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.5px", padding: "3px 10px", borderRadius: 999, background: i < step ? "rgba(34,197,94,0.1)" : i === step ? "var(--green)" : "rgba(255,255,255,0.04)", color: i < step ? "#22c55e" : i === step ? "#000" : "#656565", border: `1px solid ${i < step ? "rgba(34,197,94,0.25)" : i === step ? "transparent" : "rgba(255,255,255,0.06)"}`, transition: "all 0.3s" }}>{s}</div>
+            <div key={s} style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.5px", padding: "3px 10px", borderRadius: 999, background: i < step ? "rgba(34,197,94,0.1)" : i === step ? "var(--green)" : "var(--surface)", color: i < step ? "#22c55e" : i === step ? "#000" : "var(--gray)", border: `1px solid ${i < step ? "rgba(34,197,94,0.25)" : i === step ? "transparent" : "var(--border)"}`, transition: "all 0.3s" }}>{s}</div>
           ))}
         </div>
         <div style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : `translateY(${animDir > 0 ? 14 : -14}px)`, transition: "all 0.25s cubic-bezier(0.22,1,0.36,1)", marginBottom: 28 }}>
@@ -1238,11 +1238,11 @@ const WebDevOnboardingPage = ({ setPage }) => {
         <div style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : `translateY(${animDir > 0 ? 14 : -14}px)`, transition: "all 0.25s 0.04s cubic-bezier(0.22,1,0.36,1)" }}>
           {stepContent()}
         </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 36, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          <button onClick={() => step === 0 ? setPage("webdev") : go(-1)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", fontSize: 13, fontWeight: 600, borderRadius: 8, background: "transparent", color: "#555", border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer" }}>← {step === 0 ? "Back" : "Previous"}</button>
-          <span style={{ fontSize: 11, color: "#656565", fontFamily: "var(--mono)" }}>{step + 1} / {STEPS_ONBOARDING.length}</span>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 36, paddingTop: 24, borderTop: "1px solid var(--divider)" }}>
+          <button onClick={() => step === 0 ? setPage("webdev") : go(-1)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", fontSize: 13, fontWeight: 600, borderRadius: 8, background: "transparent", color: "var(--gray)", border: "1px solid var(--border)", cursor: "pointer" }}>← {step === 0 ? "Back" : "Previous"}</button>
+          <span style={{ fontSize: 11, color: "var(--muted)", fontFamily: "var(--mono)" }}>{step + 1} / {STEPS_ONBOARDING.length}</span>
           {step < STEPS_ONBOARDING.length - 1 ? (
-            <button onClick={() => canNext() && go(1)} disabled={!canNext()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", fontSize: 13, fontWeight: 700, borderRadius: 8, background: canNext() ? "var(--white)" : "rgba(255,255,255,0.08)", color: canNext() ? "var(--black)" : "#656565", border: "none", cursor: canNext() ? "pointer" : "default", transition: "all 0.2s" }}>Next →</button>
+            <button onClick={() => canNext() && go(1)} disabled={!canNext()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", fontSize: 13, fontWeight: 700, borderRadius: 8, background: canNext() ? "var(--white)" : "var(--surface)", color: canNext() ? "var(--black)" : "var(--gray)", border: "none", cursor: canNext() ? "pointer" : "default", transition: "all 0.2s" }}>Next →</button>
           ) : (
             <button onClick={handleSubmit} disabled={!canNext()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", fontSize: 13, fontWeight: 700, borderRadius: 8, background: canNext() ? "var(--green)" : "rgba(34,197,94,0.15)", color: canNext() ? "#000" : "#1a4a2e", border: "none", cursor: canNext() ? "pointer" : "default" }}>Submit →</button>
           )}
