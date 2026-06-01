@@ -418,7 +418,7 @@ const HomePage = ({ setPage }) => {
     <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
       <span className="badge-dot" style={{ width:6,height:6 }} /> In Development
     </div>
-    <div style={{ fontSize:isMobile?36:48,fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>PayChaser</div>
+    <div style={{ fontSize:isMobile?36:48,fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>PayChaser</div>
     <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>Track invoices, chase payments, and collect faster, all in one place.</p>
     <span style={{ fontSize:20,color:"var(--muted)" }}>↗</span>
   </button>
@@ -428,7 +428,7 @@ const HomePage = ({ setPage }) => {
     <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--green)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
       <span className="badge-dot" style={{ width:6,height:6 }} /> Live Now
     </div>
-    <div style={{ fontSize:isMobile?36:48,fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>ReviewChaser</div>
+    <div style={{ fontSize:isMobile?36:48,fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:8 }}>ReviewChaser</div>
     <p style={{ fontSize:13.5,color:"var(--muted)",lineHeight:1.75,marginBottom:8 }}>Send SMS review requests in seconds. Get more Google reviews without the awkwardness.</p>
     <span style={{ fontSize:20,color:"var(--muted)" }}>↗</span>
   </button>
@@ -553,7 +553,7 @@ const SysCard = ({ onClick, live, name, desc }) => {
       <div style={{ display:"flex",alignItems:"center",gap:7,fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:live?"var(--green)":"var(--muted)" }}>
         {live&&<span className="badge-dot" style={{ width:6,height:6 }} />} {live?"Live Now":"Coming Soon"}
       </div>
-      <div style={{ fontSize:32,fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",lineHeight:1,marginTop:4 }}>{name}</div>
+      <div style={{ fontSize:32,fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",lineHeight:1,marginTop:4 }}>{name}</div>
       <p style={{ fontSize:13,color:"#858585",lineHeight:1.7 }}>{desc}</p>
       <span style={{ fontSize:18,color:"var(--muted)",marginTop:"auto" }}>↗</span>
     </button>
