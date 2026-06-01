@@ -4217,8 +4217,20 @@ const BookingWidget = () => {
   const fmtShort   = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric", year:"numeric" }) : "";
   const fmtSlotHdr = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric" }) : "";
 
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim())                              e.name  = "Please enter your full name.";
+    if (!form.email.trim())                             e.email = "Please enter your email address.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = "Please enter a valid email address.";
+    if (form.phone.trim() && !/^[\d\s\-()+]{6,20}$/.test(form.phone.trim())) e.phone = "Please enter a valid phone number.";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleBook = async () => {
-    if (!form.name || !form.email) return;
+    if (!validate()) return;
     setSubmitting(true);
     try {
       await fetch("https://formspree.io/f/mlgzbpng", {
@@ -4228,9 +4240,9 @@ const BookingWidget = () => {
           "📅 Booking": "30 Min Discovery Call",
           "📆 Date":    fmtShort(selectedDate),
           "⏰ Time":    selectedTime,
-          "👤 Name":    form.name,
-          "📧 Email":   form.email,
-          "📱 Phone":   form.phone ? `${countryCode} ${form.phone}` : "—",
+          "👤 Name":    form.name.trim(),
+          "📧 Email":   form.email.trim(),
+          "📱 Phone":   form.phone.trim() ? `${countryCode} ${form.phone.trim()}` : "—",
           "🌐 Timezone": timezone,
         }),
       });
@@ -4288,18 +4300,31 @@ const BookingWidget = () => {
     <div style={{ display:"flex", flexDirection:isMobile?"column":"row" }}>
       <InfoPanel />
       <div style={{ flex:1, padding:isMobile?"24px":"40px 48px", background:"var(--card-bg)" }}>
-        <button onClick={() => setStep(1)} style={{ background:"none", border:"none", color:"var(--gray)", fontSize:13, cursor:"pointer", padding:0, marginBottom:20, display:"flex", alignItems:"center", gap:6, fontFamily:"var(--font)" }}>
+        <button onClick={() => { setStep(1); setErrors({}); }} style={{ background:"none", border:"none", color:"var(--gray)", fontSize:13, cursor:"pointer", padding:0, marginBottom:20, display:"flex", alignItems:"center", gap:6, fontFamily:"var(--font)" }}>
           ← Back
         </button>
         <h3 style={{ fontSize:16, fontWeight:700, color:"var(--white)", marginBottom:20 }}>Enter your details</h3>
         <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
           <div>
             <label style={LBL}>Full name *</label>
-            <input value={form.name} onChange={e => setForm(f => ({...f, name:e.target.value}))} placeholder="Alex Smith" style={INP} />
+            <input
+              value={form.name}
+              onChange={e => { setForm(f => ({...f, name:e.target.value})); setErrors(ev => ({...ev, name:undefined})); }}
+              placeholder="Alex Smith"
+              style={{ ...INP, border:`1px solid ${errors.name ? "#f87171" : "var(--input-border)"}` }}
+            />
+            {errors.name && <div style={{ fontSize:12, color:"#f87171", marginTop:5 }}>{errors.name}</div>}
           </div>
           <div>
             <label style={LBL}>Email address *</label>
-            <input type="email" value={form.email} onChange={e => setForm(f => ({...f, email:e.target.value}))} placeholder="alex@example.com" style={INP} />
+            <input
+              type="email"
+              value={form.email}
+              onChange={e => { setForm(f => ({...f, email:e.target.value})); setErrors(ev => ({...ev, email:undefined})); }}
+              placeholder="alex@example.com"
+              style={{ ...INP, border:`1px solid ${errors.email ? "#f87171" : "var(--input-border)"}` }}
+            />
+            {errors.email && <div style={{ fontSize:12, color:"#f87171", marginTop:5 }}>{errors.email}</div>}
           </div>
           <div>
             <label style={LBL}>Phone number (optional)</label>
@@ -4307,7 +4332,7 @@ const BookingWidget = () => {
               <select
                 value={countryCode}
                 onChange={e => setCountryCode(e.target.value)}
-                style={{ padding:"11px 10px", background:"var(--input-bg)", border:"1px solid var(--input-border)", borderRadius:8, fontSize:14, color:"var(--input-text)", outline:"none", fontFamily:"var(--font)", cursor:"pointer", flexShrink:0 }}
+                style={{ padding:"11px 10px", background:"var(--input-bg)", border:`1px solid ${errors.phone ? "#f87171" : "var(--input-border)"}`, borderRadius:8, fontSize:14, color:"var(--input-text)", outline:"none", fontFamily:"var(--font)", cursor:"pointer", flexShrink:0 }}
               >
                 {COUNTRY_CODES.map(c => (
                   <option key={c.label} value={c.code}>{c.flag} {c.label} ({c.code})</option>
@@ -4316,17 +4341,18 @@ const BookingWidget = () => {
               <input
                 type="tel"
                 value={form.phone}
-                onChange={e => setForm(f => ({...f, phone:e.target.value}))}
+                onChange={e => { setForm(f => ({...f, phone:e.target.value})); setErrors(ev => ({...ev, phone:undefined})); }}
                 placeholder={isAU ? "04XX XXX XXX" : "555 000 0000"}
-                style={INP}
+                style={{ ...INP, border:`1px solid ${errors.phone ? "#f87171" : "var(--input-border)"}` }}
               />
             </div>
+            {errors.phone && <div style={{ fontSize:12, color:"#f87171", marginTop:5 }}>{errors.phone}</div>}
           </div>
         </div>
         <button
           onClick={handleBook}
-          disabled={!form.name || !form.email || submitting}
-          style={{ marginTop:24, width:"100%", padding:"13px", background:form.name&&form.email?"#22c55e":"var(--surface)", color:form.name&&form.email?"#fff":"var(--muted)", border:"none", borderRadius:8, fontSize:14, fontWeight:700, cursor:form.name&&form.email?"pointer":"not-allowed", fontFamily:"var(--font)" }}
+          disabled={submitting}
+          style={{ marginTop:24, width:"100%", padding:"13px", background:"var(--green)", color:"#fff", border:"none", borderRadius:8, fontSize:14, fontWeight:700, cursor:submitting?"not-allowed":"pointer", fontFamily:"var(--font)", opacity:submitting?0.7:1 }}
         >
           {submitting ? "Booking…" : "Confirm Booking →"}
         </button>
