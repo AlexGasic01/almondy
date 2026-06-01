@@ -103,19 +103,39 @@ const GlobalStyle = () => (
   <style>{`
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
+      --black: #f7f8fa; --surface: #edf0f3; --surface2: #e3e6eb;
+      --border: rgba(0,0,0,0.08); --border-bright: rgba(0,0,0,0.18);
+      --white: #0d0d0d; --gray: #555; --muted: #999;
+      --green: #16a34a; --green-dim: rgba(22,163,74,0.1);
+      --font: 'Inter', sans-serif; --mono: 'Inter', sans-serif;
+      --card-bg: #ffffff; --section-bg: #edf0f3;
+      --nav-bg: rgba(247,248,250,0.95); --nav-bg-solid: #f7f8fa;
+      --divider: rgba(0,0,0,0.07);
+      --grid-line: rgba(0,0,0,0.05);
+      --hover-glow: rgba(0,0,0,0.03);
+      --hero-glow: rgba(180,180,180,0.18);
+      --input-bg: #ffffff; --input-border: rgba(0,0,0,0.12); --input-text: #0d0d0d;
+    }
+    [data-theme="dark"] {
       --black: #080808; --surface: #111111; --surface2: #1a1a1a;
       --border: rgba(255,255,255,0.07); --border-bright: rgba(255,255,255,0.18);
       --white: #ffffff; --gray: #888; --muted: #444;
       --green: #22c55e; --green-dim: rgba(34,197,94,0.12);
-      --font: 'Inter', sans-serif; --mono: 'Inter', sans-serif;
+      --card-bg: #0c0c0c; --section-bg: #0a0a0a;
+      --nav-bg: rgba(8,8,8,0.92); --nav-bg-solid: #0d0d0d;
+      --divider: rgba(255,255,255,0.055);
+      --grid-line: rgba(255,255,255,0.025);
+      --hover-glow: rgba(255,255,255,0.025);
+      --hero-glow: rgba(50,50,50,0.5);
+      --input-bg: #0f0f0f; --input-border: rgba(255,255,255,0.1); --input-text: #ffffff;
     }
     html { scroll-behavior: smooth; scrollbar-gutter: stable; }
-    body { background: var(--black); color: var(--white); font-family: var(--font); line-height: 1.6; overflow-x: hidden; }
-    * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent; }
+    body { background: var(--black); color: var(--white); font-family: var(--font); line-height: 1.6; overflow-x: hidden; transition: background 0.25s, color 0.25s; }
+    * { scrollbar-width: thin; scrollbar-color: rgba(128,128,128,0.2) transparent; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+    ::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.35); }
     a { text-decoration: none; }
     button { cursor: pointer; font-family: var(--font); -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
     button:active { opacity: 0.7; transform: scale(0.97); transition: opacity 0.1s, transform 0.1s; }
@@ -185,7 +205,7 @@ const Nav = memo(({ page, setPage }) => {
 
   return (
     <>
-      <nav style={{ position:"fixed",top:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"0 18px":"0 48px",height:62,background:"rgba(8,8,8,0.92)",backdropFilter:"blur(20px) saturate(1.4)",borderBottom:"1px solid var(--border)" }}>
+      <nav style={{ position:"fixed",top:0,left:0,right:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"space-between",padding:isMobile?"0 18px":"0 48px",height:62,background:"var(--nav-bg)",backdropFilter:"blur(20px) saturate(1.4)",borderBottom:"1px solid var(--border)" }}>
         <button onClick={() => go("home")} style={{ display:"flex",alignItems:"center",gap:10,background:"none",border:"none" }}>
           <WordmarkSVG height={isMobile ? 20 : 24} />
         </button>
@@ -213,9 +233,9 @@ const Nav = memo(({ page, setPage }) => {
       {isMobile && menuOpen && (
         <>
           <div className="mobile-overlay" onClick={() => setMenuOpen(false)} />
-          <div style={{ position:"fixed",top:62,right:0,bottom:0,width:"75vw",maxWidth:300,background:"#0d0d0d",borderLeft:"1px solid var(--border)",zIndex:200,display:"flex",flexDirection:"column",padding:"24px 0",animation:"fadeRight 0.25s both" }}>
+          <div style={{ position:"fixed",top:62,right:0,bottom:0,width:"75vw",maxWidth:300,background:"var(--nav-bg-solid)",borderLeft:"1px solid var(--border)",zIndex:200,display:"flex",flexDirection:"column",padding:"24px 0",animation:"fadeRight 0.25s both" }}>
             {NAV_LINKS.map(l => (
-              <button key={l.id} onClick={() => go(l.id)} style={{ background:"none",border:"none",borderBottom:"1px solid rgba(255,255,255,0.05)",padding:"18px 24px",fontSize:16,fontWeight:600,color:page===l.id?"var(--white)":"var(--gray)",textAlign:"left",transition:"color 0.15s" }}>
+              <button key={l.id} onClick={() => go(l.id)} style={{ background:"none",border:"none",borderBottom:"1px solid var(--border)",padding:"18px 24px",fontSize:16,fontWeight:600,color:page===l.id?"var(--white)":"var(--gray)",textAlign:"left",transition:"color 0.15s" }}>
                 {l.label}
               </button>
             ))}
@@ -232,34 +252,55 @@ const Nav = memo(({ page, setPage }) => {
 /* ─── FOOTER ─── */
 const Footer = memo(({ setPage }) => {
   const isMobile = useIsMobile();
+  const [theme, setThemeState] = useState(() => {
+    if (typeof window === "undefined") return "light";
+    return localStorage.getItem("almondy-theme") || "light";
+  });
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setThemeState(next);
+    localStorage.setItem("almondy-theme", next);
+    document.documentElement.setAttribute("data-theme", next);
+  };
+
   return (
     <>
-      <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)" }} />
+      <div style={{ width:"100%",height:1,background:"var(--divider)" }} />
       <footer style={{ borderTop:"1px solid var(--border)",padding:isMobile?"24px 20px":"32px 48px",display:"flex",alignItems:isMobile?"flex-start":"center",justifyContent:"space-between",flexWrap:"wrap",gap:16,flexDirection:isMobile?"column":"row" }}>
         <button onClick={() => setPage("home")} style={{ display:"flex",alignItems:"center",gap:8,background:"none",border:"none" }}>
           <WordmarkSVG height={20} />
         </button>
         <span style={{ fontSize:12,color:"var(--muted)",fontFamily:"var(--mono)" }}>© 2026 Almondy. All rights reserved.</span>
-        <ul style={{ display:"flex",gap:16,listStyle:"none",flexWrap:"wrap" }}>
-          {[
-            ["Privacy", null],
-            ["Terms", null],
-            ["Systems", "systems"],
-            ["ReviewChaser", "reviewchaser"],
-            ["Lead Heater", "lead-heater"],
-            ["CallCatch", "call-catch"],
-            ["Contact", "contact"],
-          ].map(([label, pageId]) => (
-            <li key={label}>
-              <button
-                onClick={() => pageId && setPage(pageId)}
-                style={{ background:"none",border:"none",fontSize:12,color:"var(--muted)",cursor:pageId?"pointer":"default" }}
-              >
-                {label}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div style={{ display:"flex",alignItems:"center",gap:16,flexWrap:"wrap" }}>
+          <ul style={{ display:"flex",gap:16,listStyle:"none",flexWrap:"wrap" }}>
+            {[
+              ["Privacy", null],
+              ["Terms", null],
+              ["Systems", "systems"],
+              ["ReviewChaser", "reviewchaser"],
+              ["Lead Heater", "lead-heater"],
+              ["CallCatch", "call-catch"],
+              ["Contact", "contact"],
+            ].map(([label, pageId]) => (
+              <li key={label}>
+                <button
+                  onClick={() => pageId && setPage(pageId)}
+                  style={{ background:"none",border:"none",fontSize:12,color:"var(--muted)",cursor:pageId?"pointer":"default" }}
+                >
+                  {label}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={toggleTheme}
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            style={{ display:"flex",alignItems:"center",gap:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:999,padding:"5px 12px",fontSize:12,fontWeight:500,color:"var(--gray)",cursor:"pointer",fontFamily:"var(--font)",flexShrink:0,transition:"background 0.2s,border-color 0.2s" }}
+          >
+            {theme === "dark" ? "☀ Light" : "🌙 Dark"}
+          </button>
+        </div>
       </footer>
     </>
   );
@@ -319,8 +360,8 @@ const HomePage = ({ setPage }) => {
     <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
       {/* HERO */}
       <div style={{ position:"relative",overflow:"hidden" }}>
-        <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
-        <div style={{ position:"absolute",inset:0,background:"radial-gradient(ellipse 70% 60% at 50% 45%, rgba(50,50,50,0.5) 0%, transparent 70%)",pointerEvents:"none" }} />
+        <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
+        <div style={{ position:"absolute",inset:0,background:"radial-gradient(ellipse 70% 60% at 50% 45%, var(--hero-glow) 0%, transparent 70%)",pointerEvents:"none" }} />
         <div style={{ position:"relative",zIndex:1,minHeight:isMobile?"auto":"100vh",display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",alignItems:"center",maxWidth:1280,margin:"0 auto",padding:isMobile?"40px 20px 48px":"40px 48px 0 64px" }}>
           <div style={{ display:"flex",flexDirection:"column",alignItems:"flex-start",paddingRight:isMobile?0:48,textAlign:isMobile?"left":"left" }}>
             <button onClick={() => setPage("systems")} style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12.5,fontWeight:600,color:"var(--green)",marginBottom:28,animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both",fontFamily:"var(--mono)" }}>
@@ -363,7 +404,7 @@ const HomePage = ({ setPage }) => {
       </div>
 
       <div style={{ height:isMobile?0:48 }} />
-      <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)" }} />
+      <div style={{ width:"100%",height:1,background:"var(--divider)" }} />
 
       {/* PRODUCTS — now includes ReviewChaser */}
       <div style={{ maxWidth:1180,margin:"0 auto",padding:isMobile?"60px 20px":"100px 48px" }}>
@@ -373,7 +414,7 @@ const HomePage = ({ setPage }) => {
         </h2>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
   {/* PayChaser */}
-  <button onClick={() => setPage("paychaser")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"#0c0c0c",cursor:"pointer",textAlign:"left" }}>
+  <button onClick={() => setPage("paychaser")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"var(--card-bg)",cursor:"pointer",textAlign:"left" }}>
     <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
       <span className="badge-dot" style={{ width:6,height:6 }} /> In Development
     </div>
@@ -383,7 +424,7 @@ const HomePage = ({ setPage }) => {
   </button>
 
   {/* ReviewChaser */}
-  <button onClick={() => setPage("reviewchaser")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"#0c0c0c",cursor:"pointer",textAlign:"left" }}>
+  <button onClick={() => setPage("reviewchaser")} style={{ border:"1px solid var(--border)",borderRadius:12,padding:isMobile?"24px":"36px",display:"flex",flexDirection:"column",alignItems:"flex-start",position:"relative",overflow:"hidden",background:"var(--card-bg)",cursor:"pointer",textAlign:"left" }}>
     <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--green)",display:"flex",alignItems:"center",gap:7,marginBottom:8 }}>
       <span className="badge-dot" style={{ width:6,height:6 }} /> Live Now
     </div>
@@ -507,8 +548,8 @@ const SystemsPage = ({ setPage }) => {
 const SysCard = ({ onClick, live, name, desc }) => {
   const [pos, setPos] = useState({ x:50,y:50 });
   return (
-    <button onClick={onClick} onMouseMove={e=>{ const r=e.currentTarget.getBoundingClientRect(); setPos({ x:((e.clientX-r.left)/r.width*100).toFixed(1),y:((e.clientY-r.top)/r.height*100).toFixed(1) }); }} style={{ position:"relative",border:"1px solid var(--border)",borderRadius:14,overflow:"hidden",background:"#0c0c0c",minHeight:220,display:"flex",flexDirection:"column",cursor:"pointer",textAlign:"left",padding:28,gap:10 }}>
-      <div style={{ position:"absolute",inset:0,background:`radial-gradient(circle at ${pos.x}% ${pos.y}%, rgba(255,255,255,0.03) 0%, transparent 60%)`,pointerEvents:"none" }} />
+    <button onClick={onClick} onMouseMove={e=>{ const r=e.currentTarget.getBoundingClientRect(); setPos({ x:((e.clientX-r.left)/r.width*100).toFixed(1),y:((e.clientY-r.top)/r.height*100).toFixed(1) }); }} style={{ position:"relative",border:"1px solid var(--border)",borderRadius:14,overflow:"hidden",background:"var(--card-bg)",minHeight:220,display:"flex",flexDirection:"column",cursor:"pointer",textAlign:"left",padding:28,gap:10 }}>
+      <div style={{ position:"absolute",inset:0,background:`radial-gradient(circle at ${pos.x}% ${pos.y}%, var(--hover-glow) 0%, transparent 60%)`,pointerEvents:"none" }} />
       <div style={{ display:"flex",alignItems:"center",gap:7,fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:live?"var(--green)":"var(--muted)" }}>
         {live&&<span className="badge-dot" style={{ width:6,height:6 }} />} {live?"Live Now":"Coming Soon"}
       </div>
@@ -1485,8 +1526,8 @@ const PaychaserPage = ({ setPage }) => {
 const PlanCard = ({ name,price,period,desc,cta,ctaStyle,features,featured=false,badge=null,onClick }) => {
   const [pos,setPos] = useState({ x:50,y:50 });
   return (
-    <div onMouseMove={e=>{const r=e.currentTarget.getBoundingClientRect();setPos({x:((e.clientX-r.left)/r.width*100).toFixed(1),y:((e.clientY-r.top)/r.height*100).toFixed(1)});}} style={{ position:"relative",border:`1px solid ${featured?"rgba(255,255,255,0.15)":"var(--border)"}`,borderRadius:16,padding:"28px 24px 24px",display:"flex",flexDirection:"column",background:featured?"#0f0f0f":"#0c0c0c",boxShadow:featured?"0 0 0 1px rgba(255,255,255,0.06), 0 32px 64px rgba(0,0,0,0.5)":"none",overflow:"hidden" }}>
-      <div style={{ position:"absolute",inset:0,background:`radial-gradient(circle at ${pos.x}% ${pos.y}%, rgba(255,255,255,0.025) 0%, transparent 65%)`,pointerEvents:"none" }} />
+    <div onMouseMove={e=>{const r=e.currentTarget.getBoundingClientRect();setPos({x:((e.clientX-r.left)/r.width*100).toFixed(1),y:((e.clientY-r.top)/r.height*100).toFixed(1)});}} style={{ position:"relative",border:`1px solid ${featured?"var(--border-bright)":"var(--border)"}`,borderRadius:16,padding:"28px 24px 24px",display:"flex",flexDirection:"column",background:"var(--card-bg)",boxShadow:featured?"0 0 0 1px var(--border), 0 32px 64px rgba(0,0,0,0.15)":"none",overflow:"hidden" }}>
+      <div style={{ position:"absolute",inset:0,background:`radial-gradient(circle at ${pos.x}% ${pos.y}%, var(--hover-glow) 0%, transparent 65%)`,pointerEvents:"none" }} />
       <div style={{ position:"relative",zIndex:1,display:"flex",flexDirection:"column",height:"100%" }}>
         {badge&&<div style={{ display:"inline-flex",alignItems:"center",gap:6,fontSize:10.5,fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:featured?"var(--green)":"var(--white)",background:featured?"var(--green-dim)":"rgba(255,255,255,0.07)",border:`1px solid ${featured?"rgba(34,197,94,0.25)":"rgba(255,255,255,0.12)"}`,borderRadius:999,padding:"4px 12px",marginBottom:18,width:"fit-content" }}>{badge}</div>}
         <div style={{ fontSize:12,fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",fontFamily:"var(--mono)",marginBottom:10 }}>{name}</div>
@@ -1498,7 +1539,7 @@ const PlanCard = ({ name,price,period,desc,cta,ctaStyle,features,featured=false,
         <div style={{ fontSize:12,color:"#3a3a3a",marginBottom:18 }}>{period}</div>
         <p style={{ fontSize:13,color:"#858585",lineHeight:1.75,marginBottom:22 }}>{desc}</p>
         <button onClick={onClick} style={{ display:"flex",alignItems:"center",justifyContent:"center",width:"100%",padding:"12px 20px",fontSize:13,fontWeight:700,borderRadius:9,border:ctaStyle==="solid"?"none":"1px solid rgba(255,255,255,0.1)",background:ctaStyle==="solid"?"var(--white)":"transparent",color:ctaStyle==="solid"?"var(--black)":"#666",marginBottom:22,letterSpacing:"-0.3px" }}>{cta}</button>
-        <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)",marginBottom:18 }} />
+        <div style={{ width:"100%",height:1,background:"var(--divider)",marginBottom:18 }} />
         <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
           {features.map(([on,label])=>(
             <div key={label} style={{ display:"flex",alignItems:"flex-start",gap:9,fontSize:13,lineHeight:1.5,color:on?"#8a8a8a":"#383838" }}>
@@ -1533,7 +1574,7 @@ const PricingPage = ({ setPage }) => {
   return (
     <div style={{ paddingTop:62 }}>
       <div style={{ position:"relative",overflow:"hidden" }}>
-        <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
+        <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
         <div style={{ position:"relative",zIndex:1,textAlign:"center",padding:isMobile?"64px 20px 48px":"88px 48px 64px",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both" }}>
   
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:22,fontFamily:"var(--mono)" }}>
@@ -1563,8 +1604,8 @@ const PricingPage = ({ setPage }) => {
       <div style={{ maxWidth:660,margin:"0 auto",padding:isMobile?"0 20px 80px":"0 48px 100px" }}>
         <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:36 }}>Questions? Answered.</h2>
         {FAQS_PRICING.map(([q,a],i)=>(
-          <div key={i} style={{ borderBottom:"1px solid rgba(255,255,255,0.055)" }}>
-            <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{ width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 0",background:"none",border:"none",fontFamily:"var(--font)",fontSize:isMobile?13.5:14,fontWeight:600,color:openFaq===i?"var(--white)":"#aaa",textAlign:"left",gap:16 }}>
+          <div key={i} style={{ borderBottom:"1px solid var(--divider)" }}>
+            <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{ width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 0",background:"none",border:"none",fontFamily:"var(--font)",fontSize:isMobile?13.5:14,fontWeight:600,color:openFaq===i?"var(--white)":"var(--gray)",textAlign:"left",gap:16 }}>
               {q}
               <div style={{ width:22,height:22,borderRadius:"50%",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#444",flexShrink:0,transform:openFaq===i?"rotate(45deg)":"none",transition:"transform 0.25s" }}>+</div>
             </button>
@@ -2050,8 +2091,8 @@ const WebDevPage = ({ setPage }) => {
       <div style={{ maxWidth:660,margin:"0 auto",padding:isMobile?"60px 20px":"80px 48px" }}>
         <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:36 }}>Questions? Answered.</h2>
         {faqs.map(([q,a],i)=>(
-          <div key={i} style={{ borderBottom:"1px solid rgba(255,255,255,0.055)" }}>
-            <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{ width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 0",background:"none",border:"none",fontFamily:"var(--font)",fontSize:isMobile?13.5:14,fontWeight:600,color:openFaq===i?"var(--white)":"#aaa",textAlign:"left",gap:16 }}>
+          <div key={i} style={{ borderBottom:"1px solid var(--divider)" }}>
+            <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{ width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 0",background:"none",border:"none",fontFamily:"var(--font)",fontSize:isMobile?13.5:14,fontWeight:600,color:openFaq===i?"var(--white)":"var(--gray)",textAlign:"left",gap:16 }}>
               {q}
               <div style={{ width:22,height:22,borderRadius:"50%",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#444",flexShrink:0,transform:openFaq===i?"rotate(45deg)":"none",transition:"transform 0.25s" }}>+</div>
             </button>
@@ -2070,7 +2111,7 @@ const ContactPage = ({ setPage }) => {
   const [submitted,setSubmitted] = useState(false);
   const [form,setForm] = useState({ name:"",email:"",message:"" });
   const set = (k,v) => setForm(f=>({ ...f,[k]:v }));
-  const inputStyle = { width:"100%",padding:"12px 16px",background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,fontSize:15,color:"#fff",outline:"none",fontFamily:"var(--font)",boxSizing:"border-box" };
+  const inputStyle = { width:"100%",padding:"12px 16px",background:"var(--input-bg)",border:"1px solid var(--input-border)",borderRadius:10,fontSize:15,color:"var(--input-text)",outline:"none",fontFamily:"var(--font)",boxSizing:"border-box" };
 
   const handleSubmit = async () => {
     if (!form.name.trim()||!form.email.includes("@")||!form.message.trim()) return;
@@ -2088,10 +2129,10 @@ const ContactPage = ({ setPage }) => {
         <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,48px)":"clamp(36px,4vw,56px)",fontWeight:800,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:12,lineHeight:1.05 }}>Let's build something.</h1>
         <p style={{ fontSize:15,color:"#858585",lineHeight:1.75,marginBottom:40 }}>Tell us what you need. We'll get back to you within 24 hours.</p>
         {submitted?(
-          <div style={{ background:"#0c0c0c",border:"1px solid rgba(34,197,94,0.2)",borderRadius:16,padding:"40px 32px",textAlign:"center" }}>
+          <div style={{ background:"var(--card-bg)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:16,padding:"40px 32px",textAlign:"center" }}>
             <div style={{ width:56,height:56,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,margin:"0 auto 18px" }}>✓</div>
-            <h2 style={{ fontSize:22,fontWeight:800,letterSpacing:"-0.8px",color:"#fff",marginBottom:10 }}>Message sent!</h2>
-            <p style={{ fontSize:14,color:"#666",lineHeight:1.75 }}>We'll get back to you at <strong style={{ color:"#999" }}>{form.email}</strong> within 24 hours.</p>
+            <h2 style={{ fontSize:22,fontWeight:800,letterSpacing:"-0.8px",color:"var(--white)",marginBottom:10 }}>Message sent!</h2>
+            <p style={{ fontSize:14,color:"var(--gray)",lineHeight:1.75 }}>We'll get back to you at <strong style={{ color:"var(--gray)" }}>{form.email}</strong> within 24 hours.</p>
           </div>
         ):(
           <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
@@ -3877,18 +3918,18 @@ const LeadHeaterPage = ({ setPage }) => {
     <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
       {/* Hero */}
       <div style={{ position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
         <div style={{ position:"relative", zIndex:1, maxWidth:900, margin:"0 auto", padding:isMobile?"64px 20px 48px":"96px 48px 72px", textAlign:"center", animation:"fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"var(--green-dim)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"var(--green)", marginBottom:24, fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> AI-Powered
           </div>
           <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)", fontWeight:800, letterSpacing:"-3px", lineHeight:1.02, color:"var(--white)", marginBottom:18 }}>Never let a warm<br />lead go cold.</h1>
-          <p style={{ fontSize:isMobile?14.5:16, color:"#858585", lineHeight:1.8, maxWidth:540, margin:"0 auto 32px" }}>You're running ads. Leads are coming in. But if you don't reply fast, they book someone else. <strong style={{ color:"#888" }}>Lead Heater responds in under 60 seconds — qualifies, books, and notifies you.</strong></p>
+          <p style={{ fontSize:isMobile?14.5:16, color:"var(--gray)", lineHeight:1.8, maxWidth:540, margin:"0 auto 32px" }}>You're running ads. Leads are coming in. But if you don't reply fast, they book someone else. <strong style={{ color:"var(--gray)" }}>Lead Heater responds in under 60 seconds — qualifies, books, and notifies you.</strong></p>
           <button onClick={() => setPage("contact")} style={{ background:"var(--white)", color:"var(--black)", padding:"13px 24px", fontSize:14, fontWeight:700, borderRadius:8, border:"none", cursor:"pointer", fontFamily:"var(--font)" }}>Book a Free Strategy Call →</button>
         </div>
       </div>
 
-      <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.055)" }} />
+      <div style={{ width:"100%", height:1, background:"var(--divider)" }} />
 
       {/* How it works */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px 120px", width:"100%" }}>
@@ -3898,17 +3939,17 @@ const LeadHeaterPage = ({ setPage }) => {
         </div>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:isMobile?16:20 }}>
           {steps.map((s) => (
-            <div key={s.num} style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:isMobile?24:28 }}>
+            <div key={s.num} style={{ background:"var(--card-bg)", border:"1px solid var(--border)", borderRadius:14, padding:isMobile?24:28 }}>
               <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--green)", fontFamily:"var(--mono)", marginBottom:16 }}>{s.num}</div>
               <h3 style={{ fontSize:isMobile?17:19, fontWeight:700, letterSpacing:"-0.8px", color:"var(--white)", marginBottom:10, lineHeight:1.2 }}>{s.title}</h3>
-              <p style={{ fontSize:13.5, color:"#858585", lineHeight:1.75 }}>{s.body}</p>
+              <p style={{ fontSize:13.5, color:"var(--gray)", lineHeight:1.75 }}>{s.body}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Who it's for */}
-      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", background:"#0a0a0a", padding:isMobile?"48px 20px":"72px 48px" }}>
+      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", background:"var(--section-bg)", padding:isMobile?"48px 20px":"72px 48px" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)", textAlign:"center" }}>Who It's For</p>
           <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)", fontWeight:800, letterSpacing:"-2px", color:"var(--white)", marginBottom:isMobile?32:48, textAlign:"center" }}>Built for detailers running ads.</h2>
@@ -3919,7 +3960,7 @@ const LeadHeaterPage = ({ setPage }) => {
               ["Missing out on jobs to faster competitors", "Speed is your biggest conversion lever. Lead Heater makes you the fastest."],
               ["Tired of chasing unqualified leads", "The AI pre-qualifies service, location, and timing before you even know the lead exists."],
             ].map(([title, desc]) => (
-              <div key={title} style={{ display:"flex", gap:14, padding:isMobile?"16px 0":"20px 0", borderBottom:"1px solid rgba(255,255,255,0.055)" }}>
+              <div key={title} style={{ display:"flex", gap:14, padding:isMobile?"16px 0":"20px 0", borderBottom:"1px solid var(--divider)" }}>
                 <span style={{ color:"var(--green)", fontSize:16, flexShrink:0, marginTop:2 }}>✓</span>
                 <div>
                   <div style={{ fontSize:14, fontWeight:700, color:"var(--white)", marginBottom:4 }}>{title}</div>
@@ -3981,18 +4022,18 @@ const CallCatchPage = ({ setPage }) => {
     <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
       {/* Hero */}
       <div style={{ position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
         <div style={{ position:"relative", zIndex:1, maxWidth:900, margin:"0 auto", padding:isMobile?"64px 20px 48px":"96px 48px 72px", textAlign:"center", animation:"fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"var(--green-dim)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"var(--green)", marginBottom:24, fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> AI-Powered
           </div>
           <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)", fontWeight:800, letterSpacing:"-3px", lineHeight:1.02, color:"var(--white)", marginBottom:18 }}>Every missed call is a<br />booking waiting to happen.</h1>
-          <p style={{ fontSize:isMobile?14.5:16, color:"#858585", lineHeight:1.8, maxWidth:540, margin:"0 auto 32px" }}>You can't answer every call when you're hands-on. <strong style={{ color:"#888" }}>CallCatch texts every missed caller within 30 seconds — so you never lose a job to voicemail again.</strong></p>
+          <p style={{ fontSize:isMobile?14.5:16, color:"var(--gray)", lineHeight:1.8, maxWidth:540, margin:"0 auto 32px" }}>You can't answer every call when you're hands-on. <strong style={{ color:"var(--gray)" }}>CallCatch texts every missed caller within 30 seconds — so you never lose a job to voicemail again.</strong></p>
           <button onClick={() => setPage("contact")} style={{ background:"var(--white)", color:"var(--black)", padding:"13px 24px", fontSize:14, fontWeight:700, borderRadius:8, border:"none", cursor:"pointer", fontFamily:"var(--font)" }}>Book a Free Strategy Call →</button>
         </div>
       </div>
 
-      <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.055)" }} />
+      <div style={{ width:"100%", height:1, background:"var(--divider)" }} />
 
       {/* How it works */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px 80px", width:"100%" }}>
@@ -4002,10 +4043,10 @@ const CallCatchPage = ({ setPage }) => {
         </div>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:isMobile?16:20, marginBottom:isMobile?40:60 }}>
           {steps.map((s) => (
-            <div key={s.num} style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:isMobile?24:28 }}>
+            <div key={s.num} style={{ background:"var(--card-bg)", border:"1px solid var(--border)", borderRadius:14, padding:isMobile?24:28 }}>
               <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--green)", fontFamily:"var(--mono)", marginBottom:16 }}>{s.num}</div>
               <h3 style={{ fontSize:isMobile?17:19, fontWeight:700, letterSpacing:"-0.8px", color:"var(--white)", marginBottom:10, lineHeight:1.2 }}>{s.title}</h3>
-              <p style={{ fontSize:13.5, color:"#858585", lineHeight:1.75 }}>{s.body}</p>
+              <p style={{ fontSize:13.5, color:"var(--gray)", lineHeight:1.75 }}>{s.body}</p>
             </div>
           ))}
         </div>
@@ -4017,17 +4058,17 @@ const CallCatchPage = ({ setPage }) => {
         </div>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)", gap:isMobile?16:20 }}>
           {modes.map((m) => (
-            <div key={m.label} style={{ background:"#0c0c0c", border:"1px solid rgba(34,197,94,0.18)", borderRadius:14, padding:isMobile?24:32 }}>
+            <div key={m.label} style={{ background:"var(--card-bg)", border:"1px solid rgba(34,197,94,0.2)", borderRadius:14, padding:isMobile?24:32 }}>
               <div style={{ fontSize:28, marginBottom:14 }}>{m.icon}</div>
               <div style={{ fontSize:13, fontWeight:700, letterSpacing:"1px", textTransform:"uppercase", color:"var(--green)", fontFamily:"var(--mono)", marginBottom:10 }}>{m.label}</div>
-              <p style={{ fontSize:14, color:"#858585", lineHeight:1.75 }}>{m.desc}</p>
+              <p style={{ fontSize:14, color:"var(--gray)", lineHeight:1.75 }}>{m.desc}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Who it's for */}
-      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", background:"#0a0a0a", padding:isMobile?"48px 20px":"72px 48px" }}>
+      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", background:"var(--section-bg)", padding:isMobile?"48px 20px":"72px 48px" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)", textAlign:"center" }}>Who It's For</p>
           <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)", fontWeight:800, letterSpacing:"-2px", color:"var(--white)", marginBottom:isMobile?32:48, textAlign:"center" }}>For detailers who are always hands-on.</h2>
@@ -4038,7 +4079,7 @@ const CallCatchPage = ({ setPage }) => {
               ["Detailers with a booking link or calendar", "CallCatch works with your existing booking tool — no new software required."],
               ["Businesses wanting a hands-free follow-up system", "Set it once. Every missed call gets followed up, automatically, forever."],
             ].map(([title, desc]) => (
-              <div key={title} style={{ display:"flex", gap:14, padding:isMobile?"16px 0":"20px 0", borderBottom:"1px solid rgba(255,255,255,0.055)" }}>
+              <div key={title} style={{ display:"flex", gap:14, padding:isMobile?"16px 0":"20px 0", borderBottom:"1px solid var(--divider)" }}>
                 <span style={{ color:"var(--green)", fontSize:16, flexShrink:0, marginTop:2 }}>✓</span>
                 <div>
                   <div style={{ fontSize:14, fontWeight:700, color:"var(--white)", marginBottom:4 }}>{title}</div>
