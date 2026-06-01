@@ -89,7 +89,7 @@ const MobileWarningPopup = ({ onDismiss }) => {
           <div style={{ position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:160,height:2,background:"linear-gradient(90deg, transparent, rgba(245,158,11,0.6), transparent)",borderRadius:999 }} />
           <button onClick={handleDismiss} style={{ position:"absolute",top:16,right:16,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:"50%",width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",color:"#555",fontSize:14,cursor:"pointer" }}>✕</button>
           <div style={{ display:"inline-flex",alignItems:"center",gap:6,background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.22)",borderRadius:999,padding:"3px 10px",fontSize:10,fontWeight:700,color:"#f59e0b",letterSpacing:"1.5px",textTransform:"uppercase",fontFamily:"var(--mono)",marginBottom:14 }}>⚠ Warning</div>
-          <h2 style={{ fontSize:21,fontWeight:800,letterSpacing:"-0.8px",color:"var(--white)",lineHeight:1.15,marginBottom:10 }}>Best viewed on desktop</h2>
+          <h2 style={{ fontSize:21,fontWeight:700,letterSpacing:"-0.8px",color:"var(--white)",lineHeight:1.15,marginBottom:10 }}>Best viewed on desktop</h2>
           <p style={{ fontSize:13.5,color:"#666",lineHeight:1.75,marginBottom:26 }}>For the best experience, use a <strong style={{ color:"#999" }}>desktop device</strong>. Some features may appear limited on mobile.</p>
           <button onClick={handleDismiss} style={{ width:"100%",padding:"13px 20px",background:"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"var(--font)" }}>Got it, continue anyway</button>
         </div>
@@ -311,14 +311,14 @@ const LockedCard = ({ style }) => {
   const [shaking, setShaking] = useState(false);
   const shake = () => { if(shaking) return; setShaking(true); setTimeout(()=>setShaking(false),600); };
   return (
-    <div onClick={shake} style={{ position:"relative",border:"1px solid var(--border)",borderRadius:14,overflow:"hidden",minHeight:220,background:"#0a0a0a",cursor:"pointer",...style }}>
+    <div onClick={shake} style={{ position:"relative",border:"1px solid var(--border)",borderRadius:14,overflow:"hidden",minHeight:220,background:"var(--card-bg)",cursor:"pointer",...style }}>
       <div style={{ padding:28,display:"flex",flexDirection:"column",gap:10,filter:"blur(5px)",opacity:0.25,userSelect:"none" }}>
         <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)" }}>In Progress</div>
-        <div style={{ fontSize:32,fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)" }}>Coming Soon</div>
+        <div style={{ fontSize:32,fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)" }}>Coming Soon</div>
       </div>
-      <div style={{ position:"absolute",inset:0,background:"rgba(8,8,8,0.82)" }} />
+      <div style={{ position:"absolute",inset:0,background:"var(--hover-glow)" }} />
       <div style={{ position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10 }}>
-        <div className={shaking?"shaking":""} style={{ width:44,height:44,background:"#111",border:"1px solid #2e2e2e",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",padding:8,boxShadow:"0 4px 20px rgba(0,0,0,0.6)" }}>
+        <div className={shaking?"shaking":""} style={{ width:44,height:44,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",padding:8,boxShadow:"0 4px 20px rgba(0,0,0,0.12)" }}>
           <LockSVG />
         </div>
         <p style={{ fontSize:10,fontWeight:700,letterSpacing:"2.5px",color:"#555",textTransform:"uppercase" }}>In Progress</p>
@@ -367,7 +367,7 @@ const HomePage = ({ setPage }) => {
             <button onClick={() => setPage("systems")} style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12.5,fontWeight:600,color:"var(--green)",marginBottom:28,animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both",fontFamily:"var(--mono)" }}>
               <span className="badge-dot" /> ReviewChaser Just Released
             </button>
-            <h1 style={{ fontSize:isMobile?"clamp(36px,10vw,52px)":"clamp(40px,4.5vw,68px)",fontWeight:800,letterSpacing:"-2.5px",lineHeight:1.05,color:"var(--white)",marginBottom:20,animation:"fadeUp 0.55s 0.08s cubic-bezier(0.22,1,0.36,1) both" }}>
+            <h1 style={{ fontSize:isMobile?"clamp(36px,10vw,52px)":"clamp(40px,4.5vw,68px)",fontWeight:700,letterSpacing:"-2.5px",lineHeight:1.05,color:"var(--white)",marginBottom:20,animation:"fadeUp 0.55s 0.08s cubic-bezier(0.22,1,0.36,1) both" }}>
               More Google reviews.<br />Zero awkwardness.
             </h1>
             <p style={{ fontSize:isMobile?15:15.5,color:"#666",maxWidth:420,lineHeight:1.75,marginBottom:36,animation:"fadeUp 0.55s 0.16s cubic-bezier(0.22,1,0.36,1) both" }}>
@@ -409,7 +409,7 @@ const HomePage = ({ setPage }) => {
       {/* PRODUCTS — now includes ReviewChaser */}
       <div style={{ maxWidth:1180,margin:"0 auto",padding:isMobile?"60px 20px":"100px 48px" }}>
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Our Systems</p>
-        <h2 style={{ fontSize:isMobile?"clamp(28px,8vw,40px)":"clamp(32px,3.5vw,52px)",fontWeight:800,letterSpacing:"-2px",lineHeight:1.05,color:"var(--white)",marginBottom:36 }}>
+        <h2 style={{ fontSize:isMobile?"clamp(28px,8vw,40px)":"clamp(32px,3.5vw,52px)",fontWeight:700,letterSpacing:"-2px",lineHeight:1.05,color:"var(--white)",marginBottom:36 }}>
           Tools that get things done.
         </h2>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
@@ -526,7 +526,7 @@ const SystemsPage = ({ setPage }) => {
       <div style={{ maxWidth:1280,margin:"0 auto",padding:isMobile?"80px 20px 48px":"140px 64px 72px",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both" }}>
 
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Our Systems</p>
-        <h1 style={{ fontSize:isMobile?"clamp(32px,10vw,52px)":"clamp(40px,5vw,72px)",fontWeight:800,letterSpacing:"-2.5px",lineHeight:1.05,color:"var(--white)",marginBottom:16 }}>
+        <h1 style={{ fontSize:isMobile?"clamp(32px,10vw,52px)":"clamp(40px,5vw,72px)",fontWeight:700,letterSpacing:"-2.5px",lineHeight:1.05,color:"var(--white)",marginBottom:16 }}>
           Tools that get things done.
         </h1>
         <p style={{ fontSize:15.5,color:"#858585",maxWidth:480,lineHeight:1.75 }}>Software built for the real world. Each system solves one problem, and solves it well.</p>
@@ -1392,7 +1392,7 @@ const PaychaserPage = ({ setPage }) => {
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:24,fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> Live Now
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)",fontWeight:800,letterSpacing:"-3px",lineHeight:1.02,color:"var(--white)",marginBottom:18 }}>Chase money<br />Not clients.</h1>
+          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)",fontWeight:700,letterSpacing:"-3px",lineHeight:1.02,color:"var(--white)",marginBottom:18 }}>Chase money<br />Not clients.</h1>
           <p style={{ fontSize:isMobile?14.5:16,color:"#858585",lineHeight:1.8,maxWidth:520,margin:"0 auto 32px" }}>Almondy sends your overdue invoice reminders automatically. <strong style={{ color:"#888" }}>Friendly at first. Firm when needed.</strong></p>
           <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
             <button onClick={()=>setPage("auth")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer",fontFamily:"var(--font)" }}>Get Started →</button>
@@ -1468,18 +1468,18 @@ const PaychaserPage = ({ setPage }) => {
         </div>
       )}
 
-      <div style={{ width:"100%",height:1,background:"rgba(255,255,255,0.055)",marginTop:isMobile?40:0 }} />
+      <div style={{ width:"100%",height:1,background:"var(--divider)",marginTop:isMobile?40:0 }} />
 
       <div id="how" style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"60px 20px 80px":"100px 48px 120px" }}>
         <div style={{ textAlign:"center",marginBottom:isMobile?40:72 }}>
           <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:12,fontFamily:"var(--mono)" }}>How It Works</p>
-          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)",fontWeight:800,letterSpacing:"-2px",lineHeight:1.05,color:"var(--white)" }}>Up and running in minutes.</h2>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)",fontWeight:700,letterSpacing:"-2px",lineHeight:1.05,color:"var(--white)" }}>Up and running in minutes.</h2>
         </div>
         <div style={{ display:"flex",alignItems:"center",marginBottom:isMobile?36:56 }}>
           {STEPS.map((_,i)=>(
             <div key={i} style={{ display:"contents" }}>
-              <button onClick={()=>goTo(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<step?"rgba(34,197,94,0.4)":i===step?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i<step?"rgba(34,197,94,0.15)":i===step?"var(--green)":"var(--black)",color:i<step?"var(--green)":i===step?"var(--black)":"#656565",fontSize:isMobile?10:11,fontWeight:800,boxShadow:i===step?"0 0 0 4px rgba(34,197,94,0.15)":"none",flexShrink:0,zIndex:1,transition:"all 0.35s" }}>{i+1}</button>
-              {i<STEPS.length-1&&<div style={{ flex:1,height:1,background:"rgba(255,255,255,0.07)",position:"relative" }}><div style={{ position:"absolute",top:0,left:0,height:"100%",width:step>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s" }} /></div>}
+              <button onClick={()=>goTo(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<step?"rgba(34,197,94,0.4)":i===step?"var(--green)":"var(--border)"}`,background:i<step?"rgba(34,197,94,0.15)":i===step?"var(--green)":"var(--black)",color:i<step?"var(--green)":i===step?"var(--black)":"var(--gray)",fontSize:isMobile?10:11,fontWeight:700,boxShadow:i===step?"0 0 0 4px rgba(34,197,94,0.15)":"none",flexShrink:0,zIndex:1,transition:"all 0.35s" }}>{i+1}</button>
+              {i<STEPS.length-1&&<div style={{ flex:1,height:1,background:"var(--border)",position:"relative" }}><div style={{ position:"absolute",top:0,left:0,height:"100%",width:step>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s" }} /></div>}
             </div>
           ))}
         </div>
@@ -1506,12 +1506,12 @@ const PaychaserPage = ({ setPage }) => {
         </div>
       </div>
 
-      <div style={{ borderTop:"1px solid var(--border)",borderBottom:"1px solid var(--border)",background:"#0a0a0a",padding:isMobile?"48px 20px":"72px 48px",textAlign:"center" }}>
-        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)",fontWeight:800,letterSpacing:"-2px",color:"var(--white)",marginBottom:14 }}>Ready to stop worrying?</h2>
-        <p style={{ fontSize:isMobile?14:15,color:"#444",marginBottom:28 }}>Join businesses already using Almondy to collect what they're owed.</p>
+      <div style={{ borderTop:"1px solid var(--border)",borderBottom:"1px solid var(--border)",background:"var(--section-bg)",padding:isMobile?"48px 20px":"72px 48px",textAlign:"center" }}>
+        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)",fontWeight:700,letterSpacing:"-2px",color:"var(--white)",marginBottom:14 }}>Ready to stop worrying?</h2>
+        <p style={{ fontSize:isMobile?14:15,color:"var(--muted)",marginBottom:28 }}>Join businesses already using Almondy to collect what they're owed.</p>
         <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
           <button onClick={()=>setPage("auth")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer",fontFamily:"var(--font)" }}>Get Started Free →</button>
-          <button onClick={()=>setPage("systems")} style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8 }}>Back to Systems</button>
+          <button onClick={()=>setPage("systems")} style={{ background:"transparent",color:"var(--gray)",border:"1px solid var(--border)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8 }}>Back to Systems</button>
         </div>
       </div>
 
@@ -1529,7 +1529,7 @@ const PlanCard = ({ name,price,period,desc,cta,ctaStyle,features,featured=false,
     <div onMouseMove={e=>{const r=e.currentTarget.getBoundingClientRect();setPos({x:((e.clientX-r.left)/r.width*100).toFixed(1),y:((e.clientY-r.top)/r.height*100).toFixed(1)});}} style={{ position:"relative",border:`1px solid ${featured?"var(--border-bright)":"var(--border)"}`,borderRadius:16,padding:"28px 24px 24px",display:"flex",flexDirection:"column",background:"var(--card-bg)",boxShadow:featured?"0 0 0 1px var(--border), 0 32px 64px rgba(0,0,0,0.15)":"none",overflow:"hidden" }}>
       <div style={{ position:"absolute",inset:0,background:`radial-gradient(circle at ${pos.x}% ${pos.y}%, var(--hover-glow) 0%, transparent 65%)`,pointerEvents:"none" }} />
       <div style={{ position:"relative",zIndex:1,display:"flex",flexDirection:"column",height:"100%" }}>
-        {badge&&<div style={{ display:"inline-flex",alignItems:"center",gap:6,fontSize:10.5,fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:featured?"var(--green)":"var(--white)",background:featured?"var(--green-dim)":"rgba(255,255,255,0.07)",border:`1px solid ${featured?"rgba(34,197,94,0.25)":"rgba(255,255,255,0.12)"}`,borderRadius:999,padding:"4px 12px",marginBottom:18,width:"fit-content" }}>{badge}</div>}
+        {badge&&<div style={{ display:"inline-flex",alignItems:"center",gap:6,fontSize:10.5,fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:featured?"var(--green)":"var(--white)",background:featured?"var(--green-dim)":"var(--surface)",border:`1px solid ${featured?"rgba(34,197,94,0.25)":"var(--border-bright)"}`,borderRadius:999,padding:"4px 12px",marginBottom:18,width:"fit-content" }}>{badge}</div>}
         <div style={{ fontSize:12,fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",fontFamily:"var(--mono)",marginBottom:10 }}>{name}</div>
         <div style={{ display:"flex",alignItems:"flex-end",gap:3,marginBottom:4,lineHeight:1 }}>
           <span style={{ fontSize:18,fontWeight:700,color:"#444",marginBottom:7 }}>$</span>
@@ -1580,7 +1580,7 @@ const PricingPage = ({ setPage }) => {
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:22,fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> PayChaser Pricing
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,52px)":"clamp(38px,5.5vw,72px)",fontWeight:800,letterSpacing:"-2.5px",lineHeight:1.03,color:"var(--white)",marginBottom:14 }}>Simple pricing.<br />No surprises.</h1>
+          <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,52px)":"clamp(38px,5.5vw,72px)",fontWeight:700,letterSpacing:"-2.5px",lineHeight:1.03,color:"var(--white)",marginBottom:14 }}>Simple pricing.<br />No surprises.</h1>
           <p style={{ fontSize:isMobile?14:15.5,color:"#858585",lineHeight:1.8,maxWidth:440,margin:"0 auto 28px" }}>Start free, scale when you're ready. Cancel any time.</p>
           <div style={{ display:"inline-flex",alignItems:"center",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:999,padding:"4px 5px" }}>
             {["monthly","annual"].map(m=>(
@@ -1602,12 +1602,12 @@ const PricingPage = ({ setPage }) => {
       </div>
 
       <div style={{ maxWidth:660,margin:"0 auto",padding:isMobile?"0 20px 80px":"0 48px 100px" }}>
-        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:36 }}>Questions? Answered.</h2>
+        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:36 }}>Questions? Answered.</h2>
         {FAQS_PRICING.map(([q,a],i)=>(
           <div key={i} style={{ borderBottom:"1px solid var(--divider)" }}>
             <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{ width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 0",background:"none",border:"none",fontFamily:"var(--font)",fontSize:isMobile?13.5:14,fontWeight:600,color:openFaq===i?"var(--white)":"var(--gray)",textAlign:"left",gap:16 }}>
               {q}
-              <div style={{ width:22,height:22,borderRadius:"50%",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#444",flexShrink:0,transform:openFaq===i?"rotate(45deg)":"none",transition:"transform 0.25s" }}>+</div>
+              <div style={{ width:22,height:22,borderRadius:"50%",background:"var(--surface)",border:"1px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"var(--gray)",flexShrink:0,transform:openFaq===i?"rotate(45deg)":"none",transition:"transform 0.25s" }}>+</div>
             </button>
             <div style={{ maxHeight:openFaq===i?300:0,overflow:"hidden",transition:"max-height 0.4s cubic-bezier(0.22,1,0.36,1)",fontSize:13.5,color:"#858585",lineHeight:1.85,paddingBottom:openFaq===i?20:0 }}>{a}</div>
           </div>
@@ -1661,7 +1661,7 @@ const AuthPage = ({ setPage, setUser }) => {
           <>
             <div style={{ textAlign:"center",marginBottom:32 }}>
               <div style={{ width:52,height:52,background:"#111",border:"1px solid #2a2a2a",borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 18px",fontSize:22 }}>✉️</div>
-              <h1 style={{ fontSize:24,fontWeight:800,letterSpacing:"-1px",color:"var(--white)",marginBottom:8 }}>Sign in to Almondy</h1>
+              <h1 style={{ fontSize:24,fontWeight:700,letterSpacing:"-1px",color:"var(--white)",marginBottom:8 }}>Sign in to Almondy</h1>
               <p style={{ fontSize:14,color:"#858585",lineHeight:1.6 }}>Enter your email and we'll send you a magic link. No password needed.</p>
             </div>
             <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
@@ -1677,7 +1677,7 @@ const AuthPage = ({ setPage, setUser }) => {
           <>
             <div style={{ textAlign:"center",marginBottom:28 }}>
               <div style={{ width:52,height:52,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.25)",borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 18px",fontSize:22 }}>📬</div>
-              <h1 style={{ fontSize:24,fontWeight:800,letterSpacing:"-1px",color:"var(--white)",marginBottom:8 }}>Check your inbox</h1>
+              <h1 style={{ fontSize:24,fontWeight:700,letterSpacing:"-1px",color:"var(--white)",marginBottom:8 }}>Check your inbox</h1>
               <p style={{ fontSize:14,color:"#858585",lineHeight:1.7 }}>We sent a sign-in link to<br /><strong style={{ color:"var(--white)" }}>{email}</strong></p>
             </div>
             <div style={{ background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.09)",borderRadius:12,padding:18,marginBottom:18 }}>
@@ -1714,7 +1714,7 @@ const OnboardingPage = ({ setPage, user, setUser }) => {
       <div style={{ position:"relative",zIndex:1,width:"100%",maxWidth:480,animation:"fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ textAlign:"center",marginBottom:36 }}>
           <div style={{ fontSize:13,fontWeight:600,color:"var(--green)",letterSpacing:"1px",textTransform:"uppercase",fontFamily:"var(--mono)",marginBottom:14 }}>Welcome aboard</div>
-          <h1 style={{ fontSize:28,fontWeight:800,letterSpacing:"-1.2px",color:"var(--white)",marginBottom:10 }}>What's your business called?</h1>
+          <h1 style={{ fontSize:28,fontWeight:700,letterSpacing:"-1.2px",color:"var(--white)",marginBottom:10 }}>What's your business called?</h1>
           <p style={{ fontSize:14,color:"#858585",lineHeight:1.6 }}>This is how Almondy will sign off your reminder emails to clients.</p>
         </div>
         <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
@@ -1824,7 +1824,7 @@ const DashboardPage = ({ setPage,user }) => {
           )}
           <div style={{ display:"flex",alignItems:isMobile?"flex-start":"center",justifyContent:"space-between",marginBottom:20,flexDirection:isMobile?"column":"row",gap:isMobile?12:0 }}>
             <div>
-              <h1 style={{ fontSize:isMobile?20:22,fontWeight:800,letterSpacing:"-0.8px",color:"var(--white)",marginBottom:4 }}>{user?.bizName??"My Dashboard"}</h1>
+              <h1 style={{ fontSize:isMobile?20:22,fontWeight:700,letterSpacing:"-0.8px",color:"var(--white)",marginBottom:4 }}>{user?.bizName??"My Dashboard"}</h1>
               <p style={{ fontSize:13,color:"#858585" }}>Here's what's happening with your invoices.</p>
             </div>
             <button onClick={()=>setPage("paywall")} style={{ display:"flex",alignItems:"center",gap:7,padding:"10px 16px",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",borderRadius:9,fontSize:13,fontWeight:600,flexShrink:0 }}>
@@ -1961,7 +1961,7 @@ const PaywallPage = ({ setPage,user,setUser }) => {
           <div style={{ display:"inline-flex",alignItems:"center",gap:7,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.25)",borderRadius:999,padding:"4px 14px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:16,fontFamily:"var(--mono)" }}>
             <span className="badge-dot" style={{ width:6,height:6 }} /> Upgrade PayChaser
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(24px,7vw,34px)":"clamp(26px,4vw,36px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:10 }}>You've hit the free limit</h1>
+          <h1 style={{ fontSize:isMobile?"clamp(24px,7vw,34px)":"clamp(26px,4vw,36px)",fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",marginBottom:10 }}>You've hit the free limit</h1>
           <p style={{ fontSize:14,color:"#666",lineHeight:1.7,maxWidth:440,margin:"0 auto 22px" }}>Upgrade to keep chasing and let Almondy do the hard work.</p>
           <div style={{ display:"inline-flex",background:"#0f0f0f",border:"1px solid rgba(255,255,255,0.07)",borderRadius:999,padding:"3px 4px" }}>
             {["monthly","annual"].map(m=>(
@@ -2054,7 +2054,7 @@ const WebDevPage = ({ setPage }) => {
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:24,fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> Taking on clients
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(34px,10vw,52px)":"clamp(42px,6vw,78px)",fontWeight:800,letterSpacing:"-3px",lineHeight:1.02,color:"var(--white)",marginBottom:18 }}>Websites that work<br />as hard as you do.</h1>
+          <h1 style={{ fontSize:isMobile?"clamp(34px,10vw,52px)":"clamp(42px,6vw,78px)",fontWeight:700,letterSpacing:"-3px",lineHeight:1.02,color:"var(--white)",marginBottom:18 }}>Websites that work<br />as hard as you do.</h1>
           <p style={{ fontSize:isMobile?14.5:16,color:"#858585",lineHeight:1.8,maxWidth:500,margin:"0 auto 32px" }}>Clean, fast, and built to convert. <strong style={{ color:"#888" }}>No templates. No bloat.</strong></p>
           <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
             <button onClick={()=>setPage("webdev-onboarding")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer" }}>Get Your Website →</button>
@@ -2066,13 +2066,13 @@ const WebDevPage = ({ setPage }) => {
       <div style={{ maxWidth:1100,margin:"0 auto",padding:isMobile?"0 20px 60px":"0 48px 80px" }}>
         <div style={{ textAlign:"center",marginBottom:isMobile?36:56 }}>
           <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:12,fontFamily:"var(--mono)" }}>The Process</p>
-          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",lineHeight:1.05 }}>Up and running fast.</h2>
+          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",lineHeight:1.05 }}>Up and running fast.</h2>
         </div>
         <div style={{ display:"flex",alignItems:"center",marginBottom:isMobile?28:40 }}>
           {process.map((_,i)=>(
             <div key={i} style={{ display:"contents" }}>
-              <button onClick={()=>setActiveStep(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<=activeStep?"var(--green)":"rgba(255,255,255,0.1)"}`,background:i===activeStep?"var(--green)":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)",color:i===activeStep?"var(--black)":i<activeStep?"var(--green)":"#656565",fontSize:isMobile?10:11,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1,boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none",transition:"all 0.35s",cursor:"pointer" }}>{i+1}</button>
-              {i<process.length-1&&<div style={{ flex:1,height:1,background:"rgba(255,255,255,0.07)",position:"relative" }}><div style={{ position:"absolute",top:0,left:0,height:"100%",width:activeStep>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} /></div>}
+              <button onClick={()=>setActiveStep(i)} style={{ width:isMobile?28:32,height:isMobile?28:32,borderRadius:"50%",border:`1px solid ${i<=activeStep?"var(--green)":"var(--border)"}`,background:i===activeStep?"var(--green)":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)",color:i===activeStep?"var(--black)":i<activeStep?"var(--green)":"var(--gray)",fontSize:isMobile?10:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1,boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none",transition:"all 0.35s",cursor:"pointer" }}>{i+1}</button>
+              {i<process.length-1&&<div style={{ flex:1,height:1,background:"var(--border)",position:"relative" }}><div style={{ position:"absolute",top:0,left:0,height:"100%",width:activeStep>i?"100%":"0%",background:"var(--green)",transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} /></div>}
             </div>
           ))}
         </div>
@@ -2089,12 +2089,12 @@ const WebDevPage = ({ setPage }) => {
       </div>
 
       <div style={{ maxWidth:660,margin:"0 auto",padding:isMobile?"60px 20px":"80px 48px" }}>
-        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:800,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:36 }}>Questions? Answered.</h2>
+        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)",fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)",textAlign:"center",marginBottom:36 }}>Questions? Answered.</h2>
         {faqs.map(([q,a],i)=>(
           <div key={i} style={{ borderBottom:"1px solid var(--divider)" }}>
             <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{ width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 0",background:"none",border:"none",fontFamily:"var(--font)",fontSize:isMobile?13.5:14,fontWeight:600,color:openFaq===i?"var(--white)":"var(--gray)",textAlign:"left",gap:16 }}>
               {q}
-              <div style={{ width:22,height:22,borderRadius:"50%",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#444",flexShrink:0,transform:openFaq===i?"rotate(45deg)":"none",transition:"transform 0.25s" }}>+</div>
+              <div style={{ width:22,height:22,borderRadius:"50%",background:"var(--surface)",border:"1px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"var(--gray)",flexShrink:0,transform:openFaq===i?"rotate(45deg)":"none",transition:"transform 0.25s" }}>+</div>
             </button>
             <div style={{ maxHeight:openFaq===i?240:0,overflow:"hidden",transition:"max-height 0.4s cubic-bezier(0.22,1,0.36,1)",fontSize:13.5,color:"#858585",lineHeight:1.85,paddingBottom:openFaq===i?20:0 }}>{a}</div>
           </div>
@@ -2126,12 +2126,12 @@ const ContactPage = ({ setPage }) => {
       <div style={{ maxWidth:580,margin:"0 auto",padding:isMobile?"60px 20px 80px":"100px 48px",flex:1 }}>
 
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Get in Touch</p>
-        <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,48px)":"clamp(36px,4vw,56px)",fontWeight:800,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:12,lineHeight:1.05 }}>Let's build something.</h1>
+        <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,48px)":"clamp(36px,4vw,56px)",fontWeight:700,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:12,lineHeight:1.05 }}>Let's build something.</h1>
         <p style={{ fontSize:15,color:"#858585",lineHeight:1.75,marginBottom:40 }}>Tell us what you need. We'll get back to you within 24 hours.</p>
         {submitted?(
           <div style={{ background:"var(--card-bg)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:16,padding:"40px 32px",textAlign:"center" }}>
             <div style={{ width:56,height:56,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,margin:"0 auto 18px" }}>✓</div>
-            <h2 style={{ fontSize:22,fontWeight:800,letterSpacing:"-0.8px",color:"var(--white)",marginBottom:10 }}>Message sent!</h2>
+            <h2 style={{ fontSize:22,fontWeight:700,letterSpacing:"-0.8px",color:"var(--white)",marginBottom:10 }}>Message sent!</h2>
             <p style={{ fontSize:14,color:"var(--gray)",lineHeight:1.75 }}>We'll get back to you at <strong style={{ color:"var(--gray)" }}>{form.email}</strong> within 24 hours.</p>
           </div>
         ):(
@@ -2155,7 +2155,7 @@ const TestimonialsPage = ({ setPage }) => {
       <div style={{ maxWidth:900,margin:"0 auto",padding:isMobile?"80px 20px":"140px 48px",textAlign:"center",animation:"fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both",flex:1 }}>
 
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Testimonials</p>
-        <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,52px)":"clamp(40px,5vw,68px)",fontWeight:800,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:16 }}>Coming soon.</h1>
+        <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,52px)":"clamp(40px,5vw,68px)",fontWeight:700,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:16 }}>Coming soon.</h1>
         <p style={{ fontSize:15,color:"#858585" }}>Reviews are being collected. Check back shortly.</p>
       </div>
       <Footer setPage={setPage} />
@@ -2389,7 +2389,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"#22c55e", marginBottom:24, fontFamily:"var(--mono)" }}>
             <span className="rc-badge-dot" /> ReviewChaser: Now Live
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(46px,6vw,84px)", fontWeight:800, letterSpacing:"-3.5px", lineHeight:1.01, color:"#fff", marginBottom:18 }}>
+          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(46px,6vw,84px)", fontWeight:700, letterSpacing:"-3.5px", lineHeight:1.01, color:"#fff", marginBottom:18 }}>
             More Google reviews.<br /><span style={{ color:"#22c55e" }}>Zero awkwardness.</span>
           </h1>
           <p style={{ fontSize:isMobile?14.5:16.5, color:"#858585", lineHeight:1.8, maxWidth:520, margin:"0 auto 32px" }}>
@@ -2422,7 +2422,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
       <div id="rc-how" style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px":"100px 48px" }}>
         <div style={{ textAlign:"center", marginBottom:isMobile?40:64 }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:12, fontFamily:"var(--mono)" }}>How It Works</p>
-          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"#fff" }}>Three steps. Thirty seconds.</h2>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:700, letterSpacing:"-2px", color:"#fff" }}>Three steps. Thirty seconds.</h2>
         </div>
         <div style={{ display:"flex", alignItems:"center", marginBottom:isMobile?28:48 }}>
           {steps.map((_, i) => (
@@ -2448,7 +2448,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px":"100px 48px", display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:isMobile?40:80, alignItems:"center" }}>
         <div>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:14, fontFamily:"var(--mono)" }}>The Send Screen</p>
-          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,46px)", fontWeight:800, letterSpacing:"-2px", color:"#fff", marginBottom:16 }}>Simpler than<br />sending a text.</h2>
+          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,46px)", fontWeight:700, letterSpacing:"-2px", color:"#fff", marginBottom:16 }}>Simpler than<br />sending a text.</h2>
           <p style={{ fontSize:isMobile?14:15, color:"#666", lineHeight:1.8, marginBottom:24 }}>Open ReviewChaser after every job. Type the mobile. Hit send. <strong style={{ color:"#888" }}>No setup. No client database. No nonsense.</strong></p>
           {["Works from your phone or desktop","Messages from a real Australian number","Customer taps link → straight to your Google page","Every send logged with timestamp"].map(f => (
             <div key={f} style={{ display:"flex", alignItems:"center", gap:10, fontSize:14, color:"#777", marginBottom:10 }}>
@@ -2498,7 +2498,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px" }}>
         <div style={{ textAlign:"center", marginBottom:isMobile?40:64 }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:12, fontFamily:"var(--mono)" }}>Real Results</p>
-          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"#fff" }}>Tradies are getting reviews.<br /><span style={{ color:"#22c55e" }}>Every single week.</span></h2>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:700, letterSpacing:"-2px", color:"#fff" }}>Tradies are getting reviews.<br /><span style={{ color:"#22c55e" }}>Every single week.</span></h2>
         </div>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":window.innerWidth<900?"1fr 1fr":"repeat(3,1fr)", gap:12, marginBottom:24 }}>
           {[
@@ -2533,7 +2533,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
       <Divider />
       {/* FAQ */}
       <div style={{ maxWidth:660, margin:"0 auto", padding:isMobile?"60px 20px 80px":"80px 48px 100px" }}>
-        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)", fontWeight:800, letterSpacing:"-1.5px", color:"#fff", textAlign:"center", marginBottom:36 }}>Questions? Answered.</h2>
+        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)", fontWeight:700, letterSpacing:"-1.5px", color:"#fff", textAlign:"center", marginBottom:36 }}>Questions? Answered.</h2>
         {faqs.map(([q,a],i) => (
           <div key={i} style={{ borderBottom:"1px solid rgba(255,255,255,0.055)" }}>
             <button onClick={() => setOpenFaq(openFaq===i?null:i)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 0", background:"none", border:"none", fontFamily:"var(--font)", fontSize:isMobile?13.5:14, fontWeight:600, color:openFaq===i?"#fff":"#aaa", textAlign:"left", gap:16 }}>
@@ -2549,7 +2549,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
         <div style={{ display:"flex", justifyContent:"center", marginBottom:18 }}>
           {[1,2,3,4,5].map(i => <span key={i} style={{ fontSize:22, color:"#f59e0b" }}>★</span>)}
         </div>
-        <h2 style={{ fontSize:isMobile?"clamp(22px,7vw,34px)":"clamp(26px,3.5vw,42px)", fontWeight:800, letterSpacing:"-2px", color:"#fff", marginBottom:12 }}>Start collecting reviews today.</h2>
+        <h2 style={{ fontSize:isMobile?"clamp(22px,7vw,34px)":"clamp(26px,3.5vw,42px)", fontWeight:700, letterSpacing:"-2px", color:"#fff", marginBottom:12 }}>Start collecting reviews today.</h2>
         <p style={{ fontSize:isMobile?14:15, color:"#444", marginBottom:28 }}>7 days free · 20 sends · No card required</p>
         <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#fff", color:"#000", padding:"14px 28px", fontSize:15, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial →</button>
       </div>
@@ -2630,7 +2630,7 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
       <div style={{ position:"relative", zIndex:1, width:"100%", maxWidth:400, animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ textAlign:"center", marginBottom:32 }}>
           <div style={{ width:52, height:52, background:"#111", border:"1px solid #2a2a2a", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>✉️</div>
-          <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Sign in to ReviewChaser</h1>
+          <h1 style={{ fontSize:24, fontWeight:700, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Sign in to ReviewChaser</h1>
           <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>Enter your email — we'll send you a 6-digit code.</p>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -2666,7 +2666,7 @@ const RCPhoneAuthFlow = ({ isMobile, onBack }) => {
       <div style={{ position:"relative", zIndex:1, width:"100%", maxWidth:400, animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ textAlign:"center", marginBottom:32 }}>
           <div style={{ width:52, height:52, background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>✉️</div>
-          <h1 style={{ fontSize:24, fontWeight:800, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Check your email</h1>
+          <h1 style={{ fontSize:24, fontWeight:700, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>Check your email</h1>
           <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>We sent a 6-digit code to<br /><strong style={{ color:"#999" }}>{email}</strong></p>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -2732,7 +2732,7 @@ const RCEmailCollectScreen = ({ isMobile, userId, onComplete }) => {
       <div style={{ position:"relative", zIndex:1, width:"100%", maxWidth:400, animation:"rc-fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both" }}>
         <div style={{ textAlign:"center", marginBottom:32 }}>
           <div style={{ width:52, height:52, background:"#111", border:"1px solid #2a2a2a", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", fontSize:22 }}>🧾</div>
-          <h1 style={{ fontSize:22, fontWeight:800, letterSpacing:"-0.8px", color:"#fff", marginBottom:10 }}>Where should we send your receipts and billing info?</h1>
+          <h1 style={{ fontSize:22, fontWeight:700, letterSpacing:"-0.8px", color:"#fff", marginBottom:10 }}>Where should we send your receipts and billing info?</h1>
           <p style={{ fontSize:14, color:"#666", lineHeight:1.6 }}>This is optional, you can skip and add it later in Settings.</p>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -3034,7 +3034,7 @@ const RCOnboardingWizard = ({ isMobile, userId, email, onComplete }) => {
         </div>
         <div style={{ opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(14px)",transition:"all 0.25s cubic-bezier(0.22,1,0.36,1)",marginBottom:24 }}>
           <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2px",textTransform:"uppercase",color:"#444",fontFamily:"var(--mono)",marginBottom:8 }}>{subheadings[step]}</p>
-          <h1 style={{ fontSize:isMobile?"clamp(22px,6vw,30px)":"clamp(24px,3vw,34px)",fontWeight:800,letterSpacing:"-1.2px",color:"#fff",marginBottom:20 }}>{headings[step]}</h1>
+          <h1 style={{ fontSize:isMobile?"clamp(22px,6vw,30px)":"clamp(24px,3vw,34px)",fontWeight:700,letterSpacing:"-1.2px",color:"#fff",marginBottom:20 }}>{headings[step]}</h1>
           {stepContent()}
         </div>
         <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:24,paddingTop:20,borderTop:"1px solid rgba(255,255,255,0.06)" }}>
@@ -3200,7 +3200,7 @@ const RCPaywallScreen = ({ isMobile, profile, onClose, onBack }) => {
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:999,padding:"4px 14px",fontSize:12,fontWeight:600,color:"#22c55e",marginBottom:16,fontFamily:"var(--mono)" }}>
             <span className="rc-badge-dot" style={{ width:6,height:6 }} /> {trialExpired?"Trial Expired":"Upgrade ReviewChaser"}
           </div>
-          <h2 style={{ fontSize:isMobile?"clamp(22px,6vw,28px)":"clamp(24px,3vw,32px)",fontWeight:800,letterSpacing:"-1.5px",color:"#fff",marginBottom:10 }}>
+          <h2 style={{ fontSize:isMobile?"clamp(22px,6vw,28px)":"clamp(24px,3vw,32px)",fontWeight:700,letterSpacing:"-1.5px",color:"#fff",marginBottom:10 }}>
             {trialExpired ? "Plans that grow with you." : "Plans that grow with your company"}
           </h2>
           <p style={{ fontSize:14,color:"#555",lineHeight:1.7 }}>
@@ -3923,7 +3923,7 @@ const LeadHeaterPage = ({ setPage }) => {
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"var(--green-dim)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"var(--green)", marginBottom:24, fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> AI-Powered
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)", fontWeight:800, letterSpacing:"-3px", lineHeight:1.02, color:"var(--white)", marginBottom:18 }}>Never let a warm<br />lead go cold.</h1>
+          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)", fontWeight:700, letterSpacing:"-3px", lineHeight:1.02, color:"var(--white)", marginBottom:18 }}>Never let a warm<br />lead go cold.</h1>
           <p style={{ fontSize:isMobile?14.5:16, color:"var(--gray)", lineHeight:1.8, maxWidth:540, margin:"0 auto 32px" }}>You're running ads. Leads are coming in. But if you don't reply fast, they book someone else. <strong style={{ color:"var(--gray)" }}>Lead Heater responds in under 60 seconds — qualifies, books, and notifies you.</strong></p>
           <button onClick={() => setPage("contact")} style={{ background:"var(--white)", color:"var(--black)", padding:"13px 24px", fontSize:14, fontWeight:700, borderRadius:8, border:"none", cursor:"pointer", fontFamily:"var(--font)" }}>Book a Free Strategy Call →</button>
         </div>
@@ -3935,7 +3935,7 @@ const LeadHeaterPage = ({ setPage }) => {
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px 120px", width:"100%" }}>
         <div style={{ textAlign:"center", marginBottom:isMobile?40:72 }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)" }}>How It Works</p>
-          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)", fontWeight:800, letterSpacing:"-2px", lineHeight:1.05, color:"var(--white)" }}>From form fill to booked job.</h2>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)", fontWeight:700, letterSpacing:"-2px", lineHeight:1.05, color:"var(--white)" }}>From form fill to booked job.</h2>
         </div>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:isMobile?16:20 }}>
           {steps.map((s) => (
@@ -3952,7 +3952,7 @@ const LeadHeaterPage = ({ setPage }) => {
       <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", background:"var(--section-bg)", padding:isMobile?"48px 20px":"72px 48px" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)", textAlign:"center" }}>Who It's For</p>
-          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)", fontWeight:800, letterSpacing:"-2px", color:"var(--white)", marginBottom:isMobile?32:48, textAlign:"center" }}>Built for detailers running ads.</h2>
+          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)", fontWeight:700, letterSpacing:"-2px", color:"var(--white)", marginBottom:isMobile?32:48, textAlign:"center" }}>Built for detailers running ads.</h2>
           <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)", gap:isMobile?12:16 }}>
             {[
               ["Running Google or Meta ads", "You're paying for every click. Don't let slow replies throw that money away."],
@@ -3974,7 +3974,7 @@ const LeadHeaterPage = ({ setPage }) => {
 
       {/* Bottom CTA */}
       <div style={{ maxWidth:900, margin:"0 auto", padding:isMobile?"60px 20px":"96px 48px", textAlign:"center" }}>
-        <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,4vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"var(--white)", marginBottom:16, lineHeight:1.05 }}>Stop losing leads to slow response times.</h2>
+        <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,4vw,52px)", fontWeight:700, letterSpacing:"-2px", color:"var(--white)", marginBottom:16, lineHeight:1.05 }}>Stop losing leads to slow response times.</h2>
         <p style={{ fontSize:isMobile?14:15, color:"#555", marginBottom:28, maxWidth:480, margin:"0 auto 28px" }}>Book a free strategy call and we'll show you exactly how Lead Heater would work for your business.</p>
         <button onClick={() => setPage("contact")} style={{ background:"var(--white)", color:"var(--black)", padding:"14px 28px", fontSize:14, fontWeight:700, borderRadius:8, border:"none", cursor:"pointer", fontFamily:"var(--font)" }}>Book a Free Strategy Call →</button>
       </div>
@@ -4027,7 +4027,7 @@ const CallCatchPage = ({ setPage }) => {
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"var(--green-dim)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"var(--green)", marginBottom:24, fontFamily:"var(--mono)" }}>
             <span className="badge-dot" /> AI-Powered
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)", fontWeight:800, letterSpacing:"-3px", lineHeight:1.02, color:"var(--white)", marginBottom:18 }}>Every missed call is a<br />booking waiting to happen.</h1>
+          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(42px,6vw,80px)", fontWeight:700, letterSpacing:"-3px", lineHeight:1.02, color:"var(--white)", marginBottom:18 }}>Every missed call is a<br />booking waiting to happen.</h1>
           <p style={{ fontSize:isMobile?14.5:16, color:"var(--gray)", lineHeight:1.8, maxWidth:540, margin:"0 auto 32px" }}>You can't answer every call when you're hands-on. <strong style={{ color:"var(--gray)" }}>CallCatch texts every missed caller within 30 seconds — so you never lose a job to voicemail again.</strong></p>
           <button onClick={() => setPage("contact")} style={{ background:"var(--white)", color:"var(--black)", padding:"13px 24px", fontSize:14, fontWeight:700, borderRadius:8, border:"none", cursor:"pointer", fontFamily:"var(--font)" }}>Book a Free Strategy Call →</button>
         </div>
@@ -4039,7 +4039,7 @@ const CallCatchPage = ({ setPage }) => {
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px 80px", width:"100%" }}>
         <div style={{ textAlign:"center", marginBottom:isMobile?40:72 }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)" }}>How It Works</p>
-          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)", fontWeight:800, letterSpacing:"-2px", lineHeight:1.05, color:"var(--white)" }}>Missed call. Booked job.</h2>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,38px)":"clamp(30px,3.5vw,48px)", fontWeight:700, letterSpacing:"-2px", lineHeight:1.05, color:"var(--white)" }}>Missed call. Booked job.</h2>
         </div>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:isMobile?16:20, marginBottom:isMobile?40:60 }}>
           {steps.map((s) => (
@@ -4054,7 +4054,7 @@ const CallCatchPage = ({ setPage }) => {
         {/* Two modes */}
         <div style={{ textAlign:"center", marginBottom:isMobile?28:40 }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)" }}>Two Modes</p>
-          <h3 style={{ fontSize:isMobile?"clamp(22px,6vw,32px)":"clamp(24px,3vw,36px)", fontWeight:800, letterSpacing:"-1.5px", color:"var(--white)" }}>Choose how hands-free you want to be.</h3>
+          <h3 style={{ fontSize:isMobile?"clamp(22px,6vw,32px)":"clamp(24px,3vw,36px)", fontWeight:700, letterSpacing:"-1.5px", color:"var(--white)" }}>Choose how hands-free you want to be.</h3>
         </div>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)", gap:isMobile?16:20 }}>
           {modes.map((m) => (
@@ -4071,7 +4071,7 @@ const CallCatchPage = ({ setPage }) => {
       <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", background:"var(--section-bg)", padding:isMobile?"48px 20px":"72px 48px" }}>
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)", textAlign:"center" }}>Who It's For</p>
-          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)", fontWeight:800, letterSpacing:"-2px", color:"var(--white)", marginBottom:isMobile?32:48, textAlign:"center" }}>For detailers who are always hands-on.</h2>
+          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,38px)":"clamp(28px,3.5vw,46px)", fontWeight:700, letterSpacing:"-2px", color:"var(--white)", marginBottom:isMobile?32:48, textAlign:"center" }}>For detailers who are always hands-on.</h2>
           <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)", gap:isMobile?12:16 }}>
             {[
               ["Solo operators mid-job", "One person, two hands busy. You can't be on the phone and under a car at the same time."],
@@ -4093,7 +4093,7 @@ const CallCatchPage = ({ setPage }) => {
 
       {/* Bottom CTA */}
       <div style={{ maxWidth:900, margin:"0 auto", padding:isMobile?"60px 20px":"96px 48px", textAlign:"center" }}>
-        <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,4vw,52px)", fontWeight:800, letterSpacing:"-2px", color:"var(--white)", marginBottom:16, lineHeight:1.05 }}>Stop letting missed calls become missed jobs.</h2>
+        <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,4vw,52px)", fontWeight:700, letterSpacing:"-2px", color:"var(--white)", marginBottom:16, lineHeight:1.05 }}>Stop letting missed calls become missed jobs.</h2>
         <p style={{ fontSize:isMobile?14:15, color:"#555", marginBottom:28, maxWidth:480, margin:"0 auto 28px" }}>Book a free strategy call and we'll set up CallCatch for your business.</p>
         <button onClick={() => setPage("contact")} style={{ background:"var(--white)", color:"var(--black)", padding:"14px 28px", fontSize:14, fontWeight:700, borderRadius:8, border:"none", cursor:"pointer", fontFamily:"var(--font)" }}>Book a Free Strategy Call →</button>
       </div>
