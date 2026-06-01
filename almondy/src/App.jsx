@@ -2108,14 +2108,15 @@ const WebDevPage = ({ setPage }) => {
 const ContactPage = ({ setPage }) => {
   const isMobile = useIsMobile();
   const [submitted,setSubmitted] = useState(false);
-  const [form,setForm] = useState({ name:"",email:"",message:"" });
+  const [form,setForm] = useState({ name:"",email:"",service:"",message:"" });
   const set = (k,v) => setForm(f=>({ ...f,[k]:v }));
   const inputStyle = { width:"100%",padding:"12px 16px",background:"var(--input-bg)",border:"1px solid var(--input-border)",borderRadius:10,fontSize:15,color:"var(--input-text)",outline:"none",fontFamily:"var(--font)",boxSizing:"border-box" };
+  const services = ["Lead Heater","CallCatch","ReviewChaser","Web Development","Other"];
 
   const handleSubmit = async () => {
     if (!form.name.trim()||!form.email.includes("@")||!form.message.trim()) return;
     try {
-      await fetch("https://formspree.io/f/mlgzbpng",{ method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({"👤 Name":form.name,"📧 Email":form.email,"💬 Message":form.message}) });
+      await fetch("https://formspree.io/f/mlgzbpng",{ method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({"👤 Name":form.name,"📧 Email":form.email,"🛠 Service":form.service||"Not specified","💬 Message":form.message}) });
     } catch(e) { console.error(e); }
     setSubmitted(true);
   };
@@ -2125,7 +2126,7 @@ const ContactPage = ({ setPage }) => {
       <div style={{ maxWidth:580,margin:"0 auto",padding:isMobile?"60px 20px 80px":"100px 48px",flex:1 }}>
 
         <p style={{ fontSize:11.5,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:"var(--muted)",marginBottom:14,fontFamily:"var(--mono)" }}>Get in Touch</p>
-        <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,48px)":"clamp(36px,4vw,56px)",fontWeight:600,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:12,lineHeight:1.05 }}>Let's build something.</h1>
+        <h1 style={{ fontSize:isMobile?"clamp(32px,9vw,48px)":"clamp(36px,4vw,56px)",fontWeight:600,letterSpacing:"-2.5px",color:"var(--white)",marginBottom:12,lineHeight:1.05 }}>Let's get in touch.</h1>
         <p style={{ fontSize:15,color:"#858585",lineHeight:1.75,marginBottom:40 }}>Tell us what you need. We'll get back to you within 24 hours.</p>
         {submitted?(
           <div style={{ background:"var(--card-bg)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:16,padding:"40px 32px",textAlign:"center" }}>
@@ -2135,9 +2136,17 @@ const ContactPage = ({ setPage }) => {
           </div>
         ):(
           <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
-            <div><label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Your name</label><input style={inputStyle} placeholder="Alex Smith" value={form.name} onChange={e=>set("name",e.target.value)} /></div>
-            <div><label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Email address</label><input style={inputStyle} type="email" placeholder="alex@yourbusiness.com" value={form.email} onChange={e=>set("email",e.target.value)} /></div>
-            <div><label style={{ fontSize:12,fontWeight:600,color:"#666",display:"block",marginBottom:8 }}>Message</label><textarea style={{ ...inputStyle,resize:"vertical",minHeight:130 }} placeholder="Tell us about your project..." value={form.message} onChange={e=>set("message",e.target.value)} /></div>
+            <div><label style={{ fontSize:12,fontWeight:600,color:"var(--gray)",display:"block",marginBottom:8 }}>Your name</label><input style={inputStyle} placeholder="Alex Smith" value={form.name} onChange={e=>set("name",e.target.value)} /></div>
+            <div><label style={{ fontSize:12,fontWeight:600,color:"var(--gray)",display:"block",marginBottom:8 }}>Email address</label><input style={inputStyle} type="email" placeholder="alex@yourbusiness.com" value={form.email} onChange={e=>set("email",e.target.value)} /></div>
+            <div>
+              <label style={{ fontSize:12,fontWeight:600,color:"var(--gray)",display:"block",marginBottom:8 }}>What are you interested in?</label>
+              <div style={{ display:"flex",flexWrap:"wrap",gap:8 }}>
+                {services.map(s => (
+                  <button key={s} onClick={()=>set("service", form.service===s?"":s)} style={{ padding:"8px 14px",borderRadius:999,fontSize:12.5,fontWeight:600,border:`1px solid ${form.service===s?"rgba(34,197,94,0.4)":"var(--border)"}`,background:form.service===s?"rgba(34,197,94,0.08)":"var(--card-bg)",color:form.service===s?"#22c55e":"var(--gray)",cursor:"pointer",transition:"all 0.2s" }}>{s}</button>
+                ))}
+              </div>
+            </div>
+            <div><label style={{ fontSize:12,fontWeight:600,color:"var(--gray)",display:"block",marginBottom:8 }}>Message</label><textarea style={{ ...inputStyle,resize:"vertical",minHeight:130 }} placeholder="Tell us about your project..." value={form.message} onChange={e=>set("message",e.target.value)} /></div>
             <button onClick={handleSubmit} disabled={!form.name.trim()||!form.email.includes("@")||!form.message.trim()} style={{ padding:"13px 24px",background:"var(--white)",color:"var(--black)",border:"none",borderRadius:10,fontSize:14,fontWeight:700,cursor:"pointer",opacity:(!form.name.trim()||!form.email.includes("@")||!form.message.trim())?0.4:1,transition:"opacity 0.2s" }}>Send message →</button>
           </div>
         )}
