@@ -4152,11 +4152,17 @@ const LanderPage = () => {
       <div style={{ flex:1, maxWidth:1000, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
         <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
           <iframe
-            src="https://cal.com/alexg009/30min-discovery?embed=true&theme=dark&layout=month_view"
+            src="https://cal.com/alexg009/30min-discovery?embed=true&theme=light&layout=month_view"
             style={{ width:"100%", height:700, border:"none", display:"block" }}
             title="Schedule a Discovery Call"
           />
         </div>
+        <p style={{ textAlign:"center", marginTop:14, fontSize:13, color:"var(--muted)" }}>
+          Calendar not loading?{" "}
+          <button onClick={() => window.location.reload()} style={{ background:"none", border:"none", padding:0, fontSize:13, color:"var(--gray)", textDecoration:"underline", cursor:"pointer", fontFamily:"var(--font)" }}>
+            Refresh Page
+          </button>
+        </p>
       </div>
     </div>
   );
