@@ -3911,6 +3911,10 @@ const LeadHeaterPage = ({ setPage }) => {
     { step: "STEP 02", title: "AI texts them within 60 seconds", desc: "Before they've even opened another tab, your AI agent is already having a conversation — qualifying service, location, vehicle, and preferred date." },
     { step: "STEP 03", title: "Booked and summarised", desc: "The appointment is locked in automatically. You get a full summary notification with everything you need before you even show up." },
   ];
+  useEffect(() => {
+    const interval = setInterval(() => setActiveStep(s => (s+1) % steps.length), 2500);
+    return () => clearInterval(interval);
+  }, []);
   return (
     <div style={{ paddingTop:62, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
       {/* Hero */}
@@ -4005,6 +4009,10 @@ const CallCatchPage = ({ setPage }) => {
     { step: "STEP 02", title: "CallCatch texts them within 30 seconds", desc: "Before they've called the next detailer, your AI sends a friendly SMS — acknowledging the missed call and starting a conversation." },
     { step: "STEP 03", title: "Qualified, booked, and you're notified", desc: "The AI handles the back-and-forth or sends a booking link depending on your mode. You finish the job, then check the notification." },
   ];
+  useEffect(() => {
+    const interval = setInterval(() => setActiveStep(s => (s+1) % steps.length), 2500);
+    return () => clearInterval(interval);
+  }, []);
   const modes = [
     {
       label: "Mode 1 — AI Conversation",
