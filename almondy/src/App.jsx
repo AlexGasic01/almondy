@@ -307,14 +307,14 @@ const Footer = memo(({ setPage }) => {
 });
 
 /* ─── LOCKED CARD ─── */
-const LockedCard = ({ style }) => {
+const LockedCard = ({ style, name }) => {
   const [shaking, setShaking] = useState(false);
   const shake = () => { if(shaking) return; setShaking(true); setTimeout(()=>setShaking(false),600); };
   return (
     <div onClick={shake} style={{ position:"relative",border:"1px solid var(--border)",borderRadius:14,overflow:"hidden",minHeight:220,background:"var(--card-bg)",cursor:"pointer",...style }}>
       <div style={{ padding:28,display:"flex",flexDirection:"column",gap:10,filter:"blur(5px)",opacity:0.25,userSelect:"none" }}>
         <div style={{ fontSize:10.5,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)" }}>In Progress</div>
-        <div style={{ fontSize:32,fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)" }}>Coming Soon</div>
+        <div style={{ fontSize:32,fontWeight:700,letterSpacing:"-1.5px",color:"var(--white)" }}>{name||"Coming Soon"}</div>
       </div>
       <div style={{ position:"absolute",inset:0,background:"var(--hover-glow)" }} />
       <div style={{ position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10 }}>
@@ -533,10 +533,10 @@ const SystemsPage = ({ setPage }) => {
       </div>
       <div style={{ maxWidth:1280,margin:"0 auto",padding:isMobile?"0 20px 48px":"0 64px 72px", flex:1 }}>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2, 1fr)",gap:10 }}>
-          <SysCard onClick={() => setPage("reviewchaser")} live name="ReviewChaser" desc="Send SMS review requests in seconds. More Google reviews, zero awkwardness." />
-          <SysCard onClick={null} live={false} name="PayChaser" desc="Automated invoice reminders and payment tracking. Coming soon." />
           <SysCard onClick={() => setPage("lead-heater")} live name="Lead Heater" desc="AI agent that follows up ad leads within 60 seconds — qualifies, books, and notifies you." />
           <SysCard onClick={() => setPage("call-catch")} live name="CallCatch" desc="AI agent that texts every missed caller within 30 seconds so you never lose a job to voicemail." />
+          <SysCard onClick={() => setPage("reviewchaser")} live name="ReviewChaser" desc="Send SMS review requests in seconds. More Google reviews, zero awkwardness." />
+          <LockedCard name="PayChaser" />
         </div>
       </div>
       <Footer setPage={setPage} />
@@ -2047,7 +2047,7 @@ const WebDevPage = ({ setPage }) => {
   return (
     <div style={{ paddingTop:62 }}>
       <div style={{ position:"relative",overflow:"hidden" }}>
-        <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
+        <div style={{ position:"absolute",inset:0,backgroundImage:"linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)",backgroundSize:"60px 60px",pointerEvents:"none" }} />
         <div style={{ position:"relative",zIndex:1,maxWidth:900,margin:"0 auto",padding:isMobile?"64px 20px 48px":"96px 48px 80px",textAlign:"center",animation:"fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
   
           <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"var(--green-dim)",border:"1px solid rgba(34,197,94,0.28)",borderRadius:999,padding:"5px 14px 5px 10px",fontSize:12,fontWeight:600,color:"var(--green)",marginBottom:24,fontFamily:"var(--mono)" }}>
@@ -2057,7 +2057,7 @@ const WebDevPage = ({ setPage }) => {
           <p style={{ fontSize:isMobile?14.5:16,color:"#858585",lineHeight:1.8,maxWidth:500,margin:"0 auto 32px" }}>Clean, fast, and built to convert. <strong style={{ color:"#888" }}>No templates. No bloat.</strong></p>
           <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
             <button onClick={()=>setPage("webdev-onboarding")} style={{ background:"var(--white)",color:"var(--black)",padding:"13px 24px",fontSize:14,fontWeight:700,borderRadius:8,border:"none",cursor:"pointer" }}>Get Your Website →</button>
-            <button onClick={()=>setPage("contact")} style={{ background:"transparent",color:"#888",border:"1px solid rgba(255,255,255,0.12)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8 }}>Contact Us</button>
+            <button onClick={()=>setPage("contact")} style={{ background:"transparent",color:"var(--gray)",border:"1px solid var(--border)",padding:"13px 24px",fontSize:14,fontWeight:600,borderRadius:8 }}>Contact Us</button>
           </div>
         </div>
       </div>
@@ -2077,11 +2077,11 @@ const WebDevPage = ({ setPage }) => {
         </div>
         <div style={{ display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:10 }}>
           {process.map(({step,title,desc},i)=>(
-            <div key={step} onClick={()=>setActiveStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.07)":"#0c0c0c",border:`1px solid ${i===activeStep?"rgba(34,197,94,0.35)":"rgba(255,255,255,0.06)"}`,borderRadius:14,padding:"22px 18px",position:"relative",overflow:"hidden",cursor:"pointer",transition:"all 0.3s" }}>
+            <div key={step} onClick={()=>setActiveStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.07)":"var(--card-bg)",border:`1px solid ${i===activeStep?"rgba(34,197,94,0.35)":"var(--border)"}`,borderRadius:14,padding:"22px 18px",position:"relative",overflow:"hidden",cursor:"pointer",transition:"all 0.3s" }}>
               {i===activeStep&&<div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,rgba(34,197,94,0.6),transparent)" }} />}
-              <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2px",color:i===activeStep?"var(--green)":"#656565",fontFamily:"var(--mono)",marginBottom:12 }}>{step}</div>
-              <div style={{ fontSize:14,fontWeight:700,color:i===activeStep?"var(--white)":"#444",marginBottom:6,letterSpacing:"-0.3px" }}>{title}</div>
-              <p style={{ fontSize:12.5,color:i===activeStep?"#858585":"#2e2e2e",lineHeight:1.7,margin:0 }}>{desc}</p>
+              <div style={{ fontSize:11,fontWeight:700,letterSpacing:"2px",color:i===activeStep?"var(--green)":"var(--gray)",fontFamily:"var(--mono)",marginBottom:12 }}>{step}</div>
+              <div style={{ fontSize:14,fontWeight:700,color:i===activeStep?"var(--white)":"var(--gray)",marginBottom:6,letterSpacing:"-0.3px" }}>{title}</div>
+              <p style={{ fontSize:12.5,color:i===activeStep?"#858585":"var(--muted)",lineHeight:1.7,margin:0 }}>{desc}</p>
             </div>
           ))}
         </div>
@@ -2183,7 +2183,7 @@ const PLAN_CONFIG = {
 };
 
 const Divider = () => (
-  <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.055)" }} />
+  <div style={{ width:"100%", height:1, background:"var(--divider)" }} />
 );
 
 const Spinner = memo(({ size=16, dark=false }) => (
@@ -2382,13 +2382,13 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
     <div>
       {/* HERO */}
       <div style={{ position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px)", backgroundSize:"60px 60px", pointerEvents:"none" }} />
         <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse 70% 55% at 50% 40%, rgba(34,197,94,0.06) 0%, transparent 70%)", pointerEvents:"none" }} />
         <div style={{ position:"relative", zIndex:1, maxWidth:860, margin:"0 auto", padding:isMobile?"64px 20px 56px":"100px 48px 90px", textAlign:"center", animation:"rc-fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both" }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.28)", borderRadius:999, padding:"5px 14px 5px 10px", fontSize:12, fontWeight:600, color:"#22c55e", marginBottom:24, fontFamily:"var(--mono)" }}>
             <span className="rc-badge-dot" /> ReviewChaser: Now Live
           </div>
-          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(46px,6vw,84px)", fontWeight:600, letterSpacing:"-3.5px", lineHeight:1.01, color:"#fff", marginBottom:18 }}>
+          <h1 style={{ fontSize:isMobile?"clamp(36px,11vw,56px)":"clamp(46px,6vw,84px)", fontWeight:600, letterSpacing:"-3.5px", lineHeight:1.01, color:"var(--white)", marginBottom:18 }}>
             More Google reviews.<br /><span style={{ color:"#22c55e" }}>Zero awkwardness.</span>
           </h1>
           <p style={{ fontSize:isMobile?14.5:16.5, color:"#858585", lineHeight:1.8, maxWidth:520, margin:"0 auto 32px" }}>
@@ -2399,7 +2399,7 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
           </div>
           <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap" }}>
             <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#fff", color:"#000", padding:"14px 28px", fontSize:15, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial →</button>
-            <button onClick={onSignIn} style={{ background:"transparent", color:"#666", border:"1px solid rgba(255,255,255,0.12)", padding:"14px 22px", fontSize:14, fontWeight:600, borderRadius:9 }}>Sign In</button>
+            <button onClick={onSignIn} style={{ background:"transparent", color:"var(--gray)", border:"1px solid var(--border)", padding:"14px 22px", fontSize:14, fontWeight:600, borderRadius:9 }}>Sign In</button>
           </div>
           <p style={{ fontSize:12, color:"#656565", marginTop:14 }}>7 days free · 20 sends included</p>
         </div>
@@ -2409,9 +2409,9 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"32px 20px":"44px 48px" }}>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)", gap:isMobile?20:0 }}>
           {[["98%","SMS open rate"],["4.7×","vs email review requests"],["<160","chars, never double-billed"],["AU","Local sending number"]].map(([val,label],i) => (
-            <div key={label} style={{ textAlign:"center", padding:isMobile?"0":"0 28px", borderRight:(!isMobile&&i<3)?"1px solid rgba(255,255,255,0.06)":"none" }}>
-              <div style={{ fontSize:isMobile?28:38, fontWeight:800, letterSpacing:"-2px", color:"#fff", lineHeight:1, marginBottom:6 }}>{val}</div>
-              <div style={{ fontSize:12.5, color:"#444", lineHeight:1.5 }}>{label}</div>
+            <div key={label} style={{ textAlign:"center", padding:isMobile?"0":"0 28px", borderRight:(!isMobile&&i<3)?"1px solid var(--border)":"none" }}>
+              <div style={{ fontSize:isMobile?28:38, fontWeight:800, letterSpacing:"-2px", color:"var(--white)", lineHeight:1, marginBottom:6 }}>{val}</div>
+              <div style={{ fontSize:12.5, color:"var(--muted)", lineHeight:1.5 }}>{label}</div>
             </div>
           ))}
         </div>
@@ -2420,24 +2420,24 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
       {/* HOW IT WORKS */}
       <div id="rc-how" style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px":"100px 48px" }}>
         <div style={{ textAlign:"center", marginBottom:isMobile?40:64 }}>
-          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:12, fontFamily:"var(--mono)" }}>How It Works</p>
-          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:600, letterSpacing:"-2px", color:"#fff" }}>Three steps. Thirty seconds.</h2>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)" }}>How It Works</p>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:600, letterSpacing:"-2px", color:"var(--white)" }}>Three steps. Thirty seconds.</h2>
         </div>
         <div style={{ display:"flex", alignItems:"center", marginBottom:isMobile?28:48 }}>
           {steps.map((_, i) => (
             <div key={i} style={{ display:"contents" }}>
-              <button onClick={() => setActiveStep(i)} style={{ width:isMobile?28:34, height:isMobile?28:34, borderRadius:"50%", border:`1px solid ${i<=activeStep?"#22c55e":"rgba(255,255,255,0.1)"}`, background:i===activeStep?"#22c55e":i<activeStep?"rgba(34,197,94,0.15)":"#080808", color:i===activeStep?"#000":i<activeStep?"#22c55e":"#656565", fontSize:11, fontWeight:800, flexShrink:0, zIndex:1, boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none", transition:"all 0.35s" }}>{i+1}</button>
-              {i<2 && <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.07)", position:"relative" }}><div style={{ position:"absolute", top:0, left:0, height:"100%", width:activeStep>i?"100%":"0%", background:"#22c55e", transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} /></div>}
+              <button onClick={() => setActiveStep(i)} style={{ width:isMobile?28:34, height:isMobile?28:34, borderRadius:"50%", border:`1px solid ${i<=activeStep?"#22c55e":"var(--border)"}`, background:i===activeStep?"#22c55e":i<activeStep?"rgba(34,197,94,0.15)":"var(--black)", color:i===activeStep?"#000":i<activeStep?"#22c55e":"#656565", fontSize:11, fontWeight:800, flexShrink:0, zIndex:1, boxShadow:i===activeStep?"0 0 0 4px rgba(34,197,94,0.15)":"none", transition:"all 0.35s" }}>{i+1}</button>
+              {i<2 && <div style={{ flex:1, height:1, background:"var(--border)", position:"relative" }}><div style={{ position:"absolute", top:0, left:0, height:"100%", width:activeStep>i?"100%":"0%", background:"#22c55e", transition:"width 0.5s cubic-bezier(0.22,1,0.36,1)" }} /></div>}
             </div>
           ))}
         </div>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:10 }}>
           {steps.map(({ num, title, desc }, i) => (
-            <div key={num} onClick={() => setActiveStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.06)":"#0c0c0c", border:`1px solid ${i===activeStep?"rgba(34,197,94,0.3)":"rgba(255,255,255,0.06)"}`, borderRadius:14, padding:"24px 22px", cursor:"pointer", position:"relative", overflow:"hidden", transition:"all 0.3s" }}>
+            <div key={num} onClick={() => setActiveStep(i)} style={{ background:i===activeStep?"rgba(34,197,94,0.06)":"var(--card-bg)", border:`1px solid ${i===activeStep?"rgba(34,197,94,0.3)":"var(--border)"}`, borderRadius:14, padding:"24px 22px", cursor:"pointer", position:"relative", overflow:"hidden", transition:"all 0.3s" }}>
               {i===activeStep && <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:"linear-gradient(90deg,rgba(34,197,94,0.7),transparent)" }} />}
-              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2px", color:i===activeStep?"#22c55e":"#656565", fontFamily:"var(--mono)", marginBottom:14 }}>{num}</div>
-              <div style={{ fontSize:16, fontWeight:700, color:i===activeStep?"#fff":"#555", letterSpacing:"-0.4px", marginBottom:8 }}>{title}</div>
-              <p style={{ fontSize:13.5, color:i===activeStep?"#858585":"#2e2e2e", lineHeight:1.75, margin:0 }}>{desc}</p>
+              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"2px", color:i===activeStep?"#22c55e":"var(--gray)", fontFamily:"var(--mono)", marginBottom:14 }}>{num}</div>
+              <div style={{ fontSize:16, fontWeight:700, color:i===activeStep?"var(--white)":"var(--gray)", letterSpacing:"-0.4px", marginBottom:8 }}>{title}</div>
+              <p style={{ fontSize:13.5, color:i===activeStep?"#858585":"var(--muted)", lineHeight:1.75, margin:0 }}>{desc}</p>
             </div>
           ))}
         </div>
@@ -2446,11 +2446,11 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
       {/* LIVE DEMO */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px":"100px 48px", display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:isMobile?40:80, alignItems:"center" }}>
         <div>
-          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:14, fontFamily:"var(--mono)" }}>The Send Screen</p>
-          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,46px)", fontWeight:600, letterSpacing:"-2px", color:"#fff", marginBottom:16 }}>Simpler than<br />sending a text.</h2>
-          <p style={{ fontSize:isMobile?14:15, color:"#666", lineHeight:1.8, marginBottom:24 }}>Open ReviewChaser after every job. Type the mobile. Hit send. <strong style={{ color:"#888" }}>No setup. No client database. No nonsense.</strong></p>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:14, fontFamily:"var(--mono)" }}>The Send Screen</p>
+          <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,46px)", fontWeight:600, letterSpacing:"-2px", color:"var(--white)", marginBottom:16 }}>Simpler than<br />sending a text.</h2>
+          <p style={{ fontSize:isMobile?14:15, color:"var(--gray)", lineHeight:1.8, marginBottom:24 }}>Open ReviewChaser after every job. Type the mobile. Hit send. <strong style={{ color:"#888" }}>No setup. No client database. No nonsense.</strong></p>
           {["Works from your phone or desktop","Messages from a real Australian number","Customer taps link → straight to your Google page","Every send logged with timestamp"].map(f => (
-            <div key={f} style={{ display:"flex", alignItems:"center", gap:10, fontSize:14, color:"#777", marginBottom:10 }}>
+            <div key={f} style={{ display:"flex", alignItems:"center", gap:10, fontSize:14, color:"var(--gray)", marginBottom:10 }}>
               <div style={{ width:16, height:16, borderRadius:"50%", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:900, color:"#22c55e", flexShrink:0 }}>✓</div>
               {f}
             </div>
@@ -2496,8 +2496,8 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
       {/* REVIEWS */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:isMobile?"60px 20px 80px":"100px 48px" }}>
         <div style={{ textAlign:"center", marginBottom:isMobile?40:64 }}>
-          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"#444", marginBottom:12, fontFamily:"var(--mono)" }}>Real Results</p>
-          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:600, letterSpacing:"-2px", color:"#fff" }}>Tradies are getting reviews.<br /><span style={{ color:"#22c55e" }}>Every single week.</span></h2>
+          <p style={{ fontSize:11.5, fontWeight:600, letterSpacing:"2.5px", textTransform:"uppercase", color:"var(--muted)", marginBottom:12, fontFamily:"var(--mono)" }}>Real Results</p>
+          <h2 style={{ fontSize:isMobile?"clamp(26px,8vw,40px)":"clamp(30px,3.5vw,52px)", fontWeight:600, letterSpacing:"-2px", color:"var(--white)" }}>Tradies are getting reviews.<br /><span style={{ color:"#22c55e" }}>Every single week.</span></h2>
         </div>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":window.innerWidth<900?"1fr 1fr":"repeat(3,1fr)", gap:12, marginBottom:24 }}>
           {[
@@ -2508,15 +2508,15 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
             { quote:"Dead simple. No logins for my customers, no app to download. They just get a text and tap the link. Half of them leave a review within the hour.", name:"Marcus T.", biz:"MT Landscaping", location:"Gold Coast, QLD", stars:5, stat:"48hr avg. response" },
             { quote:"I was skeptical but the 7-day trial sold me. Had 8 new reviews before the trial ended. Upgraded immediately. Worth every dollar.", name:"Priya S.", biz:"Sparkle Window Cleaning", location:"Adelaide, SA", stars:5, stat:"8 reviews in 7 days" },
           ].map((r, i) => (
-            <div key={i} style={{ background:"#0c0c0c", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:"24px 22px", display:"flex", flexDirection:"column", gap:16 }}>
+            <div key={i} style={{ background:"var(--card-bg)", border:"1px solid var(--border)", borderRadius:14, padding:"24px 22px", display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ display:"flex", gap:2 }}>{[1,2,3,4,5].map(s => <span key={s} style={{ color:"#f59e0b", fontSize:13 }}>★</span>)}</div>
               <p style={{ fontSize:13.5, color:"#999", lineHeight:1.8, flex:1 }}>"{r.quote}"</p>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                   <div style={{ width:34, height:34, borderRadius:"50%", background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"#22c55e", flexShrink:0 }}>{r.name[0]}</div>
                   <div>
-                    <div style={{ fontSize:12, fontWeight:700, color:"#ccc" }}>{r.name}</div>
-                    <div style={{ fontSize:11, color:"#444" }}>{r.biz} · {r.location}</div>
+                    <div style={{ fontSize:12, fontWeight:700, color:"var(--white)" }}>{r.name}</div>
+                    <div style={{ fontSize:11, color:"var(--muted)" }}>{r.biz} · {r.location}</div>
                   </div>
                 </div>
                 <div style={{ fontSize:11, fontWeight:700, color:"#22c55e", background:"rgba(34,197,94,0.06)", border:"1px solid rgba(34,197,94,0.15)", borderRadius:999, padding:"3px 10px", whiteSpace:"nowrap", fontFamily:"var(--mono)" }}>{r.stat}</div>
@@ -2532,24 +2532,24 @@ const RCMarketingPage = ({ isMobile, onStartTrial, onSignIn, setPage }) => {
       <Divider />
       {/* FAQ */}
       <div style={{ maxWidth:660, margin:"0 auto", padding:isMobile?"60px 20px 80px":"80px 48px 100px" }}>
-        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)", fontWeight:600, letterSpacing:"-1.5px", color:"#fff", textAlign:"center", marginBottom:36 }}>Questions? Answered.</h2>
+        <h2 style={{ fontSize:isMobile?"clamp(24px,7vw,36px)":"clamp(28px,3vw,44px)", fontWeight:600, letterSpacing:"-1.5px", color:"var(--white)", textAlign:"center", marginBottom:36 }}>Questions? Answered.</h2>
         {faqs.map(([q,a],i) => (
-          <div key={i} style={{ borderBottom:"1px solid rgba(255,255,255,0.055)" }}>
-            <button onClick={() => setOpenFaq(openFaq===i?null:i)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 0", background:"none", border:"none", fontFamily:"var(--font)", fontSize:isMobile?13.5:14, fontWeight:600, color:openFaq===i?"#fff":"#aaa", textAlign:"left", gap:16 }}>
+          <div key={i} style={{ borderBottom:"1px solid var(--divider)" }}>
+            <button onClick={() => setOpenFaq(openFaq===i?null:i)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 0", background:"none", border:"none", fontFamily:"var(--font)", fontSize:isMobile?13.5:14, fontWeight:600, color:openFaq===i?"var(--white)":"var(--gray)", textAlign:"left", gap:16 }}>
               {q}
-              <div style={{ width:22, height:22, borderRadius:"50%", background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.08)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:"#444", flexShrink:0, transform:openFaq===i?"rotate(45deg)":"none", transition:"transform 0.25s" }}>+</div>
+              <div style={{ width:22, height:22, borderRadius:"50%", background:"var(--surface)", border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:"var(--gray)", flexShrink:0, transform:openFaq===i?"rotate(45deg)":"none", transition:"transform 0.25s" }}>+</div>
             </button>
             <div style={{ maxHeight:openFaq===i?300:0, overflow:"hidden", transition:"max-height 0.4s cubic-bezier(0.22,1,0.36,1)", fontSize:13.5, color:"#858585", lineHeight:1.85, paddingBottom:openFaq===i?20:0 }}>{a}</div>
           </div>
         ))}
       </div>
       {/* BOTTOM CTA */}
-      <div style={{ borderTop:"1px solid rgba(255,255,255,0.07)", background:"#0a0a0a", padding:isMobile?"48px 20px":"72px 48px", textAlign:"center" }}>
+      <div style={{ borderTop:"1px solid var(--border)", background:"var(--section-bg)", padding:isMobile?"48px 20px":"72px 48px", textAlign:"center" }}>
         <div style={{ display:"flex", justifyContent:"center", marginBottom:18 }}>
           {[1,2,3,4,5].map(i => <span key={i} style={{ fontSize:22, color:"#f59e0b" }}>★</span>)}
         </div>
-        <h2 style={{ fontSize:isMobile?"clamp(22px,7vw,34px)":"clamp(26px,3.5vw,42px)", fontWeight:600, letterSpacing:"-2px", color:"#fff", marginBottom:12 }}>Start collecting reviews today.</h2>
-        <p style={{ fontSize:isMobile?14:15, color:"#444", marginBottom:28 }}>7 days free · 20 sends · No card required</p>
+        <h2 style={{ fontSize:isMobile?"clamp(22px,7vw,34px)":"clamp(26px,3.5vw,42px)", fontWeight:600, letterSpacing:"-2px", color:"var(--white)", marginBottom:12 }}>Start collecting reviews today.</h2>
+        <p style={{ fontSize:isMobile?14:15, color:"var(--muted)", marginBottom:28 }}>7 days free · 20 sends · No card required</p>
         <button onClick={onStartTrial} className="rc-btn-primary" style={{ background:"#fff", color:"#000", padding:"14px 28px", fontSize:15, fontWeight:700, borderRadius:9, border:"none" }}>Start Free Trial →</button>
       </div>
      <Footer setPage={setPage} />
