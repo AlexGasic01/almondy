@@ -4127,11 +4127,203 @@ const CallCatchPage = ({ setPage }) => {
 };
 
 /* ════════════════════════════════════════════
+   BOOKING WIDGET (used by LanderPage)
+════════════════════════════════════════════ */
+const TIME_SLOTS = [
+  "9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM",
+  "12:00 PM","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM",
+  "3:00 PM","3:30 PM","4:00 PM","4:30 PM",
+];
+
+const BookingWidget = () => {
+  const isMobile = useIsMobile();
+  const todayBase = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
+
+  const [currentMonth, setCurrentMonth] = useState(() => new Date(todayBase.getFullYear(), todayBase.getMonth(), 1));
+  const [selectedDate, setSelectedDate]  = useState(null);
+  const [selectedTime, setSelectedTime]  = useState(null);
+  const [step, setStep]                  = useState(1);
+  const [form, setForm]                  = useState({ name:"", email:"", phone:"" });
+  const [submitting, setSubmitting]      = useState(false);
+
+  const monthLabel = currentMonth.toLocaleDateString("en-US", { month:"long", year:"numeric" });
+
+  const calDays = (() => {
+    const yr = currentMonth.getFullYear(), mo = currentMonth.getMonth();
+    const startDow = new Date(yr, mo, 1).getDay();
+    const total    = new Date(yr, mo + 1, 0).getDate();
+    const cells    = [];
+    for (let i = 0; i < startDow; i++) cells.push(null);
+    for (let d = 1; d <= total; d++) cells.push(new Date(yr, mo, d));
+    return cells;
+  })();
+
+  const isAvailable = d => {
+    if (!d || d < todayBase) return false;
+    const dow = d.getDay();
+    return dow !== 0 && dow !== 6;
+  };
+
+  const fmtLong  = d => d ? d.toLocaleDateString("en-US", { weekday:"long",  month:"long",  day:"numeric", year:"numeric" }) : "";
+  const fmtShort = d => d ? d.toLocaleDateString("en-US", { weekday:"short",  month:"short", day:"numeric", year:"numeric" }) : "";
+
+  const handleBook = async () => {
+    if (!form.name || !form.email) return;
+    setSubmitting(true);
+    try {
+      await fetch("https://formspree.io/f/mlgzbpng", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          "📅 Booking":  "30 Min Discovery Call",
+          "📆 Date":     fmtShort(selectedDate),
+          "⏰ Time":     selectedTime,
+          "👤 Name":     form.name,
+          "📧 Email":    form.email,
+          "📱 Phone":    form.phone || "—",
+        }),
+      });
+    } catch(_) {}
+    setSubmitting(false);
+    setStep(3);
+  };
+
+  /* shared input style */
+  const INP = { width:"100%", padding:"11px 14px", background:"var(--input-bg)", border:"1px solid var(--input-border)", borderRadius:8, fontSize:14, color:"var(--input-text)", outline:"none", fontFamily:"var(--font)", boxSizing:"border-box" };
+  const LBL = { fontSize:12, fontWeight:600, color:"var(--gray)", display:"block", marginBottom:6 };
+
+  /* Left info panel */
+  const InfoPanel = () => (
+    <div style={{ width:isMobile?"100%":256, minWidth:isMobile?undefined:220, padding:isMobile?"24px 24px 20px":"32px 28px", borderRight:isMobile?"none":"1px solid var(--border)", borderBottom:isMobile?"1px solid var(--border)":"none", background:"var(--card-bg)" }}>
+      <div style={{ fontSize:20, fontWeight:700, color:"var(--white)", marginBottom:12 }}>Discovery Call</div>
+      <div style={{ fontSize:13, color:"var(--gray)", display:"flex", alignItems:"center", gap:6, marginBottom:6 }}>
+        <span>🕐</span> 30 minutes
+      </div>
+      {selectedDate && (
+        <div style={{ fontSize:13, color:"var(--gray)", display:"flex", alignItems:"center", gap:6, marginBottom:6 }}>
+          <span>📅</span> {fmtShort(selectedDate)}{selectedTime ? ` · ${selectedTime}` : ""}
+        </div>
+      )}
+      <div style={{ marginTop:16, fontSize:13, color:"var(--muted)", lineHeight:1.65 }}>
+        Let's talk about your business and see if our AI systems are the right fit.
+      </div>
+      <div style={{ marginTop:16, fontSize:12, color:"var(--muted)", lineHeight:1.6 }}>
+        Fully booked? Email us at{" "}
+        <a href="mailto:alex@almondy.com" style={{ color:"var(--gray)", textDecoration:"underline" }}>alex@almondy.com</a>
+      </div>
+    </div>
+  );
+
+  /* ── Step 3: Confirmed ── */
+  if (step === 3) return (
+    <div style={{ display:"flex", flexDirection:isMobile?"column":"row", minHeight:480 }}>
+      <InfoPanel />
+      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:isMobile?"32px 24px":"48px", textAlign:"center", background:"var(--card-bg)" }}>
+        <div style={{ fontSize:52, marginBottom:16 }}>✅</div>
+        <h2 style={{ fontSize:22, fontWeight:700, color:"var(--white)", marginBottom:8 }}>You're booked!</h2>
+        <p style={{ color:"var(--gray)", fontSize:14, marginBottom:4 }}>{fmtShort(selectedDate)} · {selectedTime}</p>
+        <p style={{ color:"var(--muted)", fontSize:13, marginTop:8 }}>
+          A confirmation will be sent to <strong style={{ color:"var(--gray)" }}>{form.email}</strong>.
+        </p>
+      </div>
+    </div>
+  );
+
+  /* ── Step 2: Details form ── */
+  if (step === 2) return (
+    <div style={{ display:"flex", flexDirection:isMobile?"column":"row", minHeight:480 }}>
+      <InfoPanel />
+      <div style={{ flex:1, padding:isMobile?"24px":"40px 48px", background:"var(--card-bg)" }}>
+        <button onClick={() => setStep(1)} style={{ background:"none", border:"none", color:"var(--gray)", fontSize:13, cursor:"pointer", padding:0, marginBottom:20, display:"flex", alignItems:"center", gap:6, fontFamily:"var(--font)" }}>
+          ← Back
+        </button>
+        <h3 style={{ fontSize:16, fontWeight:700, color:"var(--white)", marginBottom:20 }}>Enter your details</h3>
+        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+          <div>
+            <label style={LBL}>Full name *</label>
+            <input value={form.name} onChange={e => setForm(f => ({...f, name:e.target.value}))} placeholder="Alex Smith" style={INP} />
+          </div>
+          <div>
+            <label style={LBL}>Email address *</label>
+            <input type="email" value={form.email} onChange={e => setForm(f => ({...f, email:e.target.value}))} placeholder="alex@example.com" style={INP} />
+          </div>
+          <div>
+            <label style={LBL}>Phone number (optional)</label>
+            <input type="tel" value={form.phone} onChange={e => setForm(f => ({...f, phone:e.target.value}))} placeholder="+1 (555) 000-0000" style={INP} />
+          </div>
+        </div>
+        <button
+          onClick={handleBook}
+          disabled={!form.name || !form.email || submitting}
+          style={{ marginTop:24, width:"100%", padding:"13px", background:form.name&&form.email?"#22c55e":"var(--surface)", color:form.name&&form.email?"#fff":"var(--muted)", border:"none", borderRadius:8, fontSize:14, fontWeight:700, cursor:form.name&&form.email?"pointer":"not-allowed", fontFamily:"var(--font)" }}
+        >
+          {submitting ? "Booking…" : "Confirm Booking →"}
+        </button>
+      </div>
+    </div>
+  );
+
+  /* ── Step 1: Calendar + time slots ── */
+  return (
+    <div style={{ display:"flex", flexDirection:isMobile?"column":"row", minHeight:480 }}>
+      <InfoPanel />
+
+      {/* Calendar */}
+      <div style={{ flex:1, padding:isMobile?"24px":"32px", borderRight:(!isMobile && selectedDate)?"1px solid var(--border)":"none", background:"var(--card-bg)" }}>
+        <h3 style={{ fontSize:16, fontWeight:700, color:"var(--white)", marginBottom:20 }}>Select Date &amp; Time</h3>
+        {/* Month nav */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:12, marginBottom:16 }}>
+          <button onClick={() => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth()-1, 1))} style={{ background:"var(--surface)", border:"1px solid var(--border)", borderRadius:8, width:32, height:32, cursor:"pointer", color:"var(--gray)", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"var(--font)" }}>‹</button>
+          <span style={{ fontWeight:600, color:"var(--white)", fontSize:15, minWidth:160, textAlign:"center" }}>{monthLabel}</span>
+          <button onClick={() => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth()+1, 1))} style={{ background:"var(--surface)", border:"1px solid var(--border)", borderRadius:8, width:32, height:32, cursor:"pointer", color:"var(--gray)", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"var(--font)" }}>›</button>
+        </div>
+        {/* Day-of-week headers */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2, marginBottom:4 }}>
+          {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(h => (
+            <div key={h} style={{ textAlign:"center", fontSize:11, fontWeight:600, color:"var(--muted)", padding:"4px 0" }}>{h}</div>
+          ))}
+        </div>
+        {/* Day cells */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2 }}>
+          {calDays.map((date, i) => {
+            if (!date) return <div key={i} />;
+            const avail  = isAvailable(date);
+            const isSel  = selectedDate && date.toDateString() === selectedDate.toDateString();
+            const isToday = date.toDateString() === todayBase.toDateString();
+            return (
+              <button key={i} onClick={() => { if (avail) { setSelectedDate(date); setSelectedTime(null); } }}
+                style={{ aspectRatio:"1", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:isSel?700:400, borderRadius:8, border:isSel?"2px solid #22c55e":isToday?"1px solid var(--border)":"1px solid transparent", background:isSel?"rgba(34,197,94,0.12)":avail?"var(--surface)":"none", color:isSel?"#22c55e":avail?"var(--white)":"var(--muted)", cursor:avail?"pointer":"default", transition:"background 0.1s" }}
+              >
+                {date.getDate()}
+              </button>
+            );
+          })}
+        </div>
+        <div style={{ marginTop:14, fontSize:12, color:"var(--muted)" }}>All times in your local timezone · Mon – Fri</div>
+      </div>
+
+      {/* Time slots — revealed once a date is picked */}
+      {selectedDate && (
+        <div style={{ width:isMobile?"100%":168, padding:isMobile?"16px 24px":"28px 16px", background:"var(--card-bg)", borderTop:isMobile?"1px solid var(--border)":"none", borderLeft:isMobile?"none":"1px solid var(--border)", display:"flex", flexDirection:"column", gap:6, overflowY:"auto", maxHeight:isMobile?240:560 }}>
+          <div style={{ fontSize:12, fontWeight:600, color:"var(--muted)", marginBottom:4, textAlign:"center" }}>{fmtShort(selectedDate)}</div>
+          {TIME_SLOTS.map(t => (
+            <button key={t} onClick={() => { setSelectedTime(t); setTimeout(() => setStep(2), 160); }}
+              style={{ padding:"9px 8px", border:selectedTime===t?"2px solid #22c55e":"1px solid var(--border)", borderRadius:8, background:selectedTime===t?"rgba(34,197,94,0.09)":"var(--surface)", color:selectedTime===t?"#22c55e":"var(--white)", fontSize:13, fontWeight:600, cursor:"pointer", textAlign:"center", transition:"all 0.1s", fontFamily:"var(--font)" }}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════════
    PAGE: LANDER  (URL-only, not in nav)
 ════════════════════════════════════════════ */
 const LanderPage = () => {
   const isMobile = useIsMobile();
-
 
   return (
     <div style={{ minHeight:"100vh", background:"var(--black)", display:"flex", flexDirection:"column" }}>
@@ -4148,21 +4340,11 @@ const LanderPage = () => {
         </p>
       </div>
 
-      {/* Cal.com booking */}
-      <div style={{ flex:1, maxWidth:1000, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
+      {/* Booking widget */}
+      <div style={{ maxWidth:1000, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
         <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
-          <iframe
-            src="https://cal.com/alexg009/30min-discovery?embed=true&theme=light&layout=month_view"
-            style={{ width:"100%", height:700, border:"none", display:"block" }}
-            title="Schedule a Discovery Call"
-          />
+          <BookingWidget />
         </div>
-        <p style={{ textAlign:"center", marginTop:14, fontSize:13, color:"var(--muted)" }}>
-          Calendar not loading?{" "}
-          <button onClick={() => window.location.reload()} style={{ background:"none", border:"none", padding:0, fontSize:13, color:"var(--gray)", textDecoration:"underline", cursor:"pointer", fontFamily:"var(--font)" }}>
-            Refresh Page
-          </button>
-        </p>
       </div>
     </div>
   );
