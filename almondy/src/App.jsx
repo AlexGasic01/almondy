@@ -4448,6 +4448,14 @@ const BookingWidget = () => {
 const LanderPage = () => {
   const isMobile = useIsMobile();
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://assets.calendly.com/assets/external/widget.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => { if (document.body.contains(script)) document.body.removeChild(script); };
+  }, []);
+
   return (
     <div style={{ minHeight:"100vh", background:"var(--black)", display:"flex", flexDirection:"column" }}>
       {/* Header */}
@@ -4463,13 +4471,17 @@ const LanderPage = () => {
         </p>
       </div>
 
-      {/* Booking widget */}
+      {/* Calendly inline widget */}
       <div style={{ maxWidth:1060, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
-        <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
-          <BookingWidget />
+        <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden", background:"#fff" }}>
+          <div
+            className="calendly-inline-widget"
+            data-url="https://calendly.com/alex-digital200/30min?hide_gdpr_banner=1&primary_color=000000&text_color=0d0d0d&background_color=ffffff"
+            style={{ minWidth:320, height: isMobile ? 750 : 700 }}
+          />
         </div>
         <p style={{ textAlign:"center", marginTop:14, fontSize:13, color:"var(--muted)" }}>
-          Having trouble?{" "}
+          Calendar not loading?{" "}
           <button onClick={() => window.location.reload()} style={{ background:"none", border:"none", padding:0, fontSize:13, color:"var(--gray)", textDecoration:"underline", cursor:"pointer", fontFamily:"var(--font)" }}>
             Refresh Page
           </button>
