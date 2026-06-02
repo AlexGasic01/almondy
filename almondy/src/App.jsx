@@ -4474,6 +4474,30 @@ const BookingWidget = () => {
 const LanderPage = () => {
   const isMobile = useIsMobile();
 
+  useEffect(() => {
+    // Tear down any stale Cal instance from previous render / navigation
+    const staleScript = document.querySelector('script[src*="app.cal.com/embed"]');
+    if (staleScript) staleScript.remove();
+    try { window.Cal = undefined; } catch(_) {}
+
+    // Cal.com IIFE — queues calls; external script processes them when loaded
+    // eslint-disable-next-line
+    (function(C,A,L){let p=function(a,ar){a.q.push(ar);};let d=C.document;C.Cal=C.Cal||function(){let cal=C.Cal;let ar=arguments;if(!cal.loaded){cal.ns={};cal.q=cal.q||[];d.head.appendChild(d.createElement("script")).src=A;cal.loaded=true;}if(ar[0]===L){const api=function(){p(api,arguments);};const namespace=ar[1];api.q=api.q||[];if(typeof namespace==="string"){cal.ns[namespace]=cal.ns[namespace]||api;p(cal.ns[namespace],ar);p(cal,[L,namespace,ar[2]]);}else p(cal,ar);return;}p(cal,ar);};C.Cal.ns={};})(window,"https://app.cal.com/embed/embed.js","init");
+
+    window.Cal("init", { origin: "https://app.cal.com" });
+    window.Cal("inline", {
+      elementOrSelector: "#cal-inline-booking",
+      calLink: "alexg009/30min-discovery",
+    });
+    window.Cal("ui", { hideEventTypeDetails: false });
+
+    return () => {
+      const s = document.querySelector('script[src*="app.cal.com/embed"]');
+      if (s) s.remove();
+      try { window.Cal = undefined; } catch(_) {}
+    };
+  }, []);
+
   return (
     <div style={{ minHeight:"100vh", background:"var(--black)", display:"flex", flexDirection:"column" }}>
       {/* Header */}
@@ -4489,11 +4513,9 @@ const LanderPage = () => {
         </p>
       </div>
 
-      {/* Booking widget */}
-      <div style={{ maxWidth:1060, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
-        <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
-          <BookingWidget />
-        </div>
+      {/* Cal.com native embed */}
+      <div style={{ flex:1, maxWidth:1060, width:"100%", margin:"0 auto", padding:isMobile?"0 0 60px":"0 0 80px" }}>
+        <div id="cal-inline-booking" style={{ width:"100%", minHeight:700 }} />
       </div>
     </div>
   );
