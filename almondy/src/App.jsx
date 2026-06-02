@@ -4129,29 +4129,9 @@ const CallCatchPage = ({ setPage }) => {
 /* ════════════════════════════════════════════
    BOOKING WIDGET  (used by LanderPage)
 ════════════════════════════════════════════ */
-/* Slots by day — Mon–Thu 4:15pm–8pm, Fri 3pm–8pm, Sat–Sun 8am–8pm */
-const SLOTS_MON_THU = [
-  "4:15 PM","4:45 PM","5:15 PM","5:45 PM",
-  "6:15 PM","6:45 PM","7:15 PM","7:30 PM",
-];
-const SLOTS_FRI = [
-  "3:00 PM","3:30 PM","4:00 PM","4:30 PM",
-  "5:00 PM","5:30 PM","6:00 PM","6:30 PM",
-  "7:00 PM","7:30 PM",
-];
-const SLOTS_WEEKEND = [
-  "8:00 AM","8:30 AM","9:00 AM","9:30 AM","10:00 AM","10:30 AM",
-  "11:00 AM","11:30 AM","12:00 PM","12:30 PM","1:00 PM","1:30 PM",
-  "2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM","4:30 PM",
-  "5:00 PM","5:30 PM","6:00 PM","6:30 PM","7:00 PM","7:30 PM",
-];
-const getSlotsForDate = d => {
-  if (!d) return [];
-  const dow = d.getDay();
-  if (dow === 5) return SLOTS_FRI;
-  if (dow === 0 || dow === 6) return SLOTS_WEEKEND;
-  return SLOTS_MON_THU;
-};
+/* Cal.com API credentials */
+const CAL_API_KEY        = "cal_live_4e34b675cfe115c850fc6389ee9b44f9";
+const CAL_EVENT_TYPE_ID  = 5865516;
 
 const COUNTRY_CODES = [
   { code:"+61", flag:"🇦🇺", label:"AU" },
@@ -4162,12 +4142,6 @@ const COUNTRY_CODES = [
   { code:"+27", flag:"🇿🇦", label:"ZA" },
 ];
 
-/* Deterministic fake-booking: ~40% of slots appear taken per day */
-const isSlotBooked = (date, idx) => {
-  const seed = date.getFullYear() * 1000000 + (date.getMonth()+1) * 10000 + date.getDate() * 100 + idx;
-  const x = Math.sin(seed * 9301 + 49297) * 233280;
-  return (x - Math.floor(x)) < 0.40;
-};
 
 const BookingWidget = () => {
   const isMobile = useIsMobile();
@@ -4177,11 +4151,7 @@ const BookingWidget = () => {
 
   const todayBase = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d; }, []);
 
-  const firstAvailable = useMemo(() => {
-    const d = new Date(todayBase);
-    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
-    return d;
-  }, [todayBase]);
+  const firstAvailable = useMemo(() => new Date(todayBase), [todayBase]);
 
   const [currentMonth, setCurrentMonth] = useState(() => new Date(firstAvailable.getFullYear(), firstAvailable.getMonth(), 1));
   const [selectedDate, setSelectedDate]  = useState(firstAvailable);
@@ -4190,6 +4160,35 @@ const BookingWidget = () => {
   const [countryCode, setCountryCode]    = useState(() => isAU ? "+61" : "+1");
   const [form, setForm]                  = useState({ name:"", email:"", phone:"" });
   const [submitting, setSubmitting]      = useState(false);
+  const [calSlots, setCalSlots]          = useState([]);
+  const [slotsLoading, setSlotsLoading]  = useState(false);
+
+  useEffect(() => {
+    if (!selectedDate) return;
+    setCalSlots([]);
+    setSlotsLoading(true);
+    const startOfDay = new Date(selectedDate); startOfDay.setHours(0,0,0,0);
+    const endOfDay   = new Date(selectedDate); endOfDay.setHours(23,59,59,999);
+    const params = new URLSearchParams({
+      apiKey: CAL_API_KEY,
+      eventTypeId: CAL_EVENT_TYPE_ID,
+      startTime: startOfDay.toISOString(),
+      endTime:   endOfDay.toISOString(),
+      timeZone:  timezone,
+    });
+    fetch(`https://api.cal.com/v1/slots?${params}`)
+      .then(r => r.json())
+      .then(data => {
+        const dateKey = selectedDate.toLocaleDateString("en-CA");
+        const raw = (data.slots && data.slots[dateKey]) || [];
+        setCalSlots(raw.map(s => ({
+          isoTime: s.time,
+          time: new Date(s.time).toLocaleTimeString("en-US", { hour:"numeric", minute:"2-digit", hour12:true }),
+        })));
+      })
+      .catch(() => setCalSlots([]))
+      .finally(() => setSlotsLoading(false));
+  }, [selectedDate, timezone]);
 
   const monthLabel = currentMonth.toLocaleDateString("en-US", { month:"long", year:"numeric" });
 
@@ -4208,11 +4207,6 @@ const BookingWidget = () => {
     const cmp = new Date(d); cmp.setHours(0,0,0,0);
     return cmp >= todayBase;
   };
-
-  const slots = useMemo(() => {
-    if (!selectedDate) return [];
-    return getSlotsForDate(selectedDate).map((t, i) => ({ time:t, booked: isSlotBooked(selectedDate, i) }));
-  }, [selectedDate]);
 
   const fmtShort   = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric", year:"numeric" }) : "";
   const fmtSlotHdr = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric" }) : "";
@@ -4233,18 +4227,26 @@ const BookingWidget = () => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      await fetch("https://formspree.io/f/mlgzbpng", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          "📅 Booking": "30 Min Discovery Call",
-          "📆 Date":    fmtShort(selectedDate),
-          "⏰ Time":    selectedTime,
-          "👤 Name":    form.name.trim(),
-          "📧 Email":   form.email.trim(),
-          "📱 Phone":   form.phone.trim() ? `${countryCode} ${form.phone.trim()}` : "—",
-          "🌐 Timezone": timezone,
-        }),
+      const slot     = calSlots.find(s => s.time === selectedTime);
+      const startISO = slot ? slot.isoTime : "";
+      const endISO   = startISO ? new Date(new Date(startISO).getTime() + 30 * 60000).toISOString() : "";
+      const body = {
+        eventTypeId: CAL_EVENT_TYPE_ID,
+        start: startISO,
+        end:   endISO,
+        responses: {
+          name:  form.name.trim(),
+          email: form.email.trim(),
+          ...(form.phone.trim() ? { phone: `${countryCode} ${form.phone.trim()}` } : {}),
+        },
+        timeZone: timezone,
+        language: "en",
+        metadata: {},
+      };
+      await fetch(`https://api.cal.com/v1/bookings?apiKey=${CAL_API_KEY}`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(body),
       });
     } catch(_) {}
     setSubmitting(false);
@@ -4390,9 +4392,6 @@ const BookingWidget = () => {
             const avail   = isAvailable(date);
             const isSel   = selectedDate && date.toDateString() === selectedDate.toDateString();
             const isToday = date.toDateString() === todayBase.toDateString();
-            /* count available slots for this day to show scarcity hint */
-            const freeCount = avail ? getSlotsForDate(date).filter((_,idx) => !isSlotBooked(date, idx)).length : 0;
-            const almostFull = avail && freeCount > 0 && freeCount <= 4;
             return (
               <div key={i} style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"3px 0" }}>
                 <div
@@ -4402,8 +4401,6 @@ const BookingWidget = () => {
                   {date.getDate()}
                   {isToday && !isSel && <span style={{ position:"absolute", bottom:3, width:4, height:4, borderRadius:"50%", background:"var(--white)" }} />}
                 </div>
-                {/* amber dot = only a few slots left */}
-                {almostFull && !isSel && <span style={{ width:4, height:4, borderRadius:"50%", background:"#f59e0b", marginTop:2 }} />}
               </div>
             );
           })}
@@ -4422,20 +4419,30 @@ const BookingWidget = () => {
           <div style={{ fontSize:13, fontWeight:600, color:"var(--gray)", marginBottom:12, textAlign:"center" }}>
             {fmtSlotHdr(selectedDate)}
           </div>
-          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-            {slots.map(({ time, booked }) => (
-              <button
-                key={time}
-                disabled={booked}
-                onClick={() => { if (!booked) { setSelectedTime(time); setTimeout(() => setStep(2), 160); } }}
-                style={{ padding:"11px 8px", border:"1px solid var(--border)", borderRadius:8, background:booked?"var(--surface)":"var(--card-bg)", color:booked?"var(--muted)":"var(--white)", fontSize:13, fontWeight:500, cursor:booked?"default":"pointer", textAlign:"center", fontFamily:"var(--font)", transition:"border-color 0.1s, background 0.1s", opacity:booked?0.55:1 }}
-                onMouseEnter={e => { if (!booked) { e.currentTarget.style.borderColor="var(--white)"; e.currentTarget.style.background="var(--surface)"; } }}
-                onMouseLeave={e => { if (!booked) { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--card-bg)"; } }}
-              >
-                {booked ? <s style={{ opacity:0.6 }}>{time}</s> : time}
-              </button>
-            ))}
-          </div>
+          {slotsLoading ? (
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"center", padding:"32px 0", color:"var(--muted)", fontSize:13 }}>
+              <svg style={{ marginRight:8, animation:"spin 1s linear infinite" }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+              Loading…
+            </div>
+          ) : calSlots.length === 0 ? (
+            <div style={{ textAlign:"center", padding:"32px 0", color:"var(--muted)", fontSize:13 }}>
+              No times available
+            </div>
+          ) : (
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              {calSlots.map(({ time }) => (
+                <button
+                  key={time}
+                  onClick={() => { setSelectedTime(time); setTimeout(() => setStep(2), 160); }}
+                  style={{ padding:"11px 8px", border:"1px solid var(--border)", borderRadius:8, background:"var(--card-bg)", color:"var(--white)", fontSize:13, fontWeight:500, cursor:"pointer", textAlign:"center", fontFamily:"var(--font)", transition:"border-color 0.1s, background 0.1s" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor="var(--white)"; e.currentTarget.style.background="var(--surface)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--card-bg)"; }}
+                >
+                  {time}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
