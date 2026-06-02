@@ -4473,11 +4473,12 @@ const LanderPage = () => {
 
       {/* Calendly inline widget */}
       <div style={{ maxWidth:1060, width:"100%", margin:"0 auto", padding:isMobile?"0 12px 60px":"0 48px 80px" }}>
-        <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden", background:"#fff", lineHeight:0 }}>
+        <div style={{ border:"1px solid var(--border)", borderRadius:16, overflow:"hidden", lineHeight:0 }}>
           <div
             className="calendly-inline-widget"
-            data-url="https://calendly.com/alex-digital200/30min?hide_gdpr_banner=1&primary_color=000000&text_color=0d0d0d&background_color=ffffff"
-            style={{ width:"100%", minWidth:320, height: isMobile ? 900 : 750, display:"block" }}
+            data-url="https://calendly.com/alex-digital200/30min?hide_gdpr_banner=1&layout=month_view&hide_event_type_details=0&primary_color=000000&text_color=0d0d0d&background_color=ffffff"
+            data-resize="true"
+            style={{ width:"100%", minWidth:320, minHeight: isMobile ? 900 : 700 }}
           />
         </div>
         <p style={{ textAlign:"center", marginTop:14, fontSize:13, color:"var(--muted)" }}>
