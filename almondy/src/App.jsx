@@ -4162,23 +4162,26 @@ const BookingWidget = () => {
   const [submitting, setSubmitting]      = useState(false);
   const [calSlots, setCalSlots]          = useState([]);
   const [slotsLoading, setSlotsLoading]  = useState(false);
+  const [slotsError, setSlotsError]      = useState(null);
 
   useEffect(() => {
     if (!selectedDate) return;
     setCalSlots([]);
+    setSlotsError(null);
     setSlotsLoading(true);
     const startOfDay = new Date(selectedDate); startOfDay.setHours(0,0,0,0);
     const endOfDay   = new Date(selectedDate); endOfDay.setHours(23,59,59,999);
     const params = new URLSearchParams({
-      apiKey: CAL_API_KEY,
+      apiKey:      CAL_API_KEY,
       eventTypeId: CAL_EVENT_TYPE_ID,
-      startTime: startOfDay.toISOString(),
-      endTime:   endOfDay.toISOString(),
-      timeZone:  timezone,
+      startTime:   startOfDay.toISOString(),
+      endTime:     endOfDay.toISOString(),
+      timeZone:    timezone,
     });
-    fetch(`https://api.cal.com/v1/slots?${params}`)
-      .then(r => r.json())
-      .then(data => {
+    fetch(`/api/cal-slots?${params}`)
+      .then(async r => {
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || `Error ${r.status}`);
         const dateKey = selectedDate.toLocaleDateString("en-CA");
         const raw = (data.slots && data.slots[dateKey]) || [];
         setCalSlots(raw.map(s => ({
@@ -4186,7 +4189,7 @@ const BookingWidget = () => {
           time: new Date(s.time).toLocaleTimeString("en-US", { hour:"numeric", minute:"2-digit", hour12:true }),
         })));
       })
-      .catch(() => setCalSlots([]))
+      .catch(() => setSlotsError("Couldn't load times — please refresh."))
       .finally(() => setSlotsLoading(false));
   }, [selectedDate, timezone]);
 
@@ -4211,7 +4214,8 @@ const BookingWidget = () => {
   const fmtShort   = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric", year:"numeric" }) : "";
   const fmtSlotHdr = d => d ? d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric" }) : "";
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors]       = useState({});
+  const [bookError, setBookError] = useState(null);
 
   const validate = () => {
     const e = {};
@@ -4226,31 +4230,36 @@ const BookingWidget = () => {
   const handleBook = async () => {
     if (!validate()) return;
     setSubmitting(true);
+    setBookError(null);
     try {
       const slot     = calSlots.find(s => s.time === selectedTime);
-      const startISO = slot ? slot.isoTime : "";
+      const startISO = slot?.isoTime || "";
       const endISO   = startISO ? new Date(new Date(startISO).getTime() + 30 * 60000).toISOString() : "";
-      const body = {
-        eventTypeId: CAL_EVENT_TYPE_ID,
-        start: startISO,
-        end:   endISO,
-        responses: {
-          name:  form.name.trim(),
-          email: form.email.trim(),
-          ...(form.phone.trim() ? { phone: `${countryCode} ${form.phone.trim()}` } : {}),
-        },
-        timeZone: timezone,
-        language: "en",
-        metadata: {},
-      };
-      await fetch(`https://api.cal.com/v1/bookings?apiKey=${CAL_API_KEY}`, {
+      const res = await fetch(`/api/cal-book?apiKey=${CAL_API_KEY}`, {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(body),
+        body: JSON.stringify({
+          eventTypeId: CAL_EVENT_TYPE_ID,
+          start:       startISO,
+          end:         endISO,
+          responses: {
+            name:  form.name.trim(),
+            email: form.email.trim(),
+            ...(form.phone.trim() ? { phone: `${countryCode} ${form.phone.trim()}` } : {}),
+          },
+          timeZone: timezone,
+          language: "en",
+          metadata: {},
+        }),
       });
-    } catch(_) {}
-    setSubmitting(false);
-    setStep(3);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || data.error || `Error ${res.status}`);
+      setStep(3);
+    } catch (err) {
+      setBookError(err.message || "Something went wrong — please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const INP = { width:"100%", padding:"11px 14px", background:"var(--input-bg)", border:"1px solid var(--input-border)", borderRadius:8, fontSize:14, color:"var(--input-text)", outline:"none", fontFamily:"var(--font)", boxSizing:"border-box" };
@@ -4351,10 +4360,15 @@ const BookingWidget = () => {
             {errors.phone && <div style={{ fontSize:12, color:"#f87171", marginTop:5 }}>{errors.phone}</div>}
           </div>
         </div>
+        {bookError && (
+          <div style={{ marginTop:14, padding:"10px 14px", background:"rgba(248,113,113,0.1)", border:"1px solid rgba(248,113,113,0.3)", borderRadius:8, color:"#f87171", fontSize:13 }}>
+            {bookError}
+          </div>
+        )}
         <button
           onClick={handleBook}
           disabled={submitting}
-          style={{ marginTop:24, width:"100%", padding:"13px", background:"var(--green)", color:"#fff", border:"none", borderRadius:8, fontSize:14, fontWeight:700, cursor:submitting?"not-allowed":"pointer", fontFamily:"var(--font)", opacity:submitting?0.7:1 }}
+          style={{ marginTop:14, width:"100%", padding:"13px", background:"var(--green)", color:"#fff", border:"none", borderRadius:8, fontSize:14, fontWeight:700, cursor:submitting?"not-allowed":"pointer", fontFamily:"var(--font)", opacity:submitting?0.7:1 }}
         >
           {submitting ? "Booking…" : "Confirm Booking →"}
         </button>
@@ -4423,6 +4437,11 @@ const BookingWidget = () => {
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", padding:"32px 0", color:"var(--muted)", fontSize:13 }}>
               <svg style={{ marginRight:8, animation:"spin 1s linear infinite" }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
               Loading…
+            </div>
+          ) : slotsError ? (
+            <div style={{ textAlign:"center", padding:"24px 8px", color:"#f87171", fontSize:12, lineHeight:1.5 }}>
+              {slotsError}<br />
+              <button onClick={() => { setSlotsError(null); setSlotsLoading(true); const s = new Date(selectedDate); s.setHours(0,0,0,0); const e = new Date(selectedDate); e.setHours(23,59,59,999); const p = new URLSearchParams({ apiKey:CAL_API_KEY, eventTypeId:CAL_EVENT_TYPE_ID, startTime:s.toISOString(), endTime:e.toISOString(), timeZone:timezone }); fetch(`/api/cal-slots?${p}`).then(async r => { const d = await r.json(); if(!r.ok) throw new Error(); const k = selectedDate.toLocaleDateString("en-CA"); const raw=(d.slots&&d.slots[k])||[]; setCalSlots(raw.map(x=>({isoTime:x.time,time:new Date(x.time).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true})}))); }).catch(()=>setSlotsError("Couldn't load times — please refresh.")).finally(()=>setSlotsLoading(false)); }} style={{ marginTop:8, background:"none", border:"1px solid var(--border)", borderRadius:6, padding:"5px 12px", color:"var(--gray)", fontSize:12, cursor:"pointer", fontFamily:"var(--font)" }}>Retry</button>
             </div>
           ) : calSlots.length === 0 ? (
             <div style={{ textAlign:"center", padding:"32px 0", color:"var(--muted)", fontSize:13 }}>
